@@ -1,0 +1,10 @@
+fullnameOverride: "auth-service"
+image:
+  repository: ghcr.io/amolsurjuse/auth-service
+service:
+  port: 8080
+containerPort: 8080
+secrets:
+  env:
+    DB_PASSWORD: "db-password"
+    JWT_SECRET: "jwt-secret"
