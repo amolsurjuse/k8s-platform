@@ -1,0 +1,19 @@
+common:
+  replicaCount: 2
+  env:
+    SPRING_PROFILES_ACTIVE: "qa"
+  resources:
+    requests:
+      cpu: 300m
+      memory: 768Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  ingress:
+    enabled: true
+    className: "nginx"
+    host: "auth-qa.example.com"
+    tls:
+      enabled: true
+  secrets:
+    existingSecretName: "auth-service-qa-secrets"
