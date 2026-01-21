@@ -19,7 +19,7 @@ ingress:
     enabled: false
 
 secrets:
-  existingSecretName: "auth-service-dev-secrets"
+  existingSecretName: ""
 
 hpa:
   enabled: false
@@ -30,3 +30,4 @@ pdb:
 metrics:
   servicemonitor:
     enabled: false
+
