@@ -5,9 +5,7 @@ image:
   tag: "16"
 
 auth:
-  username: appuser
-  password: devpassword
-  database: appdb
+  existingSecretName: postgresql-dev-secret
 
 persistence:
   size: 10Gi
