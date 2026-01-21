@@ -5,6 +5,9 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
+nameOverride: ""
+fullnameOverride: ""
+
 service:
   type: ClusterIP
   port: 8080
@@ -13,6 +16,15 @@ containerPort: 8080
 
 env: {}
 
+config:
+  enabled: true
+  data: {}
+
+# Prefer ExternalSecrets; this supports referencing an existing K8s Secret
+secrets:
+  existingSecretName: ""
+  env: {}   # ENV_NAME: secretKey
+
 resources:
   requests:
     cpu: 200m
@@ -20,6 +32,28 @@ resources:
   limits:
     cpu: "1"
     memory: 1Gi
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 40
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+  path: /actuator/health/liveness
+  failureThreshold: 30
+  periodSeconds: 10
 
 ingress:
   enabled: false
@@ -34,7 +68,31 @@ ingress:
 
 hpa:
   enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
 
-secrets:
-  existingSecretName: ""
-  env: {}
+pdb:
+  enabled: true
+  minAvailable: 1
+
+podAnnotations: {}
+podLabels: {}
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+metrics:
+  servicemonitor:
+    enabled: false
+    interval: 30s
+    scrapePath: /actuator/prometheus
