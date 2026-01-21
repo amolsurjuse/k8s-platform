@@ -36,28 +36,24 @@ spec:
             - name: http
               containerPort: {{ .Values.containerPort }}
           env:
-            {{- range $k, $v := .Values.env }}
+            {{- /* ConfigMap / plain values */}}
+            {{- range $k, $v := (.Values.environment_variables.configmap.values | default dict) }}
             - name: {{ $k }}
               value: {{ $v | quote }}
             {{- end }}
 
-            {{- if .Values.config.enabled }}
-            {{- range $k, $v := .Values.config.data }}
-            - name: {{ $k }}
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "common.fullname" . }}-config
-                  key: {{ $k }}
+            {{- /* Secret-backed env vars */}}
+            {{- $secretName := .Values.environment_variables.secretRefName | default "" }}
+            {{- if .Values.environment_variables.secrets }}
+            {{- if not $secretName }}
+              {{- fail "environment_variables.secretRefName is required when secrets are defined" }}
             {{- end }}
-            {{- end }}
-
-            {{- if .Values.secrets.existingSecretName }}
-            {{- range $envName, $secretKey := .Values.secrets.env }}
+            {{- range $envName, $_ := .Values.environment_variables.secrets }}
             - name: {{ $envName }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ $.Values.secrets.existingSecretName }}
-                  key: {{ $secretKey }}
+                  name: {{ $secretName }}
+                  key: {{ $envName }}
             {{- end }}
             {{- end }}
 
