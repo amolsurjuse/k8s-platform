@@ -1,0 +1,14 @@
+fullnameOverride: postgresql
+
+image:
+  repository: postgres
+  tag: "16"
+
+auth:
+  existingSecretName: postgresql-dev-secret
+
+persistence:
+  size: 10Gi
+
+pdb:
+  enabled: false

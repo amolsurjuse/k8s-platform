@@ -1,6 +1,6 @@
 fullnameOverride: "auth-service"
 image:
-  repository: ghcr.io/amolsurjuse/auth-service
+  repository: amolsurjuse/auth-service
 service:
   port: 8080
 containerPort: 8080

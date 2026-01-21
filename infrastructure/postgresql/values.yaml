@@ -1,0 +1,64 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "16"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 5432
+
+auth:
+  username: postgres
+  password: ""            # REQUIRED if existingSecretName is empty
+  database: appdb
+  existingSecretName: ""  # if set, chart won't create a Secret
+  secretKeys:
+    usernameKey: POSTGRES_USER
+    passwordKey: POSTGRES_PASSWORD
+    databaseKey: POSTGRES_DB
+
+persistence:
+  enabled: true
+  storageClass: ""        # optional
+  size: 20Gi
+  accessModes: ["ReadWriteOnce"]
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+postgresql:
+  config: {}
+  # Example:
+  # config:
+  #   max_connections: "200"
+  #   shared_buffers: "256MB"
+  #   work_mem: "8MB"
+
+initdb:
+  enabled: false
+  scripts: {}
+  # Example:
+  # scripts:
+  #   01_create_extensions.sql: |
+  #     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+podAnnotations: {}
+podLabels: {}
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

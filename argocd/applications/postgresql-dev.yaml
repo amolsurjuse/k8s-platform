@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgresql-dev
+  namespace: argocd
+spec:
+  project: amy
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: infrastructure/postgresql
+    helm:
+      releaseName: postgresql
+      valueFiles:
+        - ../../platform-config/infrastructure/postgresql/us/values/dev.yaml
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

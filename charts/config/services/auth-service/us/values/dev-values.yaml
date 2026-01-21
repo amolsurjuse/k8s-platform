@@ -1,0 +1,51 @@
+environment_variables:
+  secretRefName: core-web-secrets-qa
+  secrets:
+    ENV_CORE_API_SECRET_TOKEN_KEY: replace
+    ENV_AUTH_DATASOURCE_USERNAME: replace
+    ENV_AUTH_DATASOURCE_PASSWORD: replace
+
+  secret_files:
+    CORE_WEB_KAFKA_KEYSTORE: kafka.client.keystore.qa.jks
+
+  configmap:
+    values:
+      ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/appdb"
+
+
+
+autoscaling:
+  minReplicas: 2
+  maxReplicas: 2
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "auth-dev.example.com"
+  tls:
+    enabled: false
+
+secrets:
+  existingSecretName: ""
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false
+

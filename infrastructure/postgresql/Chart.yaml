@@ -1,0 +1,6 @@
+apiVersion: v2
+name: postgresql
+description: PostgreSQL Helm chart (StatefulSet + PVC + Secret + ConfigMap)
+type: application
+version: 1.0.0
+appVersion: "16"
