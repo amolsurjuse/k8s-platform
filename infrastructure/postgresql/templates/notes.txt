@@ -1,0 +1,15 @@
+PostgreSQL deployed.
+
+Service:
+  {{ include "postgresql.fullname" . }}:{{ .Values.service.port }}
+
+Database:
+  DB={{ .Values.auth.database }}
+  USER={{ .Values.auth.username }}
+
+If using an existing secret:
+  auth.existingSecretName=<your-secret>
+Expected keys:
+  {{ .Values.auth.secretKeys.usernameKey }},
+  {{ .Values.auth.secretKeys.passwordKey }},
+  {{ .Values.auth.secretKeys.databaseKey }}

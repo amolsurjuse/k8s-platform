@@ -1,0 +1,16 @@
+fullnameOverride: postgresql
+
+image:
+  repository: postgres
+  tag: "16"
+
+auth:
+  username: appuser
+  password: devpassword
+  database: appdb
+
+persistence:
+  size: 10Gi
+
+pdb:
+  enabled: false
