@@ -1,12 +1,11 @@
 environment_variables:
-  secretRefName: core-web-secrets-qa
+  secretRefName: auth-secrets-dev
   secrets:
-    ENV_CORE_API_SECRET_TOKEN_KEY: replace
     ENV_AUTH_DATASOURCE_USERNAME: replace
     ENV_AUTH_DATASOURCE_PASSWORD: replace
 
   secret_files:
-    CORE_WEB_KAFKA_KEYSTORE: kafka.client.keystore.qa.jks
+    ENV_AUTH_KAFKA_KEYSTORE: ""
 
   configmap:
     values:
