@@ -9,7 +9,7 @@ environment_variables:
 
   configmap:
     values:
-      ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/appdb"
+      ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
 
 
 
