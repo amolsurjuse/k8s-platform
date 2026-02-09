@@ -1,8 +1,7 @@
-common:
-  image:
-    repository: ghcr.io/amolsurjuse/auth-service
-  service:
-    port: 8080
-  containerPort: 8080
-  env:
-    JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"
+image:
+  repository: ghcr.io/amolsurjuse/auth-service
+service:
+  port: 8080
+containerPort: 8080
+env:
+  JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"

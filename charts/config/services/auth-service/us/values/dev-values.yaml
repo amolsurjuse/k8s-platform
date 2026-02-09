@@ -1,21 +1,10 @@
-environment_variables:
-  secretRefName: auth-secrets-dev
-  secrets:
-    ENV_AUTH_DATASOURCE_USERNAME: replace
-    ENV_AUTH_DATASOURCE_PASSWORD: replace
+config:
+  enabled: true
+  data:
+    ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
 
-  secret_files:
-    ENV_AUTH_KAFKA_KEYSTORE: ""
-
-  configmap:
-    values:
-      ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
-
-
-
-autoscaling:
-  minReplicas: 2
-  maxReplicas: 2
+secrets:
+  existingSecretName: "auth-secrets-dev"
 
 env:
   SPRING_PROFILES_ACTIVE: "dev"
@@ -34,9 +23,6 @@ ingress:
   host: "auth-dev.example.com"
   tls:
     enabled: false
-
-secrets:
-  existingSecretName: ""
 
 hpa:
   enabled: false
