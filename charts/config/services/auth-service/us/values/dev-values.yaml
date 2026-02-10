@@ -8,6 +8,7 @@ secrets:
 
 env:
   SPRING_PROFILES_ACTIVE: "dev"
+  SPRING_LIQUIBASE_ENABLED: "true"
 
 resources:
   requests:
