@@ -11,7 +11,7 @@ secrets:
 
 config:
   data:
-    LOGGING_LEVEL_ROOT: "INFO"
+    LOGGING_LEVEL_ROOT: "DEUBUG"
     LOGGING_LEVEL_COM_ELECTRAHUB_IDENTITY: "INFO"
     LOGGING_LEVEL_ORG_SPRINGFRAMEWORK: "WARN"
     LOGGING_LEVEL_ORG_HIBERNATE: "WARN"
@@ -33,6 +33,7 @@ config:
     APP_SECURITY_JWT_SECRET: "CHANGE_ME_TO_A_LONG_RANDOM_64+_CHAR_SECRET_CHANGE_ME"
     APP_SECURITY_JWT_ACCESS_TOKEN_TTL_MINUTES: "15"
     APP_SECURITY_JWT_REFRESH_TOKEN_TTL_DAYS: "30"
+    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "http://localhost:4200,http://localhost:8080,http://driver-portal-dev.electrahub.com:8080,https://driver-portal-dev.electrahub.com,https://driver-portal-dev.electrahub.com:8443,https://driver-portal-*.electrahub.com,https://driver-portal-*.electrahub.com:*"
     APP_COOKIES_REFRESH_NAME: "__Host-rt"
     APP_COOKIES_DEVICE_NAME: "did"
     APP_COOKIES_SAME_SITE: "Strict"
