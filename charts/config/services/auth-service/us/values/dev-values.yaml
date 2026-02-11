@@ -23,10 +23,11 @@ ingress:
   className: "nginx"
   host: "auth-dev.electrahub.com"
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   tls:
-    enabled: false
+    enabled: true
+    secretName: "electrahub-dev-tls"
 
 hpa:
   enabled: false

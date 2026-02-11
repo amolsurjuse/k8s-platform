@@ -15,12 +15,13 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "/$2"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   path: /ocpp-simulator(/|$)(.*)
   pathType: ImplementationSpecific
   tls:
-    enabled: false
+    enabled: true
+    secretName: "electrahub-dev-tls"
 
 hpa:
   enabled: false

@@ -13,12 +13,13 @@ ingress:
   className: "nginx"
   host: "driver-portal-dev.electrahub.com"
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   path: /
   pathType: Prefix
   tls:
-    enabled: false
+    enabled: true
+    secretName: "electrahub-dev-tls"
 
 hpa:
   enabled: false
