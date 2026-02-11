@@ -1,0 +1,10 @@
+replicaCount: 3
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "driver-portal.example.com"
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: true
