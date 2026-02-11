@@ -11,7 +11,7 @@ resources:
 ingress:
   enabled: true
   className: "nginx"
-  host: "driver-portal-dev.example.com"
+  host: "driver-portal-dev.electrahub.com"
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"

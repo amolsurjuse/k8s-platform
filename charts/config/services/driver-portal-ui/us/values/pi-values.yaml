@@ -3,7 +3,7 @@ replicaCount: 2
 ingress:
   enabled: true
   className: "nginx"
-  host: "driver-portal-pi.example.com"
+  host: "driver-portal-pi.electrahub.com"
   path: /
   pathType: Prefix
   tls:
