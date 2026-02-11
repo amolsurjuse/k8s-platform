@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/ocpi-simulator-ui
+service:
+  port: 80
+containerPort: 80
