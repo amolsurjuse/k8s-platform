@@ -21,7 +21,10 @@ resources:
 ingress:
   enabled: true
   className: "nginx"
-  host: "auth-dev.example.com"
+  host: "auth-dev.electrahub.com"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
   tls:
     enabled: false
 
