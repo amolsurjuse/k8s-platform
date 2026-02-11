@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/ocpi-simulator
+service:
+  port: 8081
+containerPort: 8081

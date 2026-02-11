@@ -1,0 +1,26 @@
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "ocpp-simulator-dev.example.com"
+  tls:
+    enabled: false
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false

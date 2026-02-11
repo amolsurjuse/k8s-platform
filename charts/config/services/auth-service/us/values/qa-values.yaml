@@ -1,4 +1,8 @@
 replicaCount: 2
+config:
+  enabled: true
+  data:
+    ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
 env:
   SPRING_PROFILES_ACTIVE: "qa"
 resources:
