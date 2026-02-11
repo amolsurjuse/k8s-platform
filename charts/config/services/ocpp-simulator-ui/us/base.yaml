@@ -24,3 +24,6 @@ livenessProbe:
 
 startupProbe:
   enabled: false
+
+securityContext:
+  enabled: false
