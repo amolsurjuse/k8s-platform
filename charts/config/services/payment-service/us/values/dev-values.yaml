@@ -1,7 +1,7 @@
 secrets:
   existingSecretName: "postgresql-dev-secret"
 
-replicaCount: 2
+replicaCount: 1
 
 resources:
   requests:
