@@ -1,3 +1,6 @@
+secrets:
+  existingSecretName: "postgresql-dev-secret"
+
 replicaCount: 2
 
 resources:
