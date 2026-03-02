@@ -20,6 +20,9 @@ config:
     MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
     ENV_USER_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
     SPRING_LIQUIBASE_ENABLED: "true"
+    SPRING_LIQUIBASE_DEFAULT_SCHEMA: "user_mgmt"
+    SPRING_LIQUIBASE_LIQUIBASE_SCHEMA: "public"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: "user_mgmt"
     APP_PAYMENT_SERVICE_BASE_URL: "http://payment-service:8083"
 
 readinessProbe:
