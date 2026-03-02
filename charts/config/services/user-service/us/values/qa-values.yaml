@@ -1,0 +1,27 @@
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "user-service-qa.electrahub.com"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: true
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false

@@ -1,0 +1,49 @@
+fullnameOverride: "user-service"
+image:
+  repository: amolsurjuse/user-service
+
+service:
+  port: 8082
+containerPort: 8082
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+
+secrets:
+  env:
+    ENV_USER_DATASOURCE_USERNAME: "POSTGRES_USER"
+    ENV_USER_DATASOURCE_PASSWORD: "POSTGRES_PASSWORD"
+
+config:
+  data:
+    SERVER_PORT: "8082"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    ENV_USER_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
+    SPRING_LIQUIBASE_ENABLED: "true"
+    APP_PAYMENT_SERVICE_BASE_URL: "http://payment-service:8083"
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000

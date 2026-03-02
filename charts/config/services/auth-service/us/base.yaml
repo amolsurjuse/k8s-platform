@@ -47,3 +47,4 @@ config:
     SPRINGDOC_API_DOCS_PATH: "/v3/api-docs"
     SPRINGDOC_SWAGGER_UI_PATH: "/swagger-ui.html"
     SPRINGDOC_SWAGGER_UI_DISABLE_DEFAULT_URL: "false"
+    APP_USER_SERVICE_BASE_URL: "http://user-service:8082"
