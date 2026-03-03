@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-socket-connector
+  namespace: argocd
+spec:
+  project: amy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: web-socket-connector
+      valueFiles:
+        - web-socket-connector/values.yaml
+        - ../config/services/web-socket-connector/us/values/dev-values.yaml
+        - ../config/services/web-socket-connector/us/version/dev-version.yaml
+        - ../config/services/web-socket-connector/us/base.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

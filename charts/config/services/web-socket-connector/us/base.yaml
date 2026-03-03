@@ -1,25 +1,19 @@
-fullnameOverride: "ocpp-simulator"
+fullnameOverride: "web-socket-connector"
 image:
-  repository: amolsurjuse/ocpi-simulator
+  repository: amolsurjuse/web-socket-connector
 
 service:
-  port: 8081
-containerPort: 8081
+  port: 8091
+containerPort: 8091
 
 config:
   data:
-    PORT: "8081"
-    BASE_URL: "http://ocpp-simulator:8081"
-    WS_CONNECTOR_BASE_URL: "http://web-socket-connector:8091"
+    PORT: "8091"
     LOG_LEVEL: "info"
-    EVENT_INTERVAL: "5s"
-    READ_TIMEOUT: "10s"
-    WRITE_TIMEOUT: "20s"
-    SHUTDOWN_TIMEOUT: "10s"
 
 readinessProbe:
   enabled: true
-  path: /readyz
+  path: /healthz
   initialDelaySeconds: 5
   periodSeconds: 10
   timeoutSeconds: 2
