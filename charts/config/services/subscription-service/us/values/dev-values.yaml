@@ -1,0 +1,37 @@
+secrets:
+  existingSecretName: "postgresql-dev-secret"
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "dev.electrahub.com"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  path: /subscription(/|$)(.*)
+  pathType: ImplementationSpecific
+  tls:
+    enabled: true
+    secretName: "electrahub-dev-tls"
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false
