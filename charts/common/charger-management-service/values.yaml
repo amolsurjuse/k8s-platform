@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/charger-management-service
+service:
+  port: 8086
+containerPort: 8086
