@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-gateway
+  namespace: argocd
+spec:
+  project: amy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: api-gateway
+      valueFiles:
+        - api-gateway/values.yaml
+        - ../config/services/api-gateway/us/values/dev-values.yaml
+        - ../config/services/api-gateway/us/version/dev-version.yaml
+        - ../config/services/api-gateway/us/base.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

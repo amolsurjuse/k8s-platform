@@ -1,0 +1,69 @@
+fullnameOverride: "api-gateway"
+image:
+  repository: amolsurjuse/api-gateway
+
+service:
+  port: 8090
+containerPort: 8090
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+
+config:
+  data:
+    SERVER_PORT: "8090"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+
+    # Redis (shared with auth-service)
+    SPRING_DATA_REDIS_HOST: "redis"
+    SPRING_DATA_REDIS_PORT: "6379"
+    SPRING_DATA_REDIS_TIMEOUT: "2s"
+    SPRING_DATA_REDIS_LETTUCE_POOL_ENABLED: "true"
+    SPRING_DATA_REDIS_LETTUCE_POOL_MAX_ACTIVE: "16"
+    SPRING_DATA_REDIS_LETTUCE_POOL_MAX_IDLE: "16"
+    SPRING_DATA_REDIS_LETTUCE_POOL_MIN_IDLE: "2"
+
+    # JWT (same secret and issuer as auth-service)
+    APP_SECURITY_JWT_ISSUER: "auth-service"
+    APP_SECURITY_JWT_SECRET: "CHANGE_ME_TO_A_LONG_RANDOM_64+_CHAR_SECRET_CHANGE_ME"
+
+    # Redis key prefixes (must match auth-service)
+    APP_REDIS_DENYLIST_PREFIX: "deny:jwt:"
+    APP_REDIS_TOKEN_VERSION_PREFIX: "tv:"
+
+    # CORS
+    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "http://localhost:4200,http://localhost:4201,http://localhost:4211,http://localhost:8080,https://dev.electrahub.com,https://dev.electrahub.com:8443,http://driver-portal-dev.electrahub.com:8080,https://driver-portal-dev.electrahub.com,https://driver-portal-dev.electrahub.com:8443,https://driver-portal-*.electrahub.com,https://driver-portal-*.electrahub.com:*"
+
+    # Route targets (cluster-internal service DNS)
+    GATEWAY_ROUTE_AUTH: "http://auth-service:8080"
+    GATEWAY_ROUTE_USER: "http://user-service:8082"
+    GATEWAY_ROUTE_SUBSCRIPTION: "http://subscription-service:8086"
+    GATEWAY_ROUTE_PAYMENT: "http://payment-service:8083"
+    GATEWAY_ROUTE_CHARGER_MANAGEMENT: "http://charger-management-service:8086"
+    GATEWAY_ROUTE_WS_CONNECTOR: "http://web-socket-connector:8091"
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 25
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
