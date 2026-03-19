@@ -13,6 +13,7 @@ config:
   data:
     SERVER_PORT: "8090"
     MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    LOGGING_LEVEL_COM_ELECTRAHUB_GATEWAY: "DEBUG"
 
     # Redis (shared with auth-service)
     SPRING_DATA_REDIS_HOST: "redis"
