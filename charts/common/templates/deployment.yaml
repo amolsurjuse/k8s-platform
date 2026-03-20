@@ -41,6 +41,7 @@ spec:
           {{- $secrets := .Values.secrets | default dict }}
           {{- $secretsEnv := $secrets.env | default dict }}
           {{- $secretName := $secrets.existingSecretName | default "" }}
+          {{- $extraSecretEnv := .Values.extraSecretEnv | default list }}
 
           {{- if and .Values.config.enabled (gt (len .Values.config.data) 0) }}
           envFrom:
@@ -48,7 +49,7 @@ spec:
                 name: {{ include "common.fullname" . }}-config
           {{- end }}
 
-          {{- if or (gt (len $plainEnv) 0) (gt (len $secretsEnv) 0) }}
+          {{- if or (gt (len $plainEnv) 0) (gt (len $secretsEnv) 0) (gt (len $extraSecretEnv) 0) }}
           env:
             {{- /* Plain env vars */}}
             {{- range $k, $v := $plainEnv }}
@@ -68,6 +69,24 @@ spec:
                   name: {{ $secretName }}
                   key: {{ $secretKey }}
             {{- end }}
+            {{- end }}
+
+            {{- /* Additional secret-backed env vars from arbitrary secrets */}}
+            {{- range $entry := $extraSecretEnv }}
+            {{- if not $entry.name }}
+              {{- fail "extraSecretEnv[].name is required" }}
+            {{- end }}
+            {{- if not $entry.secretName }}
+              {{- fail "extraSecretEnv[].secretName is required" }}
+            {{- end }}
+            {{- if not $entry.secretKey }}
+              {{- fail "extraSecretEnv[].secretKey is required" }}
+            {{- end }}
+            - name: {{ $entry.name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $entry.secretName }}
+                  key: {{ $entry.secretKey }}
             {{- end }}
           {{- end }}
 

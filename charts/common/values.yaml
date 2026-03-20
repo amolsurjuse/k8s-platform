@@ -24,6 +24,7 @@ config:
 secrets:
   existingSecretName: ""
   env: {}   # ENV_NAME: secretKey
+extraSecretEnv: [] # [{name: ENV_NAME, secretName: secret-name, secretKey: key}]
 
 resources:
   requests:
