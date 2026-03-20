@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/billing-service
+service:
+  port: 8085
+containerPort: 8085

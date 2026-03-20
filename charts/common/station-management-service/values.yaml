@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/station-management-service
+service:
+  port: 8081
+containerPort: 8081

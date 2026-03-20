@@ -1,0 +1,53 @@
+fullnameOverride: "station-management-service"
+image:
+  repository: amolsurjuse/station-management-service
+
+service:
+  port: 8081
+containerPort: 8081
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+
+secrets:
+  env:
+    SPRING_DATASOURCE_USERNAME: "POSTGRES_USER"
+    SPRING_DATASOURCE_PASSWORD: "POSTGRES_PASSWORD"
+
+config:
+  data:
+    SERVER_PORT: "8081"
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/station_db"
+    REDIS_HOST: "redis"
+    REDIS_PORT: "6379"
+    SPRING_LIQUIBASE_ENABLED: "true"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+    MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+    MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED: "true"
+    MANAGEMENT_HEALTH_READINESSSTATE_ENABLED: "true"
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
