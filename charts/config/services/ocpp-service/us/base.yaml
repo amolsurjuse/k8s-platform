@@ -46,6 +46,9 @@ livenessProbe:
 
 startupProbe:
   enabled: true
+  path: /actuator/health/liveness
+  periodSeconds: 10
+  failureThreshold: 90
 
 securityContext:
   enabled: true
