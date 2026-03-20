@@ -46,7 +46,7 @@ livenessProbe:
   failureThreshold: 6
 
 startupProbe:
-  enabled: false
+  enabled: true
 
 securityContext:
   enabled: true
