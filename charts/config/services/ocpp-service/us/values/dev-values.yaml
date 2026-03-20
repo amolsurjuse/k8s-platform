@@ -3,6 +3,11 @@ secrets:
 
 replicaCount: 1
 
+config:
+  data:
+    SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+    SPRING_LIQUIBASE_ENABLED: "false"
+
 resources:
   requests:
     cpu: "100m"
