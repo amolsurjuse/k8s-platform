@@ -3,6 +3,12 @@ secrets:
 
 replicaCount: 1
 
+config:
+  enabled: true
+  data:
+    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
+    SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
+
 resources:
   requests:
     cpu: "100m"

@@ -2,6 +2,8 @@ config:
   enabled: true
   data:
     ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
+    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
+    SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
 
 secrets:
   existingSecretName: "auth-secrets-dev"
@@ -30,4 +32,3 @@ pdb:
 metrics:
   servicemonitor:
     enabled: false
-
