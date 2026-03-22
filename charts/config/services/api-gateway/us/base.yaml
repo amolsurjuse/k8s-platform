@@ -43,6 +43,8 @@ config:
     GATEWAY_ROUTE_PAYMENT: "http://payment-service:8083"
     GATEWAY_ROUTE_CHARGER_MANAGEMENT: "http://charger-management-service:8086"
     GATEWAY_ROUTE_WS_CONNECTOR: "http://web-socket-connector:8091"
+    GATEWAY_ROUTE_PRICING: "http://pricing-service:8092"
+    GATEWAY_ROUTES_PRICING: "http://pricing-service:8092"
 
 readinessProbe:
   enabled: true

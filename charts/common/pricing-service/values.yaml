@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/pricing-service
+service:
+  port: 8092
+containerPort: 8092

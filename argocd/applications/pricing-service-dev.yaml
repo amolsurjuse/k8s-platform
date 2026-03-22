@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pricing-service
+  namespace: argocd
+spec:
+  project: amy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: pricing-service
+      valueFiles:
+        - pricing-service/values.yaml
+        - ../config/services/pricing-service/us/values/dev-values.yaml
+        - ../config/services/pricing-service/us/version/dev-version.yaml
+        - ../config/services/pricing-service/us/base.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

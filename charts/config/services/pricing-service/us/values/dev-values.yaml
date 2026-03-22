@@ -1,0 +1,30 @@
+secrets:
+  existingSecretName: "postgresql-dev-secret"
+
+extraSecretEnv:
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-dev-secret"
+    secretKey: "redis-password"
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  enabled: false
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false
