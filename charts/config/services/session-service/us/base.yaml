@@ -8,6 +8,7 @@ containerPort: 8083
 
 env:
   SPRING_PROFILES_ACTIVE: "dev"
+  JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
 
 secrets:
   env:
