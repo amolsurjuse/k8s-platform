@@ -19,9 +19,6 @@ startupProbe:
   periodSeconds: 10
   failureThreshold: 90
 
-env:
-  JAVA_TOOL_OPTIONS: "-Xms96m -Xmx192m"
-
 resources:
   requests:
     cpu: "100m"
