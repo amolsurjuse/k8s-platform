@@ -5,6 +5,10 @@ image:
 service:
   port: 8083
 containerPort: 8083
+grpc:
+  enabled: true
+  port: 9083
+  containerPort: 9083
 
 env:
   SPRING_PROFILES_ACTIVE: "dev"

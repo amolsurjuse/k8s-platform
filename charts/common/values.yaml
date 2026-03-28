@@ -14,6 +14,11 @@ service:
 
 containerPort: 8080
 
+grpc:
+  enabled: false
+  port: 9000
+  containerPort: 9000
+
 env: {}
 
 config:

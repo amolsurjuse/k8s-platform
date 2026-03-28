@@ -37,6 +37,10 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}
+            {{- if .Values.grpc.enabled }}
+            - name: grpc
+              containerPort: {{ .Values.grpc.containerPort }}
+            {{- end }}
           {{- $plainEnv := .Values.env | default dict }}
           {{- $secrets := .Values.secrets | default dict }}
           {{- $secretsEnv := $secrets.env | default dict }}

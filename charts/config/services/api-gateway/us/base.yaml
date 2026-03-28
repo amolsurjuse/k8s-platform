@@ -46,6 +46,21 @@ config:
     GATEWAY_ROUTE_PRICING: "http://pricing-service:8092"
     GATEWAY_ROUTES_PRICING: "http://pricing-service:8092"
 
+    # gRPC transport configuration (disabled by default)
+    APP_RBAC_TRANSPORT: "rest"
+    APP_GRPC_FORWARDERS_AUTH_ENABLED: "false"
+    APP_GRPC_FORWARDERS_AUTH_ADDRESS: "auth-service:9080"
+    APP_GRPC_FORWARDERS_USER_ENABLED: "false"
+    APP_GRPC_FORWARDERS_USER_ADDRESS: "user-service:9082"
+    APP_GRPC_FORWARDERS_PAYMENT_ENABLED: "false"
+    APP_GRPC_FORWARDERS_PAYMENT_ADDRESS: "payment-service:9083"
+    APP_GRPC_FORWARDERS_SUBSCRIPTION_ENABLED: "false"
+    APP_GRPC_FORWARDERS_SUBSCRIPTION_ADDRESS: "subscription-service:9086"
+    APP_GRPC_FORWARDERS_CHARGER_MANAGEMENT_ENABLED: "false"
+    APP_GRPC_FORWARDERS_CHARGER_MANAGEMENT_ADDRESS: "charger-management-service:9086"
+    APP_GRPC_FORWARDERS_PRICING_ENABLED: "false"
+    APP_GRPC_FORWARDERS_PRICING_ADDRESS: "pricing-service:9092"
+
 readinessProbe:
   enabled: true
   path: /actuator/health/readiness
