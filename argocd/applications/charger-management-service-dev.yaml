@@ -16,9 +16,9 @@ spec:
       releaseName: charger-management-service
       valueFiles:
         - charger-management-service/values.yaml
+        - ../config/services/charger-management-service/us/base.yaml
         - ../config/services/charger-management-service/us/values/dev-values.yaml
         - ../config/services/charger-management-service/us/version/dev-version.yaml
-        - ../config/services/charger-management-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

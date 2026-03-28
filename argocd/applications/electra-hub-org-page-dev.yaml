@@ -16,9 +16,9 @@ spec:
       releaseName: electra-hub-org-page
       valueFiles:
         - electra-hub-org-page/values.yaml
+        - ../config/services/electra-hub-org-page/us/base.yaml
         - ../config/services/electra-hub-org-page/us/values/dev-values.yaml
         - ../config/services/electra-hub-org-page/us/version/dev-version.yaml
-        - ../config/services/electra-hub-org-page/us/base.yaml
   syncPolicy:
     automated:
       prune: true

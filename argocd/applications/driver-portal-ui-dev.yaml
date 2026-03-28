@@ -16,9 +16,9 @@ spec:
       releaseName: driver-portal-ui
       valueFiles:
         - driver-portal-ui/values.yaml
+        - ../config/services/driver-portal-ui/us/base.yaml
         - ../config/services/driver-portal-ui/us/values/dev-values.yaml
         - ../config/services/driver-portal-ui/us/version/dev-version.yaml
-        - ../config/services/driver-portal-ui/us/base.yaml
   syncPolicy:
     automated:
       prune: true

@@ -16,9 +16,9 @@ spec:
       releaseName: ocpi-service
       valueFiles:
         - ocpi-service/values.yaml
+        - ../config/services/ocpi-service/us/base.yaml
         - ../config/services/ocpi-service/us/values/dev-values.yaml
         - ../config/services/ocpi-service/us/version/dev-version.yaml
-        - ../config/services/ocpi-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

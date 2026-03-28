@@ -16,9 +16,9 @@ spec:
       releaseName: ocpp-simulator-ui
       valueFiles:
         - ocpp-simulator-ui/values.yaml
+        - ../config/services/ocpp-simulator-ui/us/base.yaml
         - ../config/services/ocpp-simulator-ui/us/values/dev-values.yaml
         - ../config/services/ocpp-simulator-ui/us/version/dev-version.yaml
-        - ../config/services/ocpp-simulator-ui/us/base.yaml
   syncPolicy:
     automated:
       prune: true

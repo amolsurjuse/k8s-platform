@@ -16,9 +16,9 @@ spec:
       releaseName: ocpp-service
       valueFiles:
         - ocpp-service/values.yaml
+        - ../config/services/ocpp-service/us/base.yaml
         - ../config/services/ocpp-service/us/values/dev-values.yaml
         - ../config/services/ocpp-service/us/version/dev-version.yaml
-        - ../config/services/ocpp-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

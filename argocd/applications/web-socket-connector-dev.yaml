@@ -16,9 +16,9 @@ spec:
       releaseName: web-socket-connector
       valueFiles:
         - web-socket-connector/values.yaml
+        - ../config/services/web-socket-connector/us/base.yaml
         - ../config/services/web-socket-connector/us/values/dev-values.yaml
         - ../config/services/web-socket-connector/us/version/dev-version.yaml
-        - ../config/services/web-socket-connector/us/base.yaml
   syncPolicy:
     automated:
       prune: true

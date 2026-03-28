@@ -16,9 +16,9 @@ spec:
       releaseName: subscription-service
       valueFiles:
         - subscription-service/values.yaml
+        - ../config/services/subscription-service/us/base.yaml
         - ../config/services/subscription-service/us/values/dev-values.yaml
         - ../config/services/subscription-service/us/version/dev-version.yaml
-        - ../config/services/subscription-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

@@ -16,9 +16,9 @@ spec:
       releaseName: pricing-service
       valueFiles:
         - pricing-service/values.yaml
+        - ../config/services/pricing-service/us/base.yaml
         - ../config/services/pricing-service/us/values/dev-values.yaml
         - ../config/services/pricing-service/us/version/dev-version.yaml
-        - ../config/services/pricing-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

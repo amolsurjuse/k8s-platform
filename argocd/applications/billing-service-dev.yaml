@@ -16,9 +16,9 @@ spec:
       releaseName: billing-service
       valueFiles:
         - billing-service/values.yaml
+        - ../config/services/billing-service/us/base.yaml
         - ../config/services/billing-service/us/values/dev-values.yaml
         - ../config/services/billing-service/us/version/dev-version.yaml
-        - ../config/services/billing-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

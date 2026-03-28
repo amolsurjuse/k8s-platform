@@ -16,9 +16,9 @@ spec:
       releaseName: session-service
       valueFiles:
         - session-service/values.yaml
+        - ../config/services/session-service/us/base.yaml
         - ../config/services/session-service/us/values/dev-values.yaml
         - ../config/services/session-service/us/version/dev-version.yaml
-        - ../config/services/session-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

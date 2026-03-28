@@ -1,3 +1,5 @@
+replicaCount: 1
+
 config:
   enabled: true
   data:
@@ -11,6 +13,7 @@ secrets:
 env:
   SPRING_PROFILES_ACTIVE: "dev"
   SPRING_LIQUIBASE_ENABLED: "true"
+  JAVA_TOOL_OPTIONS: "-Xms96m -Xmx192m"
 
 resources:
   requests:

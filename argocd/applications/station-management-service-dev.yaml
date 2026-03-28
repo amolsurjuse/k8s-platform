@@ -16,9 +16,9 @@ spec:
       releaseName: station-management-service
       valueFiles:
         - station-management-service/values.yaml
+        - ../config/services/station-management-service/us/base.yaml
         - ../config/services/station-management-service/us/values/dev-values.yaml
         - ../config/services/station-management-service/us/version/dev-version.yaml
-        - ../config/services/station-management-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

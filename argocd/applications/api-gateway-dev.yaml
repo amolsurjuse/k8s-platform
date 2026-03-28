@@ -16,9 +16,9 @@ spec:
       releaseName: api-gateway
       valueFiles:
         - api-gateway/values.yaml
+        - ../config/services/api-gateway/us/base.yaml
         - ../config/services/api-gateway/us/values/dev-values.yaml
         - ../config/services/api-gateway/us/version/dev-version.yaml
-        - ../config/services/api-gateway/us/base.yaml
   syncPolicy:
     automated:
       prune: true

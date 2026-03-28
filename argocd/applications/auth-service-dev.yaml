@@ -16,9 +16,9 @@ spec:
       releaseName: auth-service
       valueFiles:
         - auth-service/values.yaml
+        - ../config/services/auth-service/us/base.yaml
         - ../config/services/auth-service/us/values/dev-values.yaml
         - ../config/services/auth-service/us/version/dev-version.yaml
-        - ../config/services/auth-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true

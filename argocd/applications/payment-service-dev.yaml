@@ -16,9 +16,9 @@ spec:
       releaseName: payment-service
       valueFiles:
         - payment-service/values.yaml
+        - ../config/services/payment-service/us/base.yaml
         - ../config/services/payment-service/us/values/dev-values.yaml
         - ../config/services/payment-service/us/version/dev-version.yaml
-        - ../config/services/payment-service/us/base.yaml
   syncPolicy:
     automated:
       prune: true
