@@ -27,6 +27,8 @@ config:
     SPRING_LIQUIBASE_DEFAULT_SCHEMA: "public"
     SPRING_LIQUIBASE_LIQUIBASE_SCHEMA: "public"
     MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+    BILLING_SERVICE_ENABLED: "true"
+    BILLING_SERVICE_URL: "http://billing-service:8085"
     APP_CORS_ALLOWED_ORIGIN_1: "http://localhost:4200"
     APP_CORS_ALLOWED_ORIGIN_2: "http://localhost:8080"
     APP_CORS_ALLOWED_ORIGIN_3: "https://dev.electrahub.com"
