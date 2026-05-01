@@ -1,0 +1,31 @@
+secrets:
+  existingSecretName: "postgresql-dev-secret"
+
+replicaCount: 1
+
+config:
+  enabled: true
+  data:
+    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
+    SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "512Mi"
+  limits:
+    cpu: "500m"
+    memory: "1Gi"
+
+ingress:
+  enabled: false
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false

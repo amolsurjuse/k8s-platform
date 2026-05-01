@@ -1,0 +1,9 @@
+Elasticsearch deployed.
+
+Service endpoint (inside cluster):
+  http://{{ include "elasticsearch.fullname" . }}:{{ .Values.service.port }}
+
+Example health check:
+  kubectl -n {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "elasticsearch.fullname" . }} 9200:{{ .Values.service.port }}
+  curl -s http://127.0.0.1:9200/_cluster/health?pretty

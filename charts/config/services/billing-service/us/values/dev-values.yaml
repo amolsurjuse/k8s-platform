@@ -1,0 +1,41 @@
+secrets:
+  existingSecretName: "postgresql-dev-secret"
+
+extraSecretEnv:
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-dev-secret"
+    secretKey: "redis-password"
+
+replicaCount: 1
+
+config:
+  data:
+    SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+    SPRING_LIQUIBASE_ENABLED: "false"
+
+startupProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  periodSeconds: 10
+  failureThreshold: 90
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  enabled: false
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false

@@ -1,25 +1,18 @@
-environment_variables:
-  secretRefName: core-web-secrets-qa
-  secrets:
-    ENV_CORE_API_SECRET_TOKEN_KEY: replace
-    ENV_AUTH_DATASOURCE_USERNAME: replace
-    ENV_AUTH_DATASOURCE_PASSWORD: replace
+replicaCount: 1
 
-  secret_files:
-    CORE_WEB_KAFKA_KEYSTORE: kafka.client.keystore.qa.jks
+config:
+  enabled: true
+  data:
+    ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
+    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
+    SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
 
-  configmap:
-    values:
-      ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/appdb"
-
-
-
-autoscaling:
-  minReplicas: 2
-  maxReplicas: 2
+secrets:
+  existingSecretName: "auth-secrets-dev"
 
 env:
   SPRING_PROFILES_ACTIVE: "dev"
+  SPRING_LIQUIBASE_ENABLED: "true"
 
 resources:
   requests:
@@ -30,14 +23,7 @@ resources:
     memory: "512Mi"
 
 ingress:
-  enabled: true
-  className: "nginx"
-  host: "auth-dev.example.com"
-  tls:
-    enabled: false
-
-secrets:
-  existingSecretName: ""
+  enabled: false
 
 hpa:
   enabled: false
@@ -48,4 +34,3 @@ pdb:
 metrics:
   servicemonitor:
     enabled: false
-

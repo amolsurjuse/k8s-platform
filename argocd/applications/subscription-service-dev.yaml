@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: subscription-service
+  namespace: argocd
+spec:
+  project: amy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: subscription-service
+      valueFiles:
+        - subscription-service/values.yaml
+        - ../config/services/subscription-service/us/base.yaml
+        - ../config/services/subscription-service/us/values/dev-values.yaml
+        - ../config/services/subscription-service/us/version/dev-version.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

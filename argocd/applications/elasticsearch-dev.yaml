@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elasticsearch-dev
+  namespace: argocd
+spec:
+  project: amy
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: infrastructure/elasticsearch
+    helm:
+      releaseName: elasticsearch
+      valueFiles:
+        - ../../platform-config/infrastructure/elasticsearch/us/values/dev.yaml
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

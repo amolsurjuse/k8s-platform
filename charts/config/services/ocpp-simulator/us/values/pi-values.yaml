@@ -1,0 +1,27 @@
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: "150m"
+    memory: "192Mi"
+  limits:
+    cpu: "500m"
+    memory: "768Mi"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "ocpp-simulator-pi.electrahub.com"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+  path: /ocpp-simulator(/|$)(.*)
+  pathType: ImplementationSpecific
+  tls:
+    enabled: false
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false

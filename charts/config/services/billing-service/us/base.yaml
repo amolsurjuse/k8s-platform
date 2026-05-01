@@ -1,0 +1,59 @@
+fullnameOverride: "billing-service"
+image:
+  repository: amolsurjuse/billing-service
+
+service:
+  port: 8085
+containerPort: 8085
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+  JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
+
+secrets:
+  env:
+    DB_USERNAME: "POSTGRES_USER"
+    DB_PASSWORD: "POSTGRES_PASSWORD"
+
+config:
+  data:
+    SERVER_PORT: "8085"
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/billing_db"
+    REDIS_HOST: "redis"
+    REDIS_PORT: "6379"
+    SESSION_SERVICE_URL: "http://session-service:8083"
+    STATION_SERVICE_URL: "http://station-management-service:8081"
+    SPRING_LIQUIBASE_ENABLED: "true"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+    MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+    MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED: "true"
+    MANAGEMENT_HEALTH_READINESSSTATE_ENABLED: "true"
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  periodSeconds: 10
+  failureThreshold: 90
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000

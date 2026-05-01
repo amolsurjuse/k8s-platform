@@ -1,0 +1,61 @@
+fullnameOverride: "charger-management-service"
+image:
+  repository: amolsurjuse/charger-management-service
+
+service:
+  port: 8086
+containerPort: 8086
+grpc:
+  enabled: true
+  port: 9086
+  containerPort: 9086
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+  JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
+
+secrets:
+  env:
+    ENV_CHARGER_DATASOURCE_USERNAME: "POSTGRES_USER"
+    ENV_CHARGER_DATASOURCE_PASSWORD: "POSTGRES_PASSWORD"
+
+config:
+  data:
+    SERVER_PORT: "8086"
+    ENV_CHARGER_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/charger_management_db"
+    SPRING_LIQUIBASE_ENABLED: "true"
+    SPRING_LIQUIBASE_DEFAULT_SCHEMA: "public"
+    SPRING_LIQUIBASE_LIQUIBASE_SCHEMA: "public"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+    BILLING_SERVICE_ENABLED: "true"
+    BILLING_SERVICE_URL: "http://billing-service:8085"
+    APP_CORS_ALLOWED_ORIGIN_1: "http://localhost:4200"
+    APP_CORS_ALLOWED_ORIGIN_2: "http://localhost:8080"
+    APP_CORS_ALLOWED_ORIGIN_3: "https://dev.electrahub.com"
+    APP_CORS_ALLOWED_ORIGIN_4: "https://dev.electrahub.com:8443"
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000

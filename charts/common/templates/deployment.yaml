@@ -13,9 +13,9 @@ spec:
     metadata:
       labels:
         {{- include "common.selectorLabels" . | nindent 8 }}
-          {{- with .Values.podLabels }}
-          {{- toYaml . | nindent 8 }}
-          {{- end }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
@@ -30,32 +30,69 @@ spec:
       {{- end }}
       containers:
         - name: {{ include "common.name" . }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- $imageRepo := required "image.repository is required" .Values.image.repository }}
+          {{- $imageTag := .Values.image.tag | default .Chart.AppVersion }}
+          image: "{{ $imageRepo }}:{{ $imageTag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}
+            {{- if .Values.grpc.enabled }}
+            - name: grpc
+              containerPort: {{ .Values.grpc.containerPort }}
+            {{- end }}
+          {{- $plainEnv := .Values.env | default dict }}
+          {{- $secrets := .Values.secrets | default dict }}
+          {{- $secretsEnv := $secrets.env | default dict }}
+          {{- $secretName := $secrets.existingSecretName | default "" }}
+          {{- $extraSecretEnv := .Values.extraSecretEnv | default list }}
+
+          {{- if and .Values.config.enabled (gt (len .Values.config.data) 0) }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "common.fullname" . }}-config
+          {{- end }}
+
+          {{- if or (gt (len $plainEnv) 0) (gt (len $secretsEnv) 0) (gt (len $extraSecretEnv) 0) }}
           env:
-            {{- /* ConfigMap / plain values */}}
-            {{- range $k, $v := (.Values.environment_variables.configmap.values | default dict) }}
+            {{- /* Plain env vars */}}
+            {{- range $k, $v := $plainEnv }}
             - name: {{ $k }}
               value: {{ $v | quote }}
             {{- end }}
 
             {{- /* Secret-backed env vars */}}
-            {{- $secretName := .Values.environment_variables.secretRefName | default "" }}
-            {{- if .Values.environment_variables.secrets }}
+            {{- if $secretsEnv }}
             {{- if not $secretName }}
-              {{- fail "environment_variables.secretRefName is required when secrets are defined" }}
+              {{- fail "secrets.existingSecretName is required when secrets.env is defined" }}
             {{- end }}
-            {{- range $envName, $_ := .Values.environment_variables.secrets }}
+            {{- range $envName, $secretKey := $secretsEnv }}
             - name: {{ $envName }}
               valueFrom:
                 secretKeyRef:
                   name: {{ $secretName }}
-                  key: {{ $envName }}
+                  key: {{ $secretKey }}
             {{- end }}
             {{- end }}
+
+            {{- /* Additional secret-backed env vars from arbitrary secrets */}}
+            {{- range $entry := $extraSecretEnv }}
+            {{- if not $entry.name }}
+              {{- fail "extraSecretEnv[].name is required" }}
+            {{- end }}
+            {{- if not $entry.secretName }}
+              {{- fail "extraSecretEnv[].secretName is required" }}
+            {{- end }}
+            {{- if not $entry.secretKey }}
+              {{- fail "extraSecretEnv[].secretKey is required" }}
+            {{- end }}
+            - name: {{ $entry.name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $entry.secretName }}
+                  key: {{ $entry.secretKey }}
+            {{- end }}
+          {{- end }}
 
           {{- if .Values.startupProbe.enabled }}
           startupProbe:

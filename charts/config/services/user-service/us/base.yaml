@@ -1,0 +1,58 @@
+fullnameOverride: "user-service"
+image:
+  repository: amolsurjuse/user-service
+
+service:
+  port: 8082
+containerPort: 8082
+grpc:
+  enabled: true
+  port: 9082
+  containerPort: 9082
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+  JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m"
+
+secrets:
+  env:
+    ENV_USER_DATASOURCE_USERNAME: "POSTGRES_USER"
+    ENV_USER_DATASOURCE_PASSWORD: "POSTGRES_PASSWORD"
+
+config:
+  data:
+    SERVER_PORT: "8082"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    ENV_USER_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
+    SPRING_LIQUIBASE_ENABLED: "true"
+    SPRING_LIQUIBASE_DEFAULT_SCHEMA: "user_mgmt"
+    SPRING_LIQUIBASE_LIQUIBASE_SCHEMA: "public"
+    SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: "user_mgmt"
+    APP_PAYMENT_SERVICE_BASE_URL: "http://payment-service:8083"
+    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "http://localhost:4200,http://localhost:4201,http://localhost:4211,http://localhost:8080,https://dev.electrahub.com,https://dev.electrahub.com:8443,http://driver-portal-dev.electrahub.com:8080,https://driver-portal-dev.electrahub.com:8443"
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000

@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/api-gateway
+service:
+  port: 8090
+containerPort: 8090

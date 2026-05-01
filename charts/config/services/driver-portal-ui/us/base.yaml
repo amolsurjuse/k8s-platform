@@ -1,0 +1,29 @@
+fullnameOverride: "driver-portal-ui"
+image:
+  repository: amolsurjuse/driver-portal-frontend
+
+service:
+  port: 80
+containerPort: 80
+
+readinessProbe:
+  enabled: true
+  path: /
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /healthz
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+
+securityContext:
+  enabled: false

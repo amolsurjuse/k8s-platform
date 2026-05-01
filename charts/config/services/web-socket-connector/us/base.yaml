@@ -1,0 +1,38 @@
+fullnameOverride: "web-socket-connector"
+image:
+  repository: amolsurjuse/web-socket-connector
+
+service:
+  port: 8091
+containerPort: 8091
+
+config:
+  data:
+    PORT: "8091"
+    LOG_LEVEL: "info"
+
+readinessProbe:
+  enabled: true
+  path: /healthz
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /healthz
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532

@@ -1,0 +1,44 @@
+fullnameOverride: "ocpp-simulator"
+image:
+  repository: amolsurjuse/ocpi-simulator
+
+service:
+  port: 8081
+containerPort: 8081
+
+config:
+  data:
+    PORT: "8081"
+    BASE_URL: "http://ocpp-simulator:8081"
+    WS_CONNECTOR_BASE_URL: "http://web-socket-connector:8091"
+    LOG_LEVEL: "info"
+    EVENT_INTERVAL: "5s"
+    READ_TIMEOUT: "10s"
+    WRITE_TIMEOUT: "20s"
+    SHUTDOWN_TIMEOUT: "10s"
+
+readinessProbe:
+  enabled: true
+  path: /readyz
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /healthz
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: false
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532

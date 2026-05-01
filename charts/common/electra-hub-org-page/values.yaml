@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/electra-hub-org-page
+service:
+  port: 80
+containerPort: 80

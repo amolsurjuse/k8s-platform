@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/subscription-service
+service:
+  port: 8086
+containerPort: 8086
