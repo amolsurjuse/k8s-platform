@@ -22,6 +22,7 @@ config:
     REDIS_HOST: "redis"
     REDIS_PORT: "6379"
     STATION_SERVICE_URL: "http://station-management-service:8081"
+    PAYMENT_SERVICE_URL: "http://payment-service:8083"
     AUTH_CACHE_TTL: "3600"
     AUTH_OFFLINE_POLICY: "REJECT"
     SPRING_LIQUIBASE_ENABLED: "true"
