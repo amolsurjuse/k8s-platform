@@ -3,6 +3,9 @@ secrets:
 
 replicaCount: 1
 
+image:
+  pullPolicy: Always
+
 config:
   data:
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
