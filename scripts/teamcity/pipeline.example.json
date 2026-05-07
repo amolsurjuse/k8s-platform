@@ -1,0 +1,17 @@
+{
+  "serviceName": "api-gateway",
+  "teamcityProjectName": "api-gateway",
+  "parentProjectId": "Amy",
+  "gitUrl": "https://github.com/amolsurjuse/api-gateway.git",
+  "gitBranch": "main",
+  "dockerImage": "amolsurjuse/api-gateway",
+  "dockerfilePath": "Dockerfile",
+  "pomPath": "pom.xml",
+  "mavenGoals": "clean package",
+  "mavenRunnerArgs": "",
+  "k8sBranch": "develop",
+  "deployVersionFile": "charts/config/services/api-gateway/us/version/dev-version.yaml",
+  "dockerUsername": "amolsurjuse",
+  "agentName": "teamcity-minimal-agent",
+  "addVcsTrigger": true
+}
