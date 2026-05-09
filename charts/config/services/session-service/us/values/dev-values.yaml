@@ -31,11 +31,13 @@ resources:
     memory: "512Mi"
 
 ingress:
-  # Bypass api-gateway for /session/* traffic so the SSE stream
-  # (/session/api/v1/sessions/active/stream) is not buffered by the
-  # gateway's synchronous RestClient.readAllBytes() proxy.
-  # Nginx ingress routes /session/(.*) directly to session-service
-  # with SSE-friendly annotations (no buffering, long timeouts, HTTP/1.1).
+  # TEMPORARY: bypass api-gateway ONLY for the active-sessions SSE stream
+  # so its long-lived response is not buffered by the gateway's synchronous
+  # RestClient.readAllBytes() proxy. All other /session/* traffic continues
+  # to flow through the api-gateway (auth, RBAC, JWT denylist).
+  #
+  # Remove this ingress once api-gateway streams text/event-stream natively.
+  # Tracked in api-gateway PR: streaming branch in GatewayProxyController.
   enabled: true
   className: "nginx"
   host: "dev.electrahub.com"
@@ -51,11 +53,10 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    # Higher priority than the api-gateway's catch-all `/(.*)` ingress
-    # so /session/* matches this rule first.
-    nginx.ingress.kubernetes.io/server-snippet: |
-      # session-service ingress takes precedence for /session/* paths
-  path: /session/(.*)
+  # Match ONLY the SSE endpoint. Nginx ingress prefers more-specific
+  # regex paths over the api-gateway's catch-all `/(.*)`, so this rule
+  # wins for /session/api/v1/sessions/active/stream and nothing else.
+  path: /session/(api/v1/sessions/active/stream)
   pathType: ImplementationSpecific
   tls:
     enabled: true
