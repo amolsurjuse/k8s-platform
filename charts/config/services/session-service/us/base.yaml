@@ -23,6 +23,7 @@ config:
     REDIS_PORT: "6379"
     STATION_SERVICE_URL: "http://station-management-service:8081"
     PAYMENT_SERVICE_URL: "http://payment-service:8083"
+    PRICING_SERVICE_URL: "http://pricing-service:8092"
     OCPP_SERVICE_URL: "http://ocpp-service:8082"
     ELASTICSEARCH_URIS: "http://elasticsearch:9200"
     SESSION_ELASTICSEARCH_ENABLED: "true"
