@@ -31,7 +31,35 @@ resources:
     memory: "512Mi"
 
 ingress:
-  enabled: false
+  # TEMPORARY: bypass api-gateway ONLY for the active-sessions SSE stream
+  # so its long-lived response is not buffered by the gateway's synchronous
+  # RestClient.readAllBytes() proxy. All other /session/* traffic continues
+  # to flow through the api-gateway (auth, RBAC, JWT denylist).
+  #
+  # Remove this ingress once api-gateway streams text/event-stream natively.
+  # Tracked in api-gateway PR: streaming branch in GatewayProxyController.
+  enabled: true
+  className: "nginx"
+  host: "dev.electrahub.com"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$1"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # SSE requires no response buffering and long-lived connections.
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  # Match ONLY the SSE endpoint. Nginx ingress prefers more-specific
+  # regex paths over the api-gateway's catch-all `/(.*)`, so this rule
+  # wins for /session/api/v1/sessions/active/stream and nothing else.
+  path: /session/(api/v1/sessions/active/stream)
+  pathType: ImplementationSpecific
+  tls:
+    enabled: true
+    secretName: "electrahub-dev-tls"
 
 hpa:
   enabled: false
