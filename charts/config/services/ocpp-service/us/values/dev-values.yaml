@@ -8,6 +8,9 @@ extraSecretEnv:
 
 replicaCount: 1
 
+env:
+  JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m"
+
 config:
   data:
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
@@ -17,15 +20,25 @@ startupProbe:
   enabled: true
   path: /actuator/health/liveness
   periodSeconds: 10
-  failureThreshold: 90
+  failureThreshold: 120
+
+readinessProbe:
+  enabled: true
+  timeoutSeconds: 5
+  failureThreshold: 12
+
+livenessProbe:
+  enabled: true
+  timeoutSeconds: 5
+  failureThreshold: 12
 
 resources:
   requests:
-    cpu: "100m"
-    memory: "256Mi"
-  limits:
-    cpu: "500m"
+    cpu: "250m"
     memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
 
 ingress:
   enabled: false
