@@ -7,10 +7,11 @@ image:
   tag: "4.0.0-debian-12-r10"
 
 kafka:
-  clusterId: "MkU3OEVBNTcwNTJENDM2Qk"
+  clusterId: "smfL9D2PSy2Y1AZaZirmGg"
   numPartitions: 3
   autoCreateTopics: true
   logRetentionHours: 168
+  messageMaxBytes: "1048576"
 
 persistence:
   enabled: true
