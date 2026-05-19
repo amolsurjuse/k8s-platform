@@ -1,0 +1,8 @@
+Kafka deployed.
+
+Bootstrap server:
+  {{ include "kafka.fullname" . }}:{{ .Values.service.port }}
+
+Example topic check:
+  kubectl -n {{ .Release.Namespace }} exec -it {{ include "kafka.fullname" . }}-0 -- \
+    /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.fullname" . }}:{{ .Values.service.port }} --list
