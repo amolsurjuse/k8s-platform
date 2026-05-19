@@ -14,8 +14,8 @@ ingress:
   host: "ocpp-simulator-qa.electrahub.com"
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
-  path: /ocpp-simulator(/|$)(.*)
+    nginx.ingress.kubernetes.io/rewrite-target: "/$3"
+  path: /ocpp-simulator(-ui)?(/|$)(.*)
   pathType: ImplementationSpecific
   tls:
     enabled: true
