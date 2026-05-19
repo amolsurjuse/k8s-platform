@@ -23,6 +23,7 @@ config:
     REDIS_PORT: "6379"
     SESSION_SERVICE_URL: "http://session-service:8083"
     STATION_SERVICE_URL: "http://station-management-service:8081"
+    CHARGER_SERVICE_URL: "http://charger-management-service:8086"
     SPRING_LIQUIBASE_ENABLED: "true"
     MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
     MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
