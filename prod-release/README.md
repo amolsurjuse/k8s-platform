@@ -26,12 +26,28 @@ For a local-laptop prod-like environment, the most reliable option is usually to
 ## Folder Layout
 
 - `env/prod-laptop.env.example` - environment variables used by scripts.
+- `env/prod-laptop.env.ps1.example` - PowerShell environment variables for Windows.
 - `scripts/bootstrap-prod-laptop.sh` - creates the Docker-backed Kubernetes cluster and installs core platform tooling.
+- `scripts/bootstrap-prod-laptop.ps1` - Windows PowerShell version of the bootstrap script.
 - `scripts/register-prod-cluster-with-argocd.sh` - registers the prod laptop cluster with an existing Argo CD instance.
+- `scripts/register-prod-cluster-with-argocd.ps1` - Windows PowerShell version of the Argo CD registration script.
 - `scripts/deploy-prod-release.sh` - applies prod-like Argo CD applications from this repo.
+- `scripts/deploy-prod-release.ps1` - Windows PowerShell version of the deployment script.
 - `docs/migration-runbook.md` - operational migration checklist.
 
-## Recommended First Pass
+## Prerequisites
+
+Install these tools on the target laptop and make sure they are available on `PATH`:
+
+- Docker Desktop with the Linux container engine running.
+- `kubectl`.
+- `helm`.
+- `k3d`.
+- `argocd` only if registering this cluster with an Argo CD instance running somewhere else.
+
+On Windows, run the scripts from PowerShell 7 or Windows PowerShell. Docker Desktop must be started before running the bootstrap step.
+
+## Recommended First Pass - macOS/Linux
 
 1. Copy `env/prod-laptop.env.example` to `env/prod-laptop.env`.
 2. Fill in hostnames, cluster name, repo URL, target revision, and optional Argo settings.
@@ -53,6 +69,34 @@ For a local-laptop prod-like environment, the most reliable option is usually to
 ./prod-release/scripts/deploy-prod-release.sh ./prod-release/env/prod-laptop.env
 ```
 
+## Recommended First Pass - Windows PowerShell
+
+1. Copy `env\prod-laptop.env.ps1.example` to `env\prod-laptop.env.ps1`.
+2. Fill in hostnames, cluster name, repo URL, target revision, and optional Argo settings.
+3. On the new laptop, run:
+
+```powershell
+.\prod-release\scripts\bootstrap-prod-laptop.ps1 -EnvFile .\prod-release\env\prod-laptop.env.ps1
+```
+
+4. If Argo CD runs on the current laptop and should deploy to the new laptop, run:
+
+```powershell
+.\prod-release\scripts\register-prod-cluster-with-argocd.ps1 -EnvFile .\prod-release\env\prod-laptop.env.ps1
+```
+
+5. Deploy the release applications:
+
+```powershell
+.\prod-release\scripts\deploy-prod-release.ps1 -EnvFile .\prod-release\env\prod-laptop.env.ps1
+```
+
+If PowerShell blocks local scripts, allow the current process to run them:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
 ## Release Order
 
 Deploy stateful and platform pieces first:
@@ -66,13 +110,21 @@ Deploy stateful and platform pieces first:
 7. OCPP/OCPI services and simulator
 8. portal UIs
 
-`deploy-prod-release.sh` creates Argo CD applications for Postgres, Elasticsearch, and the service stack. Redis is currently represented by raw manifests under `redis/`; move it into a Helm/Argo app before using this as a hard prod deployment.
+`deploy-prod-release.sh` and `deploy-prod-release.ps1` create Argo CD applications for Postgres, Elasticsearch, and the service stack. Redis is currently represented by raw manifests under `redis/`; move it into a Helm/Argo app before using this as a hard prod deployment.
 
 ## Validation
 
 After deployment:
 
 ```bash
+kubectl get nodes
+kubectl get pods -n prod
+kubectl -n argocd get applications
+```
+
+Windows PowerShell uses the same validation commands:
+
+```powershell
 kubectl get nodes
 kubectl get pods -n prod
 kubectl -n argocd get applications

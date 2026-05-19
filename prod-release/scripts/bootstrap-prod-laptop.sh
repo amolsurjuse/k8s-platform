@@ -48,7 +48,7 @@ kubectl config use-context "k3d-${ELECTRA_CLUSTER_NAME}"
 kubectl create namespace "${ELECTRA_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
 kubectl create namespace "${ELECTRA_ARGO_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
 
-helm repo add argo https://argoproj.github.io/argo-helm >/dev/null
+helm repo add argo https://argoproj.github.io/argo-helm --force-update >/dev/null
 helm repo update argo >/dev/null
 
 helm upgrade --install argocd argo/argo-cd \
@@ -60,4 +60,3 @@ echo "Prod-like cluster is ready."
 echo "Context: k3d-${ELECTRA_CLUSTER_NAME}"
 echo "Namespace: ${ELECTRA_NAMESPACE}"
 echo "Argo CD namespace: ${ELECTRA_ARGO_NAMESPACE}"
-
