@@ -15,7 +15,7 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "/$3"
-  path: /ocpp-simulator(-ui)?(/|$)(.*)
+  path: /(ocpp-simulator(-ui)?/)?(.*)
   pathType: ImplementationSpecific
   tls:
     enabled: true
