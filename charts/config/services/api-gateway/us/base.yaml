@@ -34,7 +34,7 @@ config:
     APP_REDIS_TOKEN_VERSION_PREFIX: "tv:"
 
     # CORS
-    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "http://localhost:*,http://127.0.0.1:*,http://localhost:4200,http://localhost:4201,http://localhost:4211,http://localhost:8080,https://dev.electrahub.com,https://dev.electrahub.com:8443,http://driver-portal-dev.electrahub.com:8080,https://driver-portal-dev.electrahub.com,https://driver-portal-dev.electrahub.com:8443,https://driver-portal-*.electrahub.com,https://driver-portal-*.electrahub.com:*,https://admin-portal-dev.electrahub.com,https://admin-portal-dev.electrahub.com:8443,https://admin-portal-*.electrahub.com,https://admin-portal-*.electrahub.com:*"
+    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "http://localhost:*,http://127.0.0.1:*,http://localhost:4200,http://localhost:4201,http://localhost:4211,http://localhost:8080,https://dev.electrahub.com,https://dev.electrahub.com:8443,http://driver-portal-dev.electrahub.com:8080,https://driver-portal-dev.electrahub.com,https://driver-portal-dev.electrahub.com:8443,https://driver-portal-*.electrahub.com,https://driver-portal-*.electrahub.com:*,https://admin-portal-dev.electrahub.com,https://admin-portal-dev.electrahub.com:8443,https://admin-portal-*.electrahub.com,https://admin-portal-*.electrahub.com:*,https://dev.electrahub.net,https://api-dev.electrahub.net,https://driver-dev.electrahub.net,https://driver-portal-dev.electrahub.net,https://admin-dev.electrahub.net,https://admin-portal-dev.electrahub.net,https://simulator-dev.electrahub.net,https://ocpp-simulator-dev.electrahub.net,https://argocd-dev.electrahub.net"
 
     # Route targets (cluster-internal service DNS)
     GATEWAY_ROUTE_AUTH: "http://auth-service:8080"
