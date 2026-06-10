@@ -1,0 +1,7 @@
+RabbitMQ deployed.
+
+AMQP endpoint:
+  {{ include "rabbitmq.fullname" . }}:{{ .Values.service.amqpPort }}
+
+Management endpoint:
+  {{ include "rabbitmq.fullname" . }}:{{ .Values.service.managementPort }}

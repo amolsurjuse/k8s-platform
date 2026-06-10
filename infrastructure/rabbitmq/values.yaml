@@ -1,0 +1,60 @@
+replicaCount: 1
+
+image:
+  repository: rabbitmq
+  tag: "3.13-management-alpine"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  amqpPort: 5672
+  managementPort: 15672
+
+auth:
+  username: guest
+  password: guest
+  existingSecretName: ""
+  secretKeys:
+    usernameKey: RABBITMQ_DEFAULT_USER
+    passwordKey: RABBITMQ_DEFAULT_PASS
+
+persistence:
+  enabled: false
+  storageClass: ""
+  size: 2Gi
+  accessModes:
+    - ReadWriteOnce
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+readinessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 20
+  timeoutSeconds: 5
+  failureThreshold: 6
+
+podAnnotations: {}
+podLabels: {}
+
+pdb:
+  enabled: false
+  minAvailable: 1
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
