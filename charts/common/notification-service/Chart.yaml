@@ -1,0 +1,9 @@
+apiVersion: v2
+name: notification-service
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: common
+    version: 1.0.0
+    repository: "oci://ghcr.io/amolsurjuse/helm"

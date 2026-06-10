@@ -1,0 +1,68 @@
+fullnameOverride: "notification-service"
+image:
+  repository: amolsurjuse/notification-service
+
+service:
+  port: 8085
+containerPort: 8085
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+  JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
+
+secrets:
+  env:
+    SPRING_DATASOURCE_USERNAME: "POSTGRES_USER"
+    SPRING_DATASOURCE_PASSWORD: "POSTGRES_PASSWORD"
+
+config:
+  data:
+    SERVER_PORT: "8085"
+    SERVER_SERVLET_CONTEXT_PATH: "/notifications"
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/appdb"
+    SPRING_LIQUIBASE_ENABLED: "true"
+    SPRING_LIQUIBASE_DEFAULT_SCHEMA: "notification"
+    SPRING_RABBITMQ_HOST: "rabbitmq"
+    SPRING_RABBITMQ_PORT: "5672"
+    SPRING_RABBITMQ_USERNAME: "guest"
+    SPRING_RABBITMQ_PASSWORD: "guest"
+    SPRING_CLOUD_STREAM_DEFAULT_BINDER: "rabbit"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus"
+    MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+    MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED: "true"
+    MANAGEMENT_HEALTH_READINESSSTATE_ENABLED: "true"
+    NOTIFICATION_CHANNEL_EMAIL_REAL_SEND_ENABLED: "false"
+    NOTIFICATION_CHANNEL_SMS_REAL_SEND_ENABLED: "false"
+    NOTIFICATION_CHANNEL_PUSH_REAL_SEND_ENABLED: "false"
+    NOTIFICATION_CHANNEL_INAPP_ENABLED: "true"
+    NOTIFICATION_SES_REGION: "us-east-1"
+    NOTIFICATION_APNS_ENVIRONMENT: "sandbox"
+
+readinessProbe:
+  enabled: true
+  path: /notifications/actuator/health/readiness
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /notifications/actuator/health/liveness
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: true
+  path: /notifications/actuator/health/liveness
+  periodSeconds: 10
+  failureThreshold: 90
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
