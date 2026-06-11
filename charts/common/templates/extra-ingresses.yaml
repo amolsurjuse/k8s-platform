@@ -1,0 +1,44 @@
+{{- range $ingress := .Values.extraIngresses | default list }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ default (printf "%s-%s" (include "common.fullname" $) (required "extraIngresses[].name is required" $ingress.name)) $ingress.fullname | trunc 63 | trimSuffix "-" }}
+  labels:
+    {{- include "common.labels" $ | nindent 4 }}
+  {{- with $ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with $ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  rules:
+    {{- range $rule := $ingress.rules }}
+    - host: {{ required "extraIngresses[].rules[].host is required" $rule.host | quote }}
+      http:
+        paths:
+          {{- range $path := $rule.paths }}
+          - path: {{ required "extraIngresses[].rules[].paths[].path is required" $path.path }}
+            pathType: {{ default "Prefix" $path.pathType }}
+            backend:
+              service:
+                name: {{ default (include "common.fullname" $) $path.serviceName }}
+                port:
+                  number: {{ default $.Values.service.port $path.servicePort }}
+          {{- end }}
+    {{- end }}
+  {{- if $ingress.tls }}
+  tls:
+    {{- range $tls := $ingress.tls }}
+    - hosts:
+        {{- range $tls.hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- with $tls.secretName }}
+      secretName: {{ . }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

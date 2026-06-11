@@ -35,3 +35,29 @@ pdb:
 metrics:
   servicemonitor:
     enabled: false
+
+extraIngresses:
+  - name: public-notifications
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: "/notifications/$2"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    rules:
+      - host: "electrahub.net"
+        paths:
+          - path: /notifications(/|$)(.*)
+            pathType: ImplementationSpecific
+      - host: "www.electrahub.net"
+        paths:
+          - path: /notifications(/|$)(.*)
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - "electrahub.net"
+          - "www.electrahub.net"
+        secretName: "electrahub-dev-tls"

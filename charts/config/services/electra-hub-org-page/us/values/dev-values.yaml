@@ -23,6 +23,48 @@ ingress:
     enabled: true
     secretName: "electrahub-dev-tls"
 
+extraIngresses:
+  - name: public-root
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    rules:
+      - host: "electrahub.net"
+        paths:
+          - path: /
+            pathType: Prefix
+      - host: "www.electrahub.net"
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - "electrahub.net"
+          - "www.electrahub.net"
+        secretName: "electrahub-dev-tls"
+  - name: public-org-prefix
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    rules:
+      - host: "electrahub.net"
+        paths:
+          - path: /org-page(/|$)(.*)
+            pathType: ImplementationSpecific
+      - host: "www.electrahub.net"
+        paths:
+          - path: /org-page(/|$)(.*)
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - "electrahub.net"
+          - "www.electrahub.net"
+        secretName: "electrahub-dev-tls"
+
 hpa:
   enabled: false
 

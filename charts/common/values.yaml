@@ -72,6 +72,8 @@ ingress:
     enabled: false
     secretName: ""
 
+extraIngresses: []
+
 hpa:
   enabled: false
   minReplicas: 2
