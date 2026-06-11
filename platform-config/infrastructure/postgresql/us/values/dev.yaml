@@ -10,5 +10,10 @@ auth:
 persistence:
   size: 10Gi
 
+postgresql:
+  config:
+    listen_addresses: "'*'"
+    max_connections: 250
+
 pdb:
   enabled: false

@@ -8,7 +8,7 @@ data:
   {{- if .Values.postgresql.config }}
   postgresql.conf: |
     {{- range $k, $v := .Values.postgresql.config }}
-    {{ $k }} = {{ $v | quote }}
+    {{ $k }} = {{ $v }}
     {{- end }}
   {{- end }}
 
