@@ -21,6 +21,8 @@ GitOps repository for ElectraHub platform deployments using Argo CD + Helm.
 - `charts/common/` - shared deploy chart
 - `charts/config/services/` - per-service env config
 - `platform-config/infrastructure/` - infra value sets
+- `cloudflare/dev-laptop/` - Cloudflare Tunnel templates for exposing this laptop's minikube dev stack
+- `scripts/cloudflare-dev-laptop/` - render/start helpers for the local Cloudflare Tunnel
 
 ## Quick Validation
 
