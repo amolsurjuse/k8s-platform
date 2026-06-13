@@ -1,0 +1,49 @@
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: "50m"
+    memory: "64Mi"
+  limits:
+    cpu: "200m"
+    memory: "128Mi"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "electrahub.net"
+  annotations: {}
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: false
+
+extraIngresses:
+  - name: public-www-root
+    className: "nginx"
+    annotations: {}
+    rules:
+      - host: "www.electrahub.net"
+        paths:
+          - path: /
+            pathType: Prefix
+  - name: public-org-prefix
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+    rules:
+      - host: "electrahub.net"
+        paths:
+          - path: /org-page(/|$)(.*)
+            pathType: ImplementationSpecific
+      - host: "www.electrahub.net"
+        paths:
+          - path: /org-page(/|$)(.*)
+            pathType: ImplementationSpecific
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false

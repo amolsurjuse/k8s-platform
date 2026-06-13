@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: electra-hub-org-page
+  namespace: argocd
+spec:
+  project: electrahub-prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: electra-hub-org-page
+      valueFiles:
+        - electra-hub-org-page/values.yaml
+        - ../config/services/electra-hub-org-page/us/base.yaml
+        - ../config/services/electra-hub-org-page/us/values/prod-values.yaml
+        - ../config/services/electra-hub-org-page/us/version/prod-version.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
