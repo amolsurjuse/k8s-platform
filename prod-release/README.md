@@ -34,6 +34,8 @@ For a local-laptop prod-like environment, the most reliable option is usually to
 - `scripts/deploy-prod-release.sh` - applies prod-like Argo CD applications from this repo.
 - `scripts/deploy-prod-release.ps1` - Windows PowerShell version of the deployment script.
 - `docs/migration-runbook.md` - operational migration checklist.
+- `docs/windows-machine-migration-plan.md` - step-by-step plan for moving Kubernetes, TeamCity, PostgreSQL, Elasticsearch, RabbitMQ, Redis, secrets, ingress, and applications to a Windows machine.
+- `docs/repository-inventory.md` - list of local repositories, Git URLs, branches, and latest local commits for migration planning.
 
 ## Prerequisites
 

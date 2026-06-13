@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .DS_Store
 .idea/
 
@@ -9,3 +10,6 @@ prod-release/env/prod-laptop.env.ps1
 # Local Cloudflare credential/config material
 .local/
 *.credentials.json
+=======
+.local/
+>>>>>>> 2eaa02e61ff90bedf4137e34d9f93cf3dac95a01

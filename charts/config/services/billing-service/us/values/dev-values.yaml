@@ -10,8 +10,8 @@ replicaCount: 1
 
 config:
   data:
-    SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
-    SPRING_LIQUIBASE_ENABLED: "false"
+    SPRING_JPA_HIBERNATE_DDL_AUTO: "validate"
+    SPRING_LIQUIBASE_ENABLED: "true"
 
 startupProbe:
   enabled: true
