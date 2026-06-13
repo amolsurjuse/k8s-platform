@@ -11,14 +11,12 @@ resources:
 ingress:
   enabled: true
   className: "nginx"
-  host: "dev.electrahub.com"
+  host: "dev.electrahub.net"
   annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-  path: /org-page(/|$)(.*)
-  pathType: ImplementationSpecific
+  path: /
+  pathType: Prefix
   tls:
     enabled: true
     secretName: "electrahub-dev-tls"
@@ -59,10 +57,15 @@ extraIngresses:
         paths:
           - path: /org-page(/|$)(.*)
             pathType: ImplementationSpecific
+      - host: "dev.electrahub.net"
+        paths:
+          - path: /org-page(/|$)(.*)
+            pathType: ImplementationSpecific
     tls:
       - hosts:
           - "electrahub.net"
           - "www.electrahub.net"
+          - "dev.electrahub.net"
         secretName: "electrahub-dev-tls"
 
 hpa:
