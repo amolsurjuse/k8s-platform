@@ -1,0 +1,11 @@
+.DS_Store
+.idea/
+
+# Local environment files
+local-k3d/env/local-k3d.env
+prod-release/env/prod-laptop.env
+prod-release/env/prod-laptop.env.ps1
+
+# Local Cloudflare credential/config material
+.local/
+*.credentials.json
