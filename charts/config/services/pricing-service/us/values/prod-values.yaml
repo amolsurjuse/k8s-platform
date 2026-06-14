@@ -1,6 +1,9 @@
 secrets:
   existingSecretName: "postgresql-prod-secret"
 
+env:
+  GRPC_SERVER_PORT: "-1"
+
 extraSecretEnv:
   - name: "SPRING_DATA_REDIS_PASSWORD"
     secretName: "redis-prod-secret"

@@ -1,7 +1,10 @@
 secrets:
   existingSecretName: "postgresql-prod-secret"
 
-replicaCount: 1
+# Temporarily quarantined: current image tag is arm64-only and cannot run on
+# the amd64 k3d prod cluster. Restore to 1 after publishing an amd64/multiarch
+# notification-service image.
+replicaCount: 0
 
 resources:
   requests:
