@@ -57,6 +57,7 @@ class PipelineConfig:
     maven_goals: str
     maven_runner_args: str
     app_dir: str
+    npm_install_command: str
     build_command: str
     test_command: str
     k8s_branch: str
@@ -94,6 +95,7 @@ class PipelineConfig:
             maven_goals=str(raw.get("mavenGoals") or "clean package").strip(),
             maven_runner_args=str(raw.get("mavenRunnerArgs") or "").strip(),
             app_dir=str(raw.get("appDir") or ".").strip(),
+            npm_install_command=str(raw.get("npmInstallCommand") or "npm ci").strip(),
             build_command=str(raw.get("buildCommand") or "npm run build").strip(),
             test_command=str(raw.get("testCommand") or "").strip(),
             k8s_branch=str(raw.get("k8sBranch") or "develop").strip(),
@@ -358,7 +360,7 @@ def create_source_build_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     elif cfg.build_kind == "node":
         script = f"""set -eu
 cd "{cfg.app_dir}"
-npm ci
+{cfg.npm_install_command}
 {cfg.build_command}
 """
         create_script_step(tc, cfg, "Node Build", script)
