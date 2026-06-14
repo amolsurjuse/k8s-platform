@@ -11,7 +11,7 @@ resources:
 ingress:
   enabled: true
   className: "nginx"
-  host: "electrahub.net"
+  host: "api.electrahub.net"
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "/$1"
