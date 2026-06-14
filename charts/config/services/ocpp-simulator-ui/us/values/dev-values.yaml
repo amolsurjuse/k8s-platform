@@ -11,7 +11,7 @@ resources:
 ingress:
   enabled: true
   className: "nginx"
-  host: "ocpp-simulator-dev.electrahub.com"
+  host: "ocpp-simulator.dev.electrahub.net"
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "/$2"
