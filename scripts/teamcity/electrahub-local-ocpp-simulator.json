@@ -17,6 +17,7 @@
       "dockerPlatforms": "linux/amd64,linux/arm64",
       "testCommand": "go test ./...",
       "agentName": "",
+      "addVcsTrigger": false,
       "deployVersionFile": "charts/config/services/ocpp-simulator/us/version/dev-version.yaml"
     }
   ]
