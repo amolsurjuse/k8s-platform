@@ -1,5 +1,12 @@
 replicaCount: 1
 
+env:
+  APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
+
+config:
+  data:
+    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
+
 resources:
   requests:
     cpu: "100m"
