@@ -1,0 +1,23 @@
+{
+  "pipelines": [
+    {
+      "serviceName": "ocpp-simulator",
+      "buildKind": "go",
+      "teamcityProjectName": "ocpp-simulator",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_OcppSimulator",
+      "buildTypeId": "ElectraHub_OcppSimulator_Build",
+      "vcsRootId": "ElectraHub_OcppSimulatorUi_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/ocpi-simulator.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/ocpi-simulator",
+      "dockerfilePath": "Dockerfile",
+      "dockerContext": ".",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "testCommand": "go test ./...",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/ocpp-simulator/us/version/dev-version.yaml"
+    }
+  ]
+}
