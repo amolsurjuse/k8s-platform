@@ -1,21 +1,20 @@
 secrets:
   existingSecretName: "postgresql-prod-secret"
 
-replicaCount: 1
+extraSecretEnv:
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-prod-secret"
+    secretKey: "redis-password"
 
-config:
-  enabled: true
-  data:
-    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
-    SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
+replicaCount: 1
 
 resources:
   requests:
     cpu: "100m"
-    memory: "512Mi"
+    memory: "256Mi"
   limits:
     cpu: "500m"
-    memory: "1Gi"
+    memory: "512Mi"
 
 ingress:
   enabled: false

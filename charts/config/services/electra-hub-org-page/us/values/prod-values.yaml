@@ -16,17 +16,27 @@ ingress:
   path: /
   pathType: Prefix
   tls:
-    enabled: false
+    enabled: true
+    secretName: "electrahub-prod-tls"
 
 extraIngresses:
-  - name: public-www-root
+  - name: public-root
     className: "nginx"
     annotations: {}
     rules:
+      - host: "electrahub.net"
+        paths:
+          - path: /
+            pathType: Prefix
       - host: "www.electrahub.net"
         paths:
           - path: /
             pathType: Prefix
+    tls:
+      - hosts:
+          - "electrahub.net"
+          - "www.electrahub.net"
+        secretName: "electrahub-prod-tls"
   - name: public-org-prefix
     className: "nginx"
     annotations:
@@ -41,6 +51,16 @@ extraIngresses:
         paths:
           - path: /org-page(/|$)(.*)
             pathType: ImplementationSpecific
+      - host: "electrahub.net"
+        paths:
+          - path: /org-page(/|$)(.*)
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - "electrahub.net"
+          - "www.electrahub.net"
+          - "electrahub.net"
+        secretName: "electrahub-prod-tls"
 
 hpa:
   enabled: false

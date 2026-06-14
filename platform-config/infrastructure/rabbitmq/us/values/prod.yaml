@@ -1,0 +1,25 @@
+fullnameOverride: rabbitmq
+
+replicaCount: 1
+
+image:
+  repository: rabbitmq
+  tag: "3.13-management-alpine"
+
+auth:
+  username: guest
+  password: guest
+
+persistence:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+pdb:
+  enabled: false

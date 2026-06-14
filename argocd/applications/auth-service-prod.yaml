@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: electra-hub-org-page-prod
+  name: auth-service-prod
   namespace: argocd
 spec:
   project: electrahub-prod
@@ -13,12 +13,12 @@ spec:
     targetRevision: develop
     path: charts/common
     helm:
-      releaseName: electra-hub-org-page
+      releaseName: auth-service
       valueFiles:
-        - electra-hub-org-page/values.yaml
-        - ../config/services/electra-hub-org-page/us/base.yaml
-        - ../config/services/electra-hub-org-page/us/values/prod-values.yaml
-        - ../config/services/electra-hub-org-page/us/version/prod-version.yaml
+        - auth-service/values.yaml
+        - ../config/services/auth-service/us/base.yaml
+        - ../config/services/auth-service/us/values/prod-values.yaml
+        - ../config/services/auth-service/us/version/prod-version.yaml
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

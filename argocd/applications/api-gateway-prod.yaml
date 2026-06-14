@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: electra-hub-org-page-prod
+  name: api-gateway-prod
   namespace: argocd
 spec:
   project: electrahub-prod
@@ -13,12 +13,12 @@ spec:
     targetRevision: develop
     path: charts/common
     helm:
-      releaseName: electra-hub-org-page
+      releaseName: api-gateway
       valueFiles:
-        - electra-hub-org-page/values.yaml
-        - ../config/services/electra-hub-org-page/us/base.yaml
-        - ../config/services/electra-hub-org-page/us/values/prod-values.yaml
-        - ../config/services/electra-hub-org-page/us/version/prod-version.yaml
+        - api-gateway/values.yaml
+        - ../config/services/api-gateway/us/base.yaml
+        - ../config/services/api-gateway/us/values/prod-values.yaml
+        - ../config/services/api-gateway/us/version/prod-version.yaml
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

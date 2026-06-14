@@ -5,21 +5,15 @@ image:
   tag: "16"
 
 auth:
-  username: appuser
-  password: devpassword
-  database: appdb
+  existingSecretName: postgresql-prod-secret
 
 persistence:
-  enabled: true
   size: 10Gi
 
-resources:
-  requests:
-    cpu: 200m
-    memory: 512Mi
-  limits:
-    cpu: "1"
-    memory: 1Gi
+postgresql:
+  config:
+    listen_addresses: "'*'"
+    max_connections: 250
 
 pdb:
   enabled: false

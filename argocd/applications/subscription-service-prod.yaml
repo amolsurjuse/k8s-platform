@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: electra-hub-org-page-prod
+  name: subscription-service-prod
   namespace: argocd
 spec:
   project: electrahub-prod
@@ -13,12 +13,12 @@ spec:
     targetRevision: develop
     path: charts/common
     helm:
-      releaseName: electra-hub-org-page
+      releaseName: subscription-service
       valueFiles:
-        - electra-hub-org-page/values.yaml
-        - ../config/services/electra-hub-org-page/us/base.yaml
-        - ../config/services/electra-hub-org-page/us/values/prod-values.yaml
-        - ../config/services/electra-hub-org-page/us/version/prod-version.yaml
+        - subscription-service/values.yaml
+        - ../config/services/subscription-service/us/base.yaml
+        - ../config/services/subscription-service/us/values/prod-values.yaml
+        - ../config/services/subscription-service/us/version/prod-version.yaml
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

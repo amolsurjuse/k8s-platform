@@ -1,0 +1,63 @@
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "electrahub.net"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$1"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+  path: /(.*)
+  pathType: ImplementationSpecific
+  tls:
+    enabled: true
+    secretName: "electrahub-prod-tls"
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false
+
+extraIngresses:
+  - name: public-notifications
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: "/notifications/$2"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    rules:
+      - host: "electrahub.net"
+        paths:
+          - path: /notifications(/|$)(.*)
+            pathType: ImplementationSpecific
+      - host: "www.electrahub.net"
+        paths:
+          - path: /notifications(/|$)(.*)
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - "electrahub.net"
+          - "www.electrahub.net"
+        secretName: "electrahub-prod-tls"

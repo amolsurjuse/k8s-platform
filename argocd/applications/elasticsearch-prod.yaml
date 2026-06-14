@@ -1,24 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: electra-hub-org-page-prod
+  name: elasticsearch-prod
   namespace: argocd
 spec:
   project: electrahub-prod
+
   destination:
     server: https://kubernetes.default.svc
     namespace: prod
+
   source:
     repoURL: https://github.com/amolsurjuse/k8s-platform.git
     targetRevision: develop
-    path: charts/common
+    path: infrastructure/elasticsearch
     helm:
-      releaseName: electra-hub-org-page
+      releaseName: elasticsearch
       valueFiles:
-        - electra-hub-org-page/values.yaml
-        - ../config/services/electra-hub-org-page/us/base.yaml
-        - ../config/services/electra-hub-org-page/us/values/prod-values.yaml
-        - ../config/services/electra-hub-org-page/us/version/prod-version.yaml
+        - ../../platform-config/infrastructure/elasticsearch/us/values/prod.yaml
+
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

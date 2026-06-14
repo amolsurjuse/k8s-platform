@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: electra-hub-org-page-prod
+  name: driver-portal-ui-prod
   namespace: argocd
 spec:
   project: electrahub-prod
@@ -13,12 +13,12 @@ spec:
     targetRevision: develop
     path: charts/common
     helm:
-      releaseName: electra-hub-org-page
+      releaseName: driver-portal-ui
       valueFiles:
-        - electra-hub-org-page/values.yaml
-        - ../config/services/electra-hub-org-page/us/base.yaml
-        - ../config/services/electra-hub-org-page/us/values/prod-values.yaml
-        - ../config/services/electra-hub-org-page/us/version/prod-version.yaml
+        - driver-portal-ui/values.yaml
+        - ../config/services/driver-portal-ui/us/base.yaml
+        - ../config/services/driver-portal-ui/us/values/prod-values.yaml
+        - ../config/services/driver-portal-ui/us/version/prod-version.yaml
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

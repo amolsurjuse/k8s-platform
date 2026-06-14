@@ -1,0 +1,76 @@
+secrets:
+  existingSecretName: "postgresql-prod-secret"
+
+extraSecretEnv:
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-prod-secret"
+    secretKey: "redis-password"
+
+replicaCount: 2
+
+image:
+  pullPolicy: Always
+
+config:
+  data:
+    SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+    SPRING_LIQUIBASE_ENABLED: "false"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+    SESSION_ANALYTICS_KAFKA_ENABLED: "true"
+    SESSION_ANALYTICS_RECEIPT_TOPIC: "eh.charging.receipt.generated.v1"
+
+startupProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  periodSeconds: 10
+  failureThreshold: 90
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  # TEMPORARY: bypass api-gateway ONLY for the active-sessions SSE stream
+  # so its long-lived response is not buffered by the gateway's synchronous
+  # RestClient.readAllBytes() proxy. All other /session/* traffic continues
+  # to flow through the api-gateway (auth, RBAC, JWT denylist).
+  #
+  # Remove this ingress once api-gateway streams text/event-stream natively.
+  # Tracked in api-gateway PR: streaming branch in GatewayProxyController.
+  enabled: true
+  className: "nginx"
+  host: "electrahub.net"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$1"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # SSE requires no response buffering and long-lived connections.
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  # Match ONLY the SSE endpoint. Nginx ingress prefers more-specific
+  # regex paths over the api-gateway's catch-all `/(.*)`, so this rule
+  # wins for /session/api/v1/sessions/active/stream and nothing else.
+  path: /session/(api/v1/sessions/active/stream)
+  pathType: ImplementationSpecific
+  tls:
+    enabled: true
+    secretName: "electrahub-prod-tls"
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false
