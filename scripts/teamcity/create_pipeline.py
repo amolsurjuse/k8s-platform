@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import getpass
 import json
 import os
 import re
@@ -50,6 +51,8 @@ class PipelineConfig:
     docker_image: str
     dockerfile_path: str
     docker_context: str
+    docker_platforms: str
+    docker_use_buildx: bool
     pom_path: str
     maven_goals: str
     maven_runner_args: str
@@ -85,6 +88,8 @@ class PipelineConfig:
             docker_image=require(raw.get("dockerImage"), "dockerImage"),
             dockerfile_path=str(raw.get("dockerfilePath") or "Dockerfile").strip(),
             docker_context=str(raw.get("dockerContext") or ".").strip(),
+            docker_platforms=str(raw.get("dockerPlatforms") or "linux/amd64,linux/arm64").strip(),
+            docker_use_buildx=bool(raw.get("dockerUseBuildx", True)),
             pom_path=str(raw.get("pomPath") or "pom.xml").strip(),
             maven_goals=str(raw.get("mavenGoals") or "clean package").strip(),
             maven_runner_args=str(raw.get("mavenRunnerArgs") or "").strip(),
@@ -94,7 +99,7 @@ class PipelineConfig:
             k8s_branch=str(raw.get("k8sBranch") or "develop").strip(),
             deploy_version_file=require(raw.get("deployVersionFile"), "deployVersionFile"),
             docker_username=str(raw.get("dockerUsername") or "amolsurjuse").strip(),
-            agent_name=str(raw.get("agentName") or "teamcity-minimal-agent").strip(),
+            agent_name=str(raw["agentName"] if "agentName" in raw else "teamcity-minimal-agent").strip(),
             add_vcs_trigger=bool(raw.get("addVcsTrigger", True)),
         )
 
@@ -109,8 +114,11 @@ class TeamCityClient:
         return f"{self.base_url}{path}"
 
     def _headers(self) -> dict[str, str]:
-        basic = base64.b64encode(f":{self.token}".encode("utf-8")).decode("ascii")
-        return {"Authorization": f"Basic {basic}", "Accept": "application/json"}
+        if self.token.startswith("basic:"):
+            token = self.token.removeprefix("basic:")
+            basic = base64.b64encode(f":{token}".encode("utf-8")).decode("ascii")
+            return {"Authorization": f"Basic {basic}", "Accept": "application/json"}
+        return {"Authorization": f"Bearer {self.token}", "Accept": "application/json"}
 
     def request(self, method: str, path: str, body: dict[str, Any] | None = None) -> Any:
         headers = self._headers()
@@ -200,7 +208,18 @@ git commit -m "chore({cfg.service_name}): deploy dev image tag ${{BUILD}}" || {{
   exit 0
 }}
 
-git push origin "$BRANCH"
+for attempt in 1 2 3; do
+  if git push origin "$BRANCH"; then
+    exit 0
+  fi
+
+  echo "Push failed, rebasing onto latest $BRANCH before retry $attempt..."
+  git fetch origin "$BRANCH"
+  git rebase "origin/$BRANCH"
+done
+
+echo "ERROR: failed to push deployment version update after retries"
+exit 1
 """
 
 
@@ -214,6 +233,20 @@ def ensure_project(tc: TeamCityClient, cfg: PipelineConfig) -> None:
         "parentProject": {"id": cfg.parent_project_id},
     })
     print(f"Created project: {cfg.project_id}")
+
+
+def ensure_parent_project(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+    if cfg.parent_project_id in ("_Root", "Root"):
+        return
+    if tc.exists(f"/app/rest/projects/id:{cfg.parent_project_id}"):
+        print(f"TeamCity parent project exists: {cfg.parent_project_id}")
+        return
+    tc.request("POST", "/app/rest/projects", {
+        "id": cfg.parent_project_id,
+        "name": cfg.parent_project_id,
+        "parentProject": {"id": "_Root"},
+    })
+    print(f"Created parent project: {cfg.parent_project_id}")
 
 
 def ensure_vcs_root(tc: TeamCityClient, cfg: PipelineConfig) -> None:
@@ -282,6 +315,9 @@ def set_parameters(tc: TeamCityClient, cfg: PipelineConfig) -> None:
 
 
 def ensure_agent_requirement(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+    if not cfg.agent_name:
+        print("Skipped agent requirement")
+        return
     requirements = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}/agent-requirements")
     if int(requirements.get("count", 0)) > 0:
         print("Agent requirement already configured")
@@ -309,22 +345,10 @@ def create_script_step(tc: TeamCityClient, cfg: PipelineConfig, name: str, scrip
 
 
 def create_maven_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
-    properties = [
-        step_property("goals", cfg.maven_goals),
-        step_property("localRepoScope", "agent"),
-        step_property("maven.path", "%teamcity.tool.maven.DEFAULT%"),
-        step_property("pomLocation", cfg.pom_path),
-        step_property("teamcity.step.mode", "default"),
-        step_property("userSettingsSelection", "userSettingsSelection:default"),
-    ]
-    if cfg.maven_runner_args:
-        properties.append(step_property("runnerArgs", cfg.maven_runner_args))
-    tc.request("POST", f"/app/rest/buildTypes/id:{cfg.build_type_id}/steps", {
-        "name": "Maven Build",
-        "type": "Maven2",
-        "properties": {"property": properties},
-    })
-
+    pom_arg = "" if cfg.pom_path == "pom.xml" else f" -f {cfg.pom_path}"
+    args = f" {cfg.maven_runner_args}" if cfg.maven_runner_args else ""
+    script = f"mvn{pom_arg} {cfg.maven_goals}{args}"
+    create_script_step(tc, cfg, "Maven Build", script)
 
 def create_source_build_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     if cfg.build_kind == "maven":
@@ -359,30 +383,47 @@ def create_steps_if_empty(tc: TeamCityClient, cfg: PipelineConfig) -> None:
         dockerfile_path = f"{app_dir}/{cfg.dockerfile_path}"
         docker_context = app_dir
 
-    tc.request("POST", f"/app/rest/buildTypes/id:{cfg.build_type_id}/steps", {
-        "name": "Docker Build",
-        "type": "DockerCommand",
-        "properties": {"property": [
-            step_property("docker.command.type", "build"),
-            step_property("docker.image.namesAndTags", f"{cfg.docker_image}:%build.number%"),
-            step_property("docker.push.remove.image", "true"),
-            step_property("dockerfile.path", dockerfile_path),
-            step_property("dockerfile.source", "PATH"),
-            step_property("docker.context.folder", docker_context),
-            step_property("teamcity.step.mode", "default"),
-        ]},
-    })
-    tc.request("POST", f"/app/rest/buildTypes/id:{cfg.build_type_id}/steps", {
-        "name": "Docker Push",
-        "type": "DockerCommand",
-        "properties": {"property": [
-            step_property("docker.command.type", "push"),
-            step_property("docker.image.namesAndTags", f"{cfg.docker_image}:%build.number%"),
-            step_property("docker.push.remove.image", "true"),
-            step_property("dockerfile.source", "PATH"),
-            step_property("teamcity.step.mode", "default"),
-        ]},
-    })
+    if cfg.docker_use_buildx:
+        create_script_step(tc, cfg, "Docker Buildx Push", f"""set -eu
+
+test -n "%docker.username%"
+test -n "%docker.password%"
+
+echo "%docker.password%" | docker login -u "%docker.username%" --password-stdin
+docker buildx create --use --name "tc-%build.number%" || docker buildx use "tc-%build.number%"
+docker buildx build \\
+  --platform "{cfg.docker_platforms}" \\
+  --file "{dockerfile_path}" \\
+  --tag "{cfg.docker_image}:%build.number%" \\
+  --push \\
+  "{docker_context}"
+docker buildx imagetools inspect "{cfg.docker_image}:%build.number%"
+""")
+    else:
+        tc.request("POST", f"/app/rest/buildTypes/id:{cfg.build_type_id}/steps", {
+            "name": "Docker Build",
+            "type": "DockerCommand",
+            "properties": {"property": [
+                step_property("docker.command.type", "build"),
+                step_property("docker.image.namesAndTags", f"{cfg.docker_image}:%build.number%"),
+                step_property("docker.push.remove.image", "true"),
+                step_property("dockerfile.path", dockerfile_path),
+                step_property("dockerfile.source", "PATH"),
+                step_property("docker.context.folder", docker_context),
+                step_property("teamcity.step.mode", "default"),
+            ]},
+        })
+        tc.request("POST", f"/app/rest/buildTypes/id:{cfg.build_type_id}/steps", {
+            "name": "Docker Push",
+            "type": "DockerCommand",
+            "properties": {"property": [
+                step_property("docker.command.type", "push"),
+                step_property("docker.image.namesAndTags", f"{cfg.docker_image}:%build.number%"),
+                step_property("docker.push.remove.image", "true"),
+                step_property("dockerfile.source", "PATH"),
+                step_property("teamcity.step.mode", "default"),
+            ]},
+        })
     create_script_step(tc, cfg, "Update build version", update_version_script(cfg))
     print("Created build steps")
 
@@ -407,6 +448,7 @@ def ensure_trigger(tc: TeamCityClient, cfg: PipelineConfig) -> None:
 
 
 def create_pipeline(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+    ensure_parent_project(tc, cfg)
     ensure_project(tc, cfg)
     ensure_vcs_root(tc, cfg)
     ensure_build_type(tc, cfg)
@@ -445,7 +487,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    token = require(args.token, "TEAMCITY_TOKEN or --token")
+    token = str(args.token or "").strip()
+    if not token and sys.stdin.isatty():
+        token = getpass.getpass("TeamCity access token: ").strip()
+    token = require(token, "TEAMCITY_TOKEN or --token")
     configs = load_configs(args.config)
     wanted = {service.lower() for service in args.service}
     if wanted:

@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ocpp-simulator-ui
+  namespace: argocd
+spec:
+  project: electrahub-dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: ocpp-simulator-ui
+      valueFiles:
+        - ocpp-simulator-ui/values.yaml
+        - ../config/services/ocpp-simulator-ui/us/base.yaml
+        - ../config/services/ocpp-simulator-ui/us/values/dev-values.yaml
+        - ../config/services/ocpp-simulator-ui/us/version/dev-version.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

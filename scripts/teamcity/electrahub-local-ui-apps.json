@@ -1,0 +1,56 @@
+{
+  "pipelines": [
+    {
+      "serviceName": "admin-portal-ui",
+      "buildKind": "node",
+      "teamcityProjectName": "admin-portal-ui",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_AdminPortalUi",
+      "buildTypeId": "ElectraHub_AdminPortalUi_Build",
+      "vcsRootId": "ElectraHub_AdminPortalUi_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/admin-portal-ui.git",
+      "gitBranch": "develop",
+      "buildCommand": "npm run build",
+      "dockerImage": "amolsurjuse/admin-portal-ui",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/admin-portal-ui/us/version/dev-version.yaml"
+    },
+    {
+      "serviceName": "driver-portal-ui",
+      "buildKind": "node",
+      "teamcityProjectName": "driver-portal-ui",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_DriverPortalUi",
+      "buildTypeId": "ElectraHub_DriverPortalUi_Build",
+      "vcsRootId": "ElectraHub_DriverPortalUi_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/driver-portal-frontend.git",
+      "gitBranch": "develop",
+      "buildCommand": "npm run build -- --configuration production",
+      "dockerImage": "amolsurjuse/driver-portal-frontend",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/driver-portal-ui/us/version/dev-version.yaml"
+    },
+    {
+      "serviceName": "ocpp-simulator-ui",
+      "buildKind": "node",
+      "teamcityProjectName": "ocpp-simulator-ui",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_OcppSimulatorUi",
+      "buildTypeId": "ElectraHub_OcppSimulatorUi_Build",
+      "vcsRootId": "ElectraHub_OcppSimulatorUi_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/ocpi-simulator.git",
+      "gitBranch": "develop",
+      "appDir": "ui",
+      "buildCommand": "npm run build -- --configuration production --base-href /ocpp-simulator-ui/",
+      "dockerImage": "amolsurjuse/ocpi-simulator-ui",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/ocpp-simulator-ui/us/version/dev-version.yaml"
+    }
+  ]
+}
