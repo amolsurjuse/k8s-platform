@@ -11,7 +11,7 @@ resources:
 ingress:
   enabled: true
   className: "nginx"
-  host: "api.dev.electrahub.net"
+  host: "api-dev.electrahub.net"
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "/$1"
@@ -37,7 +37,7 @@ metrics:
     enabled: false
 
 extraIngresses:
-  - name: api-dev-alias
+  - name: api-dot-dev-alias
     className: "nginx"
     annotations:
       nginx.ingress.kubernetes.io/use-regex: "true"
@@ -48,13 +48,13 @@ extraIngresses:
       nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     rules:
-      - host: "api-dev.electrahub.net"
+      - host: "api.dev.electrahub.net"
         paths:
           - path: /(.*)
             pathType: ImplementationSpecific
     tls:
       - hosts:
-          - "api-dev.electrahub.net"
+          - "api.dev.electrahub.net"
         secretName: "electrahub-dev-tls"
   - name: public-notifications
     className: "nginx"
