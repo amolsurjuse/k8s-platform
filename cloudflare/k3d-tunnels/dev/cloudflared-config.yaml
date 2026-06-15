@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: cloudflare
+data:
+  config.yml: |
+    tunnel: 6fa11fd3-7746-4cf8-b6eb-9aeb9f6a9de0
+    credentials-file: /etc/cloudflared/creds/credentials.json
+
+    ingress:
+      - hostname: dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: api-dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: api.dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: admin-dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: admin-portal-dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: driver-dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: driver-portal-dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: simulator-dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: ocpp-simulator-dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: grafana.dev.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: argocd-dev.electrahub.net
+        service: http://argocd-server.argocd.svc.cluster.local:80
+      - hostname: argocd.dev.electrahub.net
+        service: http://argocd-server.argocd.svc.cluster.local:80
+      - service: http_status:404

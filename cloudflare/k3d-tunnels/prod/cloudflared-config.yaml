@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: cloudflare
+data:
+  config.yml: |
+    tunnel: fdc54cbf-d80e-4aa8-92a6-34c810580505
+    credentials-file: /etc/cloudflared/creds/credentials.json
+
+    ingress:
+      - hostname: electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: www.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: api.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: admin-portal.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: driver-portal.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: ocpp-simulator.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: grafana.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: argocd.electrahub.net
+        service: http://argocd-server.argocd.svc.cluster.local:80
+      - service: http_status:404
