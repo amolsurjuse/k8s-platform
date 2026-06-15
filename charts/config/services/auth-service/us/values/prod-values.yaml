@@ -9,10 +9,18 @@ config:
     APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
 
 secrets:
-  existingSecretName: "auth-secrets-dev"
+  existingSecretName: "postgresql-prod-secret"
+  env:
+    ENV_AUTH_DATASOURCE_USERNAME: "POSTGRES_USER"
+    ENV_AUTH_DATASOURCE_PASSWORD: "POSTGRES_PASSWORD"
+
+extraSecretEnv:
+  - name: "APP_SECURITY_JWT_SECRET"
+    secretName: "auth-jwt-prod-secret"
+    secretKey: "APP_SECURITY_JWT_SECRET"
 
 env:
-  SPRING_PROFILES_ACTIVE: "dev"
+  SPRING_PROFILES_ACTIVE: "prod"
   SPRING_LIQUIBASE_ENABLED: "true"
   APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
 

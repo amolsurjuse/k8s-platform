@@ -1,7 +1,13 @@
 replicaCount: 1
 
 env:
+  SPRING_PROFILES_ACTIVE: "prod"
   APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
+
+extraSecretEnv:
+  - name: "APP_SECURITY_JWT_SECRET"
+    secretName: "auth-jwt-prod-secret"
+    secretKey: "APP_SECURITY_JWT_SECRET"
 
 config:
   data:

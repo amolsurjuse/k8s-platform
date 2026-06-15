@@ -1,11 +1,20 @@
 secrets:
   existingSecretName: "postgresql-prod-secret"
 
+extraSecretEnv:
+  - name: "APP_SECURITY_JWT_SECRET"
+    secretName: "auth-jwt-prod-secret"
+    secretKey: "APP_SECURITY_JWT_SECRET"
+
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+
 replicaCount: 1
 
 config:
   enabled: true
   data:
+    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
     SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
     SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
 

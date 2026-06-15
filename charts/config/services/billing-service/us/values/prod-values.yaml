@@ -6,6 +6,9 @@ extraSecretEnv:
     secretName: "redis-prod-secret"
     secretKey: "redis-password"
 
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+
 replicaCount: 1
 
 config:
