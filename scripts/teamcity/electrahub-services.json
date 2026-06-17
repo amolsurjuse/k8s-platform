@@ -119,6 +119,19 @@
       "deployVersionFile": "charts/config/services/session-service/us/version/dev-version.yaml"
     },
     {
+      "serviceName": "notification-service",
+      "buildKind": "maven",
+      "teamcityProjectName": "notification-service",
+      "parentProjectId": "Amy",
+      "projectId": "Amy_NotificationService",
+      "buildTypeId": "Amy_NotificationService_Build",
+      "vcsRootId": "Amy_HttpsGithubComAmolsurjuseNotificationServiceRefsHeadsDevelop",
+      "gitUrl": "https://github.com/amolsurjuse/notification-service.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/notification-service",
+      "deployVersionFile": "charts/config/services/notification-service/us/version/dev-version.yaml"
+    },
+    {
       "serviceName": "station-management-service",
       "buildKind": "maven",
       "teamcityProjectName": "station-management-service",
