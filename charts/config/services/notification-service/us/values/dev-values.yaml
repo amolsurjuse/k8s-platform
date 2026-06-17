@@ -28,3 +28,4 @@ config:
   data:
     NOTIFICATION_CHANNEL_EMAIL_DAILY_LIMIT: "59"
     NOTIFICATION_CHANNEL_PUSH_DAILY_LIMIT: "500"
+    NOTIFICATION_DRIVER_RESET_PASSWORD_URL: "https://driver-portal-dev.electrahub.net/reset-password"

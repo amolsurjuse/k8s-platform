@@ -7,6 +7,7 @@ config:
     SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
     SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
     APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
+    APP_DRIVER_RESET_PASSWORD_URL: "https://driver-portal.electrahub.net/reset-password"
 
 secrets:
   existingSecretName: "postgresql-prod-secret"
@@ -23,6 +24,7 @@ env:
   SPRING_PROFILES_ACTIVE: "prod"
   SPRING_LIQUIBASE_ENABLED: "true"
   APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
+  APP_DRIVER_RESET_PASSWORD_URL: "https://driver-portal.electrahub.net/reset-password"
 
 resources:
   requests:
