@@ -23,3 +23,7 @@ pdb:
 metrics:
   servicemonitor:
     enabled: false
+
+config:
+  data:
+    NOTIFICATION_CHANNEL_EMAIL_DAILY_LIMIT: "150"
