@@ -43,12 +43,12 @@ ingress:
   # Tracked in api-gateway PR: streaming branch in GatewayProxyController.
   enabled: true
   className: "nginx"
-  host: "dev.electrahub.com"
+  host: "api.dev.electrahub.net"
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "/$1"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
     # SSE requires no response buffering and long-lived connections.
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
