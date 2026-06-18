@@ -8,6 +8,9 @@ extraSecretEnv:
 
 replicaCount: 2
 
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+
 image:
   pullPolicy: Always
 

@@ -3,6 +3,9 @@ secrets:
 
 replicaCount: 1
 
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+
 resources:
   requests:
     cpu: "100m"
