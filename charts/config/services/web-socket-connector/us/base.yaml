@@ -10,6 +10,10 @@ config:
   data:
     PORT: "8091"
     LOG_LEVEL: "info"
+    SIMULATOR_API_BASE_URL: "http://ocpp-simulator:8081"
+    REMOTE_START_METER_INTERVAL: "5s"
+    REMOTE_START_DEFAULT_POWER_W: "44000"
+    REMOTE_START_DEFAULT_METER_WH: "1200000"
 
 readinessProbe:
   enabled: true
