@@ -1,7 +1,7 @@
 fullnameOverride: "ocpp-simulator"
 image:
   repository: amolsurjuse/ocpi-simulator
-  tag: "16"
+  tag: "18"
 
 service:
   port: 8081
