@@ -16,7 +16,7 @@ config:
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
     SPRING_LIQUIBASE_ENABLED: "false"
     KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
-    SESSION_ANALYTICS_KAFKA_ENABLED: "true"
+    SESSION_ANALYTICS_KAFKA_ENABLED: "false"
     SESSION_ANALYTICS_RECEIPT_TOPIC: "eh.charging.receipt.generated.v1"
 
 startupProbe:

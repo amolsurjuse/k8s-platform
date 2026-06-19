@@ -1,6 +1,7 @@
 fullnameOverride: "web-socket-connector"
 image:
   repository: amolsurjuse/web-socket-connector
+  tag: "9"
 
 service:
   port: 8091
