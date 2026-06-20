@@ -1,0 +1,29 @@
+replicaCount: 1
+
+image:
+  pullPolicy: Always
+
+resources:
+  requests:
+    cpu: "50m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+ingress:
+  enabled: false
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false
+
+config:
+  data:
+    SUPPORT_EMAIL: "support@electrahub.com"

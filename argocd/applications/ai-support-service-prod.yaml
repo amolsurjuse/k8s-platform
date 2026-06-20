@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ai-support-service-prod
+  namespace: argocd
+spec:
+  project: electrahub-prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: ai-support-service
+      valueFiles:
+        - ai-support-service/values.yaml
+        - ../config/services/ai-support-service/us/base.yaml
+        - ../config/services/ai-support-service/us/values/prod-values.yaml
+        - ../config/services/ai-support-service/us/version/prod-version.yaml
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

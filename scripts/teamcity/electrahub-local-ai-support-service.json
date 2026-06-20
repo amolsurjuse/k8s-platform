@@ -1,0 +1,20 @@
+{
+  "pipelines": [
+    {
+      "serviceName": "ai-support-service",
+      "buildKind": "maven",
+      "teamcityProjectName": "ai-support-service",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_AiSupportService",
+      "buildTypeId": "ElectraHub_AiSupportService_Build",
+      "vcsRootId": "ElectraHub_AiSupportService_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/ai-support-service.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/ai-support-service",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/ai-support-service/us/version/dev-version.yaml"
+    }
+  ]
+}

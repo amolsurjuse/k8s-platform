@@ -1,0 +1,51 @@
+fullnameOverride: "ai-support-service"
+image:
+  repository: amolsurjuse/ai-support-service
+
+service:
+  port: 8094
+containerPort: 8094
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+  JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
+
+config:
+  data:
+    SERVER_PORT: "8094"
+    AI_PROVIDER_ENABLED: "false"
+    SUPPORT_EMAIL: "support@electrahub.com"
+    AI_STREAM_TOKEN_DELAY_MS: "18"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+    MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+    MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED: "true"
+    MANAGEMENT_HEALTH_READINESSSTATE_ENABLED: "true"
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 25
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  periodSeconds: 10
+  failureThreshold: 60
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000

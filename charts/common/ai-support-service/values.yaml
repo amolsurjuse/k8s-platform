@@ -1,0 +1,20 @@
+fullnameOverride: ai-support-service
+
+image:
+  repository: amolsurjuse/ai-support-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8094
+
+containerPort: 8094
+
+env: {}
+config:
+  data: {}
+
+ingress:
+  enabled: false
+
