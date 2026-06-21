@@ -25,6 +25,7 @@ config:
     SESSION_SERVICE_URL: "http://session-service:8083"
     STATION_SERVICE_URL: "http://station-management-service:8081"
     CHARGER_SERVICE_URL: "http://charger-management-service:8086"
+    USER_SERVICE_URL: "http://user-service:8082"
     BILLING_ANALYTICS_ELASTICSEARCH_ENABLED: "true"
     BILLING_ANALYTICS_ELASTICSEARCH_INDEX: "charging-session-facts"
     BILLING_ANALYTICS_ELASTICSEARCH_BATCH_SIZE: "1000"
