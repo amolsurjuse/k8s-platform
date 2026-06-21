@@ -4,7 +4,7 @@ metadata:
   name: ocpp-simulator
   namespace: argocd
 spec:
-  project: amy
+  project: electrahub-dev
   destination:
     server: https://kubernetes.default.svc
     namespace: dev

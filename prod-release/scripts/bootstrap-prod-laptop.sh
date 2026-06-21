@@ -56,7 +56,7 @@ helm upgrade --install argocd argo/argo-cd \
   --set server.service.type=ClusterIP \
   --wait
 
-echo "Prod-like cluster is ready."
+echo "Prod cluster is ready."
 echo "Context: k3d-${ELECTRA_CLUSTER_NAME}"
 echo "Namespace: ${ELECTRA_NAMESPACE}"
 echo "Argo CD namespace: ${ELECTRA_ARGO_NAMESPACE}"

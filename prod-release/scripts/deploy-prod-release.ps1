@@ -202,5 +202,5 @@ foreach ($service in $services) {
   New-ServiceApplication -Name $service
 }
 
-Write-Host "Prod-like Argo CD applications submitted."
+Write-Host "Prod Argo CD applications submitted."
 Write-Host "Check with: kubectl -n $argoNamespace get applications"

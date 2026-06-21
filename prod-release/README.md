@@ -1,13 +1,13 @@
-# ElectraHub Prod-like Laptop Release
+# ElectraHub Prod Laptop Release
 
 This folder contains the runbook and scripts for promoting the current dev-tested ElectraHub stack to a separate laptop running its own Docker-backed Kubernetes cluster.
 
-The new laptop should be treated as a prod-like environment: separate Docker instance, separate Kubernetes cluster, separate data volumes, separate secrets, and its own externally reachable URLs.
+The new laptop should be treated as a Prod environment: separate Docker instance, separate Kubernetes cluster, separate data volumes, separate secrets, and its own externally reachable URLs.
 
 ## Target Model
 
 - Current laptop: development and validation environment.
-- New laptop: prod-like release environment.
+- New laptop: Prod release environment.
 - Kubernetes runtime on new laptop: `k3d` by default, because it runs cleanly on Docker and is easy to recreate.
 - GitOps controller: Argo CD can either run on the current laptop and deploy to the new laptop cluster, or run directly inside the new laptop cluster.
 
@@ -21,7 +21,7 @@ Yes. Argo CD can run on one Kubernetes cluster and deploy workloads to another K
 - Firewalls, VPN, local network routing, and laptop sleep settings allow persistent connectivity.
 - The target cluster service account used by Argo CD has enough RBAC permissions.
 
-For a local-laptop prod-like environment, the most reliable option is usually to run Argo CD inside the prod laptop cluster. Central Argo works too, but it depends on network reachability between laptops and a stable target API endpoint.
+For a local-laptop Prod environment, the most reliable option is usually to run Argo CD inside the prod laptop cluster. Central Argo works too, but it depends on network reachability between laptops and a stable target API endpoint.
 
 ## Folder Layout
 
@@ -31,7 +31,7 @@ For a local-laptop prod-like environment, the most reliable option is usually to
 - `scripts/bootstrap-prod-laptop.ps1` - Windows PowerShell version of the bootstrap script.
 - `scripts/register-prod-cluster-with-argocd.sh` - registers the prod laptop cluster with an existing Argo CD instance.
 - `scripts/register-prod-cluster-with-argocd.ps1` - Windows PowerShell version of the Argo CD registration script.
-- `scripts/deploy-prod-release.sh` - applies prod-like Argo CD applications from this repo.
+- `scripts/deploy-prod-release.sh` - applies Prod Argo CD applications from this repo.
 - `scripts/deploy-prod-release.ps1` - Windows PowerShell version of the deployment script.
 - `docs/migration-runbook.md` - operational migration checklist.
 - `docs/windows-machine-migration-plan.md` - step-by-step plan for moving Kubernetes, TeamCity, PostgreSQL, Elasticsearch, RabbitMQ, Redis, secrets, ingress, and applications to a Windows machine.

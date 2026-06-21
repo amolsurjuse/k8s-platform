@@ -1,0 +1,20 @@
+{
+  "pipelines": [
+    {
+      "serviceName": "electra-hub-org-page",
+      "buildKind": "docker",
+      "teamcityProjectName": "electra-hub-org-page",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_ElectraHubOrgPage",
+      "buildTypeId": "ElectraHub_ElectraHubOrgPage_Build",
+      "vcsRootId": "ElectraHub_ElectraHubOrgPage_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/electra-hub-org-page.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/electra-hub-org-page",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/electra-hub-org-page/us/version/dev-version.yaml"
+    }
+  ]
+}

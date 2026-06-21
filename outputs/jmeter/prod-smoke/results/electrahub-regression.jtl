@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1782054789249,29623,Full charging journey with SSE,200,full completed for jmeter+codex-prod-smoke5-001@electrahub.test,100 driver charging journeys 1-1,text,true,,371,0,1,1,null,0,0,0

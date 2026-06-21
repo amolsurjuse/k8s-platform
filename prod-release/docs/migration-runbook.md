@@ -1,6 +1,6 @@
-# Migration Runbook: Current Laptop to Prod-like Laptop
+# Migration Runbook: Current Laptop to Prod Laptop
 
-## 1. Prepare the Prod-like Laptop
+## 1. Prepare the Prod Laptop
 
 Install:
 
@@ -19,7 +19,7 @@ Allocate enough Docker resources:
 
 ## 2. Bootstrap Kubernetes and Argo CD
 
-On the prod-like laptop:
+On the Prod laptop:
 
 ```bash
 cp prod-release/env/prod-laptop.env.example prod-release/env/prod-laptop.env
@@ -30,15 +30,15 @@ This creates a separate Kubernetes cluster and installs Argo CD.
 
 ## 3. Decide Argo CD Topology
 
-Option A: Argo CD runs on the prod-like laptop.
+Option A: Argo CD runs on the Prod laptop.
 
-- Most reliable for a laptop-based prod-like environment.
+- Most reliable for a laptop-based Prod environment.
 - No cross-laptop Kubernetes API dependency.
 - Recommended for early release testing.
 
-Option B: Argo CD runs on the current laptop and manages the prod-like laptop cluster.
+Option B: Argo CD runs on the current laptop and manages the Prod laptop cluster.
 
-- Works when current laptop can reach the prod-like laptop Kubernetes API.
+- Works when current laptop can reach the Prod laptop Kubernetes API.
 - Requires `argocd cluster add <prod-context>`.
 - Requires stable networking, certificates, and RBAC.
 
@@ -81,7 +81,7 @@ kubectl -n prod get pods
 
 ## 7. Validation Checklist
 
-Run these checks before calling the prod-like laptop healthy:
+Run these checks before calling the Prod laptop healthy:
 
 - `api-gateway` ingress responds.
 - `auth-service` login works.
@@ -95,11 +95,11 @@ Run these checks before calling the prod-like laptop healthy:
 
 ## 8. Rollback
 
-Keep the current laptop dev environment untouched until prod-like validation passes.
+Keep the current laptop dev environment untouched until Prod validation passes.
 
 Rollback options:
 
 - Point clients back to the current laptop URLs.
 - Revert the GitOps image version files.
 - Restore database snapshots.
-- Recreate the prod-like cluster with `k3d cluster delete` and bootstrap again.
+- Recreate the Prod cluster with `k3d cluster delete` and bootstrap again.

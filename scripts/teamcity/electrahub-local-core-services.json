@@ -1,0 +1,52 @@
+{
+  "pipelines": [
+    {
+      "serviceName": "auth-service",
+      "buildKind": "maven",
+      "teamcityProjectName": "auth-service",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_AuthService",
+      "buildTypeId": "ElectraHub_AuthService_Build",
+      "vcsRootId": "ElectraHub_AuthService_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/auth-service.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/auth-service",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/auth-service/us/version/dev-version.yaml"
+    },
+    {
+      "serviceName": "user-service",
+      "buildKind": "maven",
+      "teamcityProjectName": "user-service",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_UserService",
+      "buildTypeId": "ElectraHub_UserService_Build",
+      "vcsRootId": "ElectraHub_UserService_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/user-service.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/user-service",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/user-service/us/version/dev-version.yaml"
+    },
+    {
+      "serviceName": "api-gateway",
+      "buildKind": "maven",
+      "teamcityProjectName": "api-gateway",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_ApiGateway",
+      "buildTypeId": "ElectraHub_ApiGateway_Build",
+      "vcsRootId": "ElectraHub_ApiGateway_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/api-gateway.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/api-gateway",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/api-gateway/us/version/dev-version.yaml"
+    }
+  ]
+}

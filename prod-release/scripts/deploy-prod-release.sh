@@ -149,5 +149,5 @@ for service in "${SERVICES[@]}"; do
   create_service_application "${service}"
 done
 
-echo "Prod-like Argo CD applications submitted."
+echo "Prod Argo CD applications submitted."
 echo "Check with: kubectl -n ${ELECTRA_ARGO_NAMESPACE} get applications"

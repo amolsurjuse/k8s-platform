@@ -112,7 +112,7 @@ Invoke-Checked "helm" "upgrade" "--install" "argocd" "argo/argo-cd" `
   "--set" "server.service.type=ClusterIP" `
   "--wait"
 
-Write-Host "Prod-like cluster is ready."
+Write-Host "Prod cluster is ready."
 Write-Host "Context: k3d-$clusterName"
 Write-Host "Namespace: $namespace"
 Write-Host "Argo CD namespace: $argoNamespace"
