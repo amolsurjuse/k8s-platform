@@ -14,7 +14,7 @@
   "jmeterImage": "justb4/jmeter:latest",
   "jmeterPlan": "scripts/jmeter/03-full-e2e-charging-100-users.jmx",
   "regressionBaseUrl": "https://api.dev.electrahub.net",
-  "regressionUsers": "5",
+  "regressionUsers": "50",
   "regressionRampSeconds": "30",
   "regressionHoldSeconds": "120",
   "regressionSseSeconds": "60",
