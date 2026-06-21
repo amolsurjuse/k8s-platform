@@ -113,6 +113,7 @@ The regression pipeline is intentionally different:
 4. Publishes the raw `.jtl`, JMeter log, and HTML dashboard as TeamCity artifacts
 5. Uses safe smoke defaults of 5 users, no VCS trigger, and `https://api.dev.electrahub.net`
 6. Uses dynamic connector selection by default so smoke runs choose a currently available connector
+7. Retries alternate live connectors when a selected connector becomes unavailable during the run
 
 If public dev Cloudflare is unhealthy, queue the build with:
 
@@ -126,3 +127,4 @@ For a full manual 100-user run, edit the build parameters before queueing:
 - `regression.hold.seconds=900`
 - `regression.sse.seconds=120`
 - `regression.dynamic.connector.selection=false`
+- `regression.connector.start.attempts=20`

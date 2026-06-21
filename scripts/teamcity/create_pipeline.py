@@ -75,6 +75,7 @@ class PipelineConfig:
     regression_sse_seconds: str
     regression_host_header: str
     regression_dynamic_connector_selection: str
+    regression_connector_start_attempts: str
 
     @staticmethod
     def from_json(raw: dict[str, Any]) -> "PipelineConfig":
@@ -129,6 +130,7 @@ class PipelineConfig:
             regression_sse_seconds=str(raw.get("regressionSseSeconds") or "60").strip(),
             regression_host_header=str(raw.get("regressionHostHeader") or "").strip(),
             regression_dynamic_connector_selection=str(raw.get("regressionDynamicConnectorSelection") or "true").strip().lower(),
+            regression_connector_start_attempts=str(raw.get("regressionConnectorStartAttempts") or "12").strip(),
         )
 
 
@@ -349,6 +351,7 @@ def set_parameters(tc: TeamCityClient, cfg: PipelineConfig) -> None:
         set_parameter(tc, cfg.build_type_id, "regression.sse.seconds", cfg.regression_sse_seconds)
         set_parameter(tc, cfg.build_type_id, "regression.host.header", cfg.regression_host_header)
         set_parameter(tc, cfg.build_type_id, "regression.dynamic.connector.selection", cfg.regression_dynamic_connector_selection)
+        set_parameter(tc, cfg.build_type_id, "regression.connector.start.attempts", cfg.regression_connector_start_attempts)
     print("Set build parameters")
 
 
@@ -423,6 +426,7 @@ printf "{}\n" > "$DOCKER_CONFIG_DIR/config.json"
 
 echo "Running ElectraHub regression against %regression.base.url%"
 echo "Users=%regression.users% Ramp=%regression.ramp.seconds%s Hold=%regression.hold.seconds%s SSE=%regression.sse.seconds%s"
+echo "DynamicConnectorSelection=%regression.dynamic.connector.selection% ConnectorStartAttempts=%regression.connector.start.attempts%"
 
 status=0
 CID=""
@@ -450,6 +454,7 @@ CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -Jsse_seconds="%regression.sse.seconds%" \
   -Jrequest_host_header="%regression.host.header%" \
   -Jdynamic_connector_selection="%regression.dynamic.connector.selection%" \
+  -Jconnector_start_attempts="%regression.connector.start.attempts%" \
   -Jrun_id="tc-%build.number%" \
   -Jjmeter.save.saveservice.output_format=csv \
   -Jjmeter.save.saveservice.print_field_names=true \

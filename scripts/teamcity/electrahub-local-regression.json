@@ -19,5 +19,6 @@
   "regressionHoldSeconds": "120",
   "regressionSseSeconds": "60",
   "regressionHostHeader": "",
-  "regressionDynamicConnectorSelection": "true"
+  "regressionDynamicConnectorSelection": "true",
+  "regressionConnectorStartAttempts": "12"
 }
