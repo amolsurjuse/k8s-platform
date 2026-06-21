@@ -425,8 +425,16 @@ echo "Running ElectraHub regression against %regression.base.url%"
 echo "Users=%regression.users% Ramp=%regression.ramp.seconds%s Hold=%regression.hold.seconds%s SSE=%regression.sse.seconds%s"
 
 status=0
-DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm \
-  -v "$(pwd):/work" \
+CID=""
+cleanup() {
+  if [ -n "$CID" ]; then
+    DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker rm -f "$CID" >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
+
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker pull "%jmeter.image%"
+CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -w /work \
   "%jmeter.image%" \
   -n \
@@ -445,7 +453,11 @@ DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm \
   -Jrun_id="tc-%build.number%" \
   -Jjmeter.save.saveservice.output_format=csv \
   -Jjmeter.save.saveservice.print_field_names=true \
-  -Jjmeter.save.saveservice.response_data.on_error=true || status=$?
+  -Jjmeter.save.saveservice.response_data.on_error=true)"
+
+tar --exclude=.git --exclude=outputs -cf - . | DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker cp - "$CID":/work
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker start -a "$CID" || status=$?
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker cp "$CID":/work/outputs/jmeter/teamcity outputs/jmeter/ || true
 
 echo "##teamcity[publishArtifacts '$RESULT_DIR/** => jmeter-results']"
 echo "##teamcity[publishArtifacts '$REPORT_DIR/** => jmeter-report']"
@@ -466,9 +478,23 @@ echo "ElectraHub regression completed successfully."
     create_script_step(tc, cfg, "JMeter Charging Regression", script)
 
 
+def clear_steps(tc: TeamCityClient, cfg: PipelineConfig, build_type: dict[str, Any]) -> None:
+    steps = build_type.get("steps", {}).get("step", [])
+    for step in steps:
+        step_id = step.get("id")
+        if step_id:
+            tc.request("DELETE", f"/app/rest/buildTypes/id:{cfg.build_type_id}/steps/{urllib.parse.quote(step_id)}")
+            print(f"Deleted build step: {step_id}")
+
+
 def create_steps_if_empty(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     build_type = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}")
     if int(build_type.get("steps", {}).get("count", 0)) > 0:
+        if cfg.build_kind == "jmeter":
+            clear_steps(tc, cfg, build_type)
+            create_jmeter_regression_step(tc, cfg)
+            print("Replaced JMeter regression step")
+            return
         print("Build steps already configured")
         return
 
