@@ -11,6 +11,7 @@ import java.util.UUID
 def slurper = new JsonSlurper()
 def action = (Parameters ?: 'full').trim()
 def baseUrl = props.getProperty('base_url', 'https://api.dev.electrahub.net').replaceAll('/+$', '')
+def requestHostHeader = props.getProperty('request_host_header', '').trim()
 def runId = props.getProperty('run_id')
 if (!runId) {
   runId = String.valueOf(System.currentTimeMillis())
@@ -34,6 +35,7 @@ int holdSeconds = props.getProperty('hold_seconds', '900') as int
 int sseSeconds = props.getProperty('sse_seconds', String.valueOf(Math.min(holdSeconds, 120))) as int
 BigDecimal walletTopupAmount = new BigDecimal(props.getProperty('wallet_topup_amount', '120.00'))
 String usersOutput = props.getProperty('users_output', 'scripts/jmeter/data/generated-users.csv')
+boolean dynamicConnectorSelection = props.getProperty('dynamic_connector_selection', 'false').toBoolean()
 
 def logLine = { String message ->
   log.info("[electrahub-jmeter][${action}][${userNumber}] ${message}")
@@ -43,7 +45,11 @@ def json = { Object value -> JsonOutput.toJson(value) }
 
 def parseJson = { String body ->
   if (!body) return null
-  slurper.parseText(body)
+  try {
+    slurper.parseText(body)
+  } catch (Exception ignored) {
+    null
+  }
 }
 
 def decodeJwtPayload = { String token ->
@@ -63,7 +69,11 @@ def request = { String method, String path, Object body = null, String token = n
   conn.setConnectTimeout(timeoutMs)
   conn.setReadTimeout(timeoutMs)
   conn.setRequestProperty('Accept', 'application/json')
+  conn.setRequestProperty('User-Agent', 'ElectraHubRegression/1.0')
   conn.setRequestProperty('X-ElectraHub-Test-Run', runId)
+  if (requestHostHeader) {
+    conn.setRequestProperty('Host', requestHostHeader)
+  }
   if (token) {
     conn.setRequestProperty('Authorization', "Bearer ${token}")
   }
@@ -150,8 +160,32 @@ def appendGeneratedUser = {
   }
 }
 
+def acceptTerms = { String token ->
+  def response = request('POST', '/auth/api/terms/accept', [
+    platform: 'Web',
+    deviceModel: 'TeamCity',
+    appVersion: '1.0',
+    deviceId: "jmeter-${runId}-${userNumber}",
+    osVersion: 'load-test'
+  ], token)
+  requireStatus(response, [200, 201, 204], 'accept terms')
+  String refreshed = response.json?.accessToken as String
+  if (refreshed) {
+    vars.put('accessToken', refreshed)
+    logLine('accepted terms and received refreshed token')
+    return refreshed
+  }
+  logLine('accepted terms; refreshing token through login')
+  login()
+}
+
 def setupPayment = { String token ->
-  requireStatus(request('GET', '/payment/api/v1/payment/state', null, token), [200, 451], 'payment state before setup')
+  def initialState = request('GET', '/payment/api/v1/payment/state', null, token)
+  if ((initialState.status as int) == 451) {
+    token = acceptTerms(token)
+    initialState = request('GET', '/payment/api/v1/payment/state', null, token)
+  }
+  requireStatus(initialState, [200], 'payment state before setup')
 
   def card = request('POST', '/payment/api/v1/payment/cards', [
     brand: 'Visa',
@@ -170,6 +204,7 @@ def setupPayment = { String token ->
 
   def state = requireStatus(request('GET', '/payment/api/v1/payment/state', null, token), [200], 'payment state after setup')
   logLine("payment ready wallet=${state.json?.wallet?.balance}")
+  token
 }
 
 def discoverChargers = { String token ->
@@ -187,6 +222,44 @@ def discoverChargers = { String token ->
   def list = requireStatus(request('POST', '/charger/graphql', [query: listQuery], token), [200], 'charger graphql list')
   if (list.body.contains('"errors"')) {
     throw new IllegalStateException("charger graphql list returned errors: ${list.body}")
+  }
+
+  if (dynamicConnectorSelection) {
+    def chargers = list.json?.data?.ocpiChargers ?: []
+    def selected = null
+    for (def charger : chargers) {
+      if (selected != null) break
+      if (String.valueOf(charger.status ?: '').equalsIgnoreCase('OFFLINE')) continue
+      for (def evse : (charger.evses ?: [])) {
+        if (selected != null) break
+        for (def connector : (evse.connectors ?: [])) {
+          String connectorStatus = String.valueOf(connector.status ?: '')
+          boolean connectorAvailable = connector.available == true || connectorStatus.equalsIgnoreCase('AVAILABLE')
+          if (connectorAvailable) {
+            selected = [charger: charger, connector: connector]
+            break
+          }
+        }
+      }
+    }
+    if (selected != null) {
+      chargerId = selected.charger.chargerId as String
+      locationId = selected.charger.location?.ocpiLocationId as String
+      connectorId = selected.connector.id as String
+      connectorType = (selected.connector.standard ?: connectorType) as String
+      def match = connectorId =~ /(\\d+)$/
+      if (match.find()) {
+        connectorNumber = (match.group(1) as int)
+      }
+      vars.put('chargerId', chargerId)
+      vars.put('locationId', locationId)
+      vars.put('connectorId', connectorId)
+      vars.put('connectorNumber', String.valueOf(connectorNumber))
+      vars.put('connectorType', connectorType)
+      logLine("selected available connector ${chargerId}/${connectorId} location=${locationId}")
+    } else {
+      logLine('dynamic connector selection found no available connector; using CSV connector')
+    }
   }
 
   def viewQuery = """query {
@@ -242,8 +315,12 @@ def monitorSse = { String token, String sessionId ->
   conn.setConnectTimeout(30000)
   conn.setReadTimeout(10000)
   conn.setRequestProperty('Accept', 'text/event-stream')
+  conn.setRequestProperty('User-Agent', 'ElectraHubRegression/1.0')
   conn.setRequestProperty('Authorization', "Bearer ${token}")
   conn.setRequestProperty('X-ElectraHub-Test-Run', runId)
+  if (requestHostHeader) {
+    conn.setRequestProperty('Host', requestHostHeader)
+  }
 
   int status = conn.responseCode
   if (status != 200) {
@@ -343,7 +420,7 @@ try {
   if (action == 'setup' || action == 'full') {
     token = registerOrLogin()
     appendGeneratedUser()
-    setupPayment(token)
+    token = setupPayment(token)
   } else if (action == 'charging') {
     token = login()
   } else {

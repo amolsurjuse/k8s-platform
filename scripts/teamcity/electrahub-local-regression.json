@@ -1,0 +1,23 @@
+{
+  "serviceName": "electrahub-regression",
+  "buildKind": "jmeter",
+  "teamcityProjectName": "Regression",
+  "buildTypeName": "JMeter Charging Regression",
+  "parentProjectId": "ElectraHub",
+  "projectId": "ElectraHub_Regression",
+  "buildTypeId": "ElectraHub_Regression_JMeterChargingFlow",
+  "vcsRootId": "ElectraHub_Regression_K8sPlatformVcsRoot",
+  "gitUrl": "https://github.com/amolsurjuse/k8s-platform.git",
+  "gitBranch": "develop",
+  "agentName": "",
+  "addVcsTrigger": false,
+  "jmeterImage": "justb4/jmeter:latest",
+  "jmeterPlan": "scripts/jmeter/03-full-e2e-charging-100-users.jmx",
+  "regressionBaseUrl": "https://api.dev.electrahub.net",
+  "regressionUsers": "5",
+  "regressionRampSeconds": "30",
+  "regressionHoldSeconds": "120",
+  "regressionSseSeconds": "60",
+  "regressionHostHeader": "",
+  "regressionDynamicConnectorSelection": "true"
+}

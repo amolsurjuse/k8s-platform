@@ -44,6 +44,7 @@ class PipelineConfig:
     parent_project_id: str
     project_id: str
     project_name: str
+    build_type_name: str
     build_type_id: str
     vcs_root_id: str
     git_url: str
@@ -65,28 +66,44 @@ class PipelineConfig:
     docker_username: str
     agent_name: str
     add_vcs_trigger: bool
+    jmeter_image: str
+    jmeter_plan: str
+    regression_base_url: str
+    regression_users: str
+    regression_ramp_seconds: str
+    regression_hold_seconds: str
+    regression_sse_seconds: str
+    regression_host_header: str
+    regression_dynamic_connector_selection: str
 
     @staticmethod
     def from_json(raw: dict[str, Any]) -> "PipelineConfig":
         service_name = require(raw.get("serviceName"), "serviceName")
         service_id = stable_id(service_name)
+        build_kind = str(raw.get("buildKind") or "maven").strip().lower()
         parent_project_id = str(raw.get("parentProjectId") or "Amy").strip()
         project_id = str(raw.get("projectId") or f"{parent_project_id}_{service_id}").strip()
         build_type_id = str(raw.get("buildTypeId") or f"{project_id}_Build").strip()
         git_branch = str(raw.get("gitBranch") or "develop").strip()
         vcs_root_id = str(raw.get("vcsRootId") or f"{project_id}_VcsRoot").strip()
+        docker_image = str(raw.get("dockerImage") or "").strip()
+        deploy_version_file = str(raw.get("deployVersionFile") or "").strip()
+        if build_kind != "jmeter":
+            docker_image = require(docker_image, "dockerImage")
+            deploy_version_file = require(deploy_version_file, "deployVersionFile")
 
         return PipelineConfig(
-            build_kind=str(raw.get("buildKind") or "maven").strip().lower(),
+            build_kind=build_kind,
             service_name=service_name,
             parent_project_id=parent_project_id,
             project_id=project_id,
             project_name=str(raw.get("teamcityProjectName") or raw.get("projectName") or service_name).strip(),
+            build_type_name=str(raw.get("buildTypeName") or "Build").strip(),
             build_type_id=build_type_id,
             vcs_root_id=vcs_root_id,
             git_url=require(raw.get("gitUrl"), "gitUrl"),
             git_branch=git_branch,
-            docker_image=require(raw.get("dockerImage"), "dockerImage"),
+            docker_image=docker_image,
             dockerfile_path=str(raw.get("dockerfilePath") or "Dockerfile").strip(),
             docker_context=str(raw.get("dockerContext") or ".").strip(),
             docker_platforms=str(raw.get("dockerPlatforms") or "linux/amd64,linux/arm64").strip(),
@@ -99,10 +116,19 @@ class PipelineConfig:
             build_command=str(raw.get("buildCommand") or "npm run build").strip(),
             test_command=str(raw.get("testCommand") or "").strip(),
             k8s_branch=str(raw.get("k8sBranch") or "develop").strip(),
-            deploy_version_file=require(raw.get("deployVersionFile"), "deployVersionFile"),
+            deploy_version_file=deploy_version_file,
             docker_username=str(raw.get("dockerUsername") or "amolsurjuse").strip(),
             agent_name=str(raw["agentName"] if "agentName" in raw else "teamcity-minimal-agent").strip(),
             add_vcs_trigger=bool(raw.get("addVcsTrigger", True)),
+            jmeter_image=str(raw.get("jmeterImage") or "justb4/jmeter:latest").strip(),
+            jmeter_plan=str(raw.get("jmeterPlan") or "scripts/jmeter/03-full-e2e-charging-100-users.jmx").strip(),
+            regression_base_url=str(raw.get("regressionBaseUrl") or "https://api.dev.electrahub.net").strip(),
+            regression_users=str(raw.get("regressionUsers") or "5").strip(),
+            regression_ramp_seconds=str(raw.get("regressionRampSeconds") or "30").strip(),
+            regression_hold_seconds=str(raw.get("regressionHoldSeconds") or "120").strip(),
+            regression_sse_seconds=str(raw.get("regressionSseSeconds") or "60").strip(),
+            regression_host_header=str(raw.get("regressionHostHeader") or "").strip(),
+            regression_dynamic_connector_selection=str(raw.get("regressionDynamicConnectorSelection") or "true").strip().lower(),
         )
 
 
@@ -283,7 +309,7 @@ def ensure_build_type(tc: TeamCityClient, cfg: PipelineConfig) -> None:
         return
     tc.request("POST", f"/app/rest/projects/id:{cfg.project_id}/buildTypes", {
         "id": cfg.build_type_id,
-        "name": "Build",
+        "name": cfg.build_type_name,
     })
     print(f"Created build config: {cfg.build_type_id}")
 
@@ -313,6 +339,16 @@ def set_parameters(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     set_parameter(tc, cfg.build_type_id, "k8s.branch", cfg.k8s_branch)
     set_parameter(tc, cfg.build_type_id, "docker.username", cfg.docker_username)
     set_parameter(tc, cfg.build_type_id, "deployment.version.file", cfg.deploy_version_file)
+    if cfg.build_kind == "jmeter":
+        set_parameter(tc, cfg.build_type_id, "jmeter.image", cfg.jmeter_image)
+        set_parameter(tc, cfg.build_type_id, "jmeter.plan", cfg.jmeter_plan)
+        set_parameter(tc, cfg.build_type_id, "regression.base.url", cfg.regression_base_url)
+        set_parameter(tc, cfg.build_type_id, "regression.users", cfg.regression_users)
+        set_parameter(tc, cfg.build_type_id, "regression.ramp.seconds", cfg.regression_ramp_seconds)
+        set_parameter(tc, cfg.build_type_id, "regression.hold.seconds", cfg.regression_hold_seconds)
+        set_parameter(tc, cfg.build_type_id, "regression.sse.seconds", cfg.regression_sse_seconds)
+        set_parameter(tc, cfg.build_type_id, "regression.host.header", cfg.regression_host_header)
+        set_parameter(tc, cfg.build_type_id, "regression.dynamic.connector.selection", cfg.regression_dynamic_connector_selection)
     print("Set build parameters")
 
 
@@ -366,14 +402,79 @@ cd "{cfg.app_dir}"
         create_script_step(tc, cfg, "Node Build", script)
     elif cfg.build_kind == "docker":
         print("Skipping source build step for docker-only pipeline")
+    elif cfg.build_kind == "jmeter":
+        print("Skipping source build step for JMeter regression pipeline")
     else:
-        raise ValueError(f"Unsupported buildKind {cfg.build_kind!r}. Use maven, go, node, or docker.")
+        raise ValueError(f"Unsupported buildKind {cfg.build_kind!r}. Use maven, go, node, docker, or jmeter.")
+
+
+def create_jmeter_regression_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+    script = """set -eu
+
+RESULT_DIR="outputs/jmeter/teamcity/results"
+REPORT_DIR="outputs/jmeter/teamcity/report"
+JTL="$RESULT_DIR/electrahub-regression.jtl"
+LOG="$RESULT_DIR/jmeter.log"
+DOCKER_CONFIG_DIR="$RESULT_DIR/docker-config"
+
+rm -rf "$RESULT_DIR" "$REPORT_DIR"
+mkdir -p "$RESULT_DIR" "$REPORT_DIR" "$DOCKER_CONFIG_DIR"
+printf "{}\n" > "$DOCKER_CONFIG_DIR/config.json"
+
+echo "Running ElectraHub regression against %regression.base.url%"
+echo "Users=%regression.users% Ramp=%regression.ramp.seconds%s Hold=%regression.hold.seconds%s SSE=%regression.sse.seconds%s"
+
+status=0
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm \
+  -v "$(pwd):/work" \
+  -w /work \
+  "%jmeter.image%" \
+  -n \
+  -t "%jmeter.plan%" \
+  -l "$JTL" \
+  -j "$LOG" \
+  -e \
+  -o "$REPORT_DIR" \
+  -Jbase_url="%regression.base.url%" \
+  -Jusers="%regression.users%" \
+  -Jramp_seconds="%regression.ramp.seconds%" \
+  -Jhold_seconds="%regression.hold.seconds%" \
+  -Jsse_seconds="%regression.sse.seconds%" \
+  -Jrequest_host_header="%regression.host.header%" \
+  -Jdynamic_connector_selection="%regression.dynamic.connector.selection%" \
+  -Jrun_id="tc-%build.number%" \
+  -Jjmeter.save.saveservice.output_format=csv \
+  -Jjmeter.save.saveservice.print_field_names=true \
+  -Jjmeter.save.saveservice.response_data.on_error=true || status=$?
+
+echo "##teamcity[publishArtifacts '$RESULT_DIR/** => jmeter-results']"
+echo "##teamcity[publishArtifacts '$REPORT_DIR/** => jmeter-report']"
+
+if [ "$status" -ne 0 ]; then
+  echo "JMeter exited with status $status"
+  exit "$status"
+fi
+
+if awk -F, 'NR==1 { for (i=1; i<=NF; i++) if ($i == "success") success=i; next } success && $success == "false" { found=1 } END { exit found ? 0 : 1 }' "$JTL"; then
+  echo "JMeter assertions failed. See jmeter-results/electrahub-regression.jtl and jmeter-report/index.html."
+  awk -F, 'NR==1 { for (i=1; i<=NF; i++) { if ($i == "label") label=i; if ($i == "responseMessage") msg=i; if ($i == "success") success=i } next } success && $success == "false" { print "FAILED: " $label " - " $msg }' "$JTL" | head -20 || true
+  exit 1
+fi
+
+echo "ElectraHub regression completed successfully."
+"""
+    create_script_step(tc, cfg, "JMeter Charging Regression", script)
 
 
 def create_steps_if_empty(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     build_type = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}")
     if int(build_type.get("steps", {}).get("count", 0)) > 0:
         print("Build steps already configured")
+        return
+
+    if cfg.build_kind == "jmeter":
+        create_jmeter_regression_step(tc, cfg)
+        print("Created JMeter regression step")
         return
 
     create_source_build_step(tc, cfg)
