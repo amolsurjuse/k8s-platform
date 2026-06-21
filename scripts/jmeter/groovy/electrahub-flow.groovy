@@ -226,22 +226,25 @@ def discoverChargers = { String token ->
 
   if (dynamicConnectorSelection) {
     def chargers = list.json?.data?.ocpiChargers ?: []
-    def selected = null
+    def candidates = []
     for (def charger : chargers) {
-      if (selected != null) break
       if (String.valueOf(charger.status ?: '').equalsIgnoreCase('OFFLINE')) continue
       for (def evse : (charger.evses ?: [])) {
-        if (selected != null) break
         for (def connector : (evse.connectors ?: [])) {
           String connectorStatus = String.valueOf(connector.status ?: '')
           boolean connectorAvailable = connector.available == true || connectorStatus.equalsIgnoreCase('AVAILABLE')
           if (connectorAvailable) {
-            selected = [charger: charger, connector: connector]
-            break
+            candidates << [charger: charger, connector: connector]
           }
         }
       }
     }
+    candidates.sort { left, right ->
+      String leftKey = "${left.charger.chargerId ?: ''}/${left.connector.id ?: ''}"
+      String rightKey = "${right.charger.chargerId ?: ''}/${right.connector.id ?: ''}"
+      leftKey <=> rightKey
+    }
+    def selected = candidates.isEmpty() ? null : candidates[Math.floorMod(threadIndex - 1, candidates.size())]
     if (selected != null) {
       chargerId = selected.charger.chargerId as String
       locationId = selected.charger.location?.ocpiLocationId as String
@@ -256,7 +259,7 @@ def discoverChargers = { String token ->
       vars.put('connectorId', connectorId)
       vars.put('connectorNumber', String.valueOf(connectorNumber))
       vars.put('connectorType', connectorType)
-      logLine("selected available connector ${chargerId}/${connectorId} location=${locationId}")
+      logLine("selected available connector ${chargerId}/${connectorId} location=${locationId} candidate=${Math.floorMod(threadIndex - 1, candidates.size()) + 1}/${candidates.size()}")
     } else {
       logLine('dynamic connector selection found no available connector; using CSV connector')
     }
