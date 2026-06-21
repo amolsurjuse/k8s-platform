@@ -478,8 +478,11 @@ echo "ElectraHub regression completed successfully."
     create_script_step(tc, cfg, "JMeter Charging Regression", script)
 
 
-def clear_steps(tc: TeamCityClient, cfg: PipelineConfig, build_type: dict[str, Any]) -> None:
-    steps = build_type.get("steps", {}).get("step", [])
+def clear_steps(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+    response = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}/steps")
+    steps = response.get("step", [])
+    if not steps and int(response.get("count", 0)) > 0:
+        raise RuntimeError(f"TeamCity reported {response.get('count')} step(s), but returned no step ids to delete")
     for step in steps:
         step_id = step.get("id")
         if step_id:
@@ -491,7 +494,7 @@ def create_steps_if_empty(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     build_type = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}")
     if int(build_type.get("steps", {}).get("count", 0)) > 0:
         if cfg.build_kind == "jmeter":
-            clear_steps(tc, cfg, build_type)
+            clear_steps(tc, cfg)
             create_jmeter_regression_step(tc, cfg)
             print("Replaced JMeter regression step")
             return
