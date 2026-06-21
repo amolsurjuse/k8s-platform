@@ -208,8 +208,10 @@ def setupPayment = { String token ->
 }
 
 def discoverChargers = { String token ->
-  def listQuery = '''query {
-    ocpiChargers(countryCode: "US", limit: 100, offset: 0) {
+  String countryArg = props.getProperty('charger_country_code', '').trim()
+  String countryFilter = countryArg ? "countryCode: \"${countryArg}\", " : ''
+  def listQuery = """query {
+    ocpiChargers(${countryFilter}limit: 100, offset: 0) {
       chargerId
       chargerName
       status
@@ -218,7 +220,7 @@ def discoverChargers = { String token ->
       location { ocpiLocationId name }
       evses { uid status connectors { id status available standard powerType } }
     }
-  }'''
+  }"""
   def list = requireStatus(request('POST', '/charger/graphql', [query: listQuery], token), [200], 'charger graphql list')
   if (list.body.contains('"errors"')) {
     throw new IllegalStateException("charger graphql list returned errors: ${list.body}")
@@ -244,6 +246,15 @@ def discoverChargers = { String token ->
       String rightKey = "${right.charger.chargerId ?: ''}/${right.connector.id ?: ''}"
       leftKey <=> rightKey
     }
+    def serializedCandidates = candidates.collect { item ->
+      [
+        chargerId: item.charger.chargerId as String,
+        locationId: item.charger.location?.ocpiLocationId as String,
+        connectorId: item.connector.id as String,
+        connectorType: (item.connector.standard ?: connectorType) as String
+      ]
+    }
+    vars.put('connectorCandidatesJson', json(serializedCandidates))
     def selected = candidates.isEmpty() ? null : candidates[Math.floorMod(threadIndex - 1, candidates.size())]
     if (selected != null) {
       chargerId = selected.charger.chargerId as String
@@ -287,24 +298,74 @@ def startSession = { String token ->
     throw new IllegalStateException('chargerId, connectorId, and locationId are required. Check connectors CSV.')
   }
   String uid = vars.get('userId') ?: ''
-  def payload = [
-    chargerId: chargerId,
-    locationId: locationId,
-    connectorId: connectorId,
-    connectorNumber: connectorNumber,
-    connectorType: connectorType,
-    idToken: uid,
-    paymentMethod: 'WALLET',
-    currency: 'USD',
-    idempotencyKey: UUID.randomUUID().toString()
-  ]
-  def response = request('POST', '/session/api/v1/sessions/start', payload, token, 60000)
-  requireStatus(response, [201], 'start charging session')
-  String sessionId = response.json.sessionId as String
-  if (!sessionId) throw new IllegalStateException("start response missing sessionId: ${response.body}")
-  vars.put('sessionId', sessionId)
-  logLine("started session=${sessionId} status=${response.json.status} remote=${response.json.remoteStartStatus}")
-  sessionId
+  def attempts = []
+  String candidatesJson = vars.get('connectorCandidatesJson')
+  if (dynamicConnectorSelection && candidatesJson) {
+    def parsedCandidates = parseJson(candidatesJson) ?: []
+    if (!parsedCandidates.isEmpty()) {
+      int startAt = Math.floorMod(threadIndex - 1, parsedCandidates.size())
+      int maxAttempts = Math.min(parsedCandidates.size(), Math.max(5, props.getProperty('connector_start_attempts', '10') as int))
+      for (int i = 0; i < maxAttempts; i++) {
+        attempts << parsedCandidates[(startAt + i) % parsedCandidates.size()]
+      }
+    }
+  }
+  if (attempts.isEmpty()) {
+    attempts << [
+      chargerId: chargerId,
+      locationId: locationId,
+      connectorId: connectorId,
+      connectorType: connectorType
+    ]
+  }
+
+  def lastResponse = null
+  int attemptNumber = 0
+  for (def candidate : attempts) {
+    attemptNumber++
+    chargerId = candidate.chargerId as String
+    locationId = candidate.locationId as String
+    connectorId = candidate.connectorId as String
+    connectorType = (candidate.connectorType ?: connectorType) as String
+    def match = connectorId =~ /(\\d+)$/
+    if (match.find()) {
+      connectorNumber = (match.group(1) as int)
+    }
+    vars.put('chargerId', chargerId)
+    vars.put('locationId', locationId)
+    vars.put('connectorId', connectorId)
+    vars.put('connectorNumber', String.valueOf(connectorNumber))
+    vars.put('connectorType', connectorType)
+
+    def payload = [
+      chargerId: chargerId,
+      locationId: locationId,
+      connectorId: connectorId,
+      connectorNumber: connectorNumber,
+      connectorType: connectorType,
+      idToken: uid,
+      paymentMethod: 'WALLET',
+      currency: 'USD',
+      idempotencyKey: UUID.randomUUID().toString()
+    ]
+    def response = request('POST', '/session/api/v1/sessions/start', payload, token, 60000)
+    lastResponse = response
+    if ((response.status as int) == 201) {
+      String sessionId = response.json.sessionId as String
+      if (!sessionId) throw new IllegalStateException("start response missing sessionId: ${response.body}")
+      vars.put('sessionId', sessionId)
+      logLine("started session=${sessionId} charger=${chargerId}/${connectorId} status=${response.json.status} remote=${response.json.remoteStartStatus} attempt=${attemptNumber}/${attempts.size()}")
+      return sessionId
+    }
+    if ([409, 503].contains(response.status as int) && attemptNumber < attempts.size()) {
+      logLine("start skipped ${chargerId}/${connectorId} HTTP ${response.status}; trying next connector")
+      sleep(1000)
+      continue
+    }
+    break
+  }
+
+  requireStatus(lastResponse, [201], 'start charging session')
 }
 
 def activeSession = { String token ->
