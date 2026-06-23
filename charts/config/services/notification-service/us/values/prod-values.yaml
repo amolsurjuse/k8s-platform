@@ -30,5 +30,14 @@ metrics:
 config:
   data:
     NOTIFICATION_CHANNEL_EMAIL_DAILY_LIMIT: "150"
+    NOTIFICATION_CHANNEL_PUSH_REAL_SEND_ENABLED: "true"
     NOTIFICATION_CHANNEL_PUSH_DAILY_LIMIT: "5000"
     NOTIFICATION_DRIVER_RESET_PASSWORD_URL: "https://driver-portal.electrahub.net/reset-password"
+
+extraSecretEnv:
+  - name: FIREBASE_PROJECT_ID
+    secretName: notification-firebase-secret
+    secretKey: FIREBASE_PROJECT_ID
+  - name: FIREBASE_SERVICE_ACCOUNT_BASE64
+    secretName: notification-firebase-secret
+    secretKey: FIREBASE_SERVICE_ACCOUNT_BASE64
