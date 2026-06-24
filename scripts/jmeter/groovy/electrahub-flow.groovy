@@ -29,7 +29,7 @@ String connectorId = vars.get('connectorId')
 String chargerId = vars.get('chargerId')
 String locationId = vars.get('locationId')
 String connectorType = vars.get('connectorType') ?: 'CCS-2'
-int connectorNumber = (vars.get('connectorNumber') ?: String.valueOf(threadIndex)) as int
+int connectorNumber = (vars.get('connectorNumber') ?: '1') as int
 
 int holdSeconds = props.getProperty('hold_seconds', '900') as int
 int sseSeconds = props.getProperty('sse_seconds', String.valueOf(Math.min(holdSeconds, 120))) as int
@@ -251,6 +251,7 @@ def discoverChargers = { String token ->
         chargerId: item.charger.chargerId as String,
         locationId: item.charger.location?.ocpiLocationId as String,
         connectorId: item.connector.id as String,
+        connectorNumber: 1,
         connectorType: (item.connector.standard ?: connectorType) as String
       ]
     }
@@ -261,10 +262,7 @@ def discoverChargers = { String token ->
       locationId = selected.charger.location?.ocpiLocationId as String
       connectorId = selected.connector.id as String
       connectorType = (selected.connector.standard ?: connectorType) as String
-      def match = connectorId =~ /(\\d+)$/
-      if (match.find()) {
-        connectorNumber = (match.group(1) as int)
-      }
+      connectorNumber = 1
       vars.put('chargerId', chargerId)
       vars.put('locationId', locationId)
       vars.put('connectorId', connectorId)
@@ -327,10 +325,7 @@ def startSession = { String token ->
     locationId = candidate.locationId as String
     connectorId = candidate.connectorId as String
     connectorType = (candidate.connectorType ?: connectorType) as String
-    def match = connectorId =~ /(\\d+)$/
-    if (match.find()) {
-      connectorNumber = (match.group(1) as int)
-    }
+    connectorNumber = (candidate.connectorNumber ?: connectorNumber ?: 1) as int
     vars.put('chargerId', chargerId)
     vars.put('locationId', locationId)
     vars.put('connectorId', connectorId)
