@@ -1,6 +1,9 @@
 secrets:
   existingSecretName: "postgresql-prod-secret"
 
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+
 replicaCount: 1
 
 resources:

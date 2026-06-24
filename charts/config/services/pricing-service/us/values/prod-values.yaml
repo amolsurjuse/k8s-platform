@@ -2,6 +2,7 @@ secrets:
   existingSecretName: "postgresql-prod-secret"
 
 env:
+  SPRING_PROFILES_ACTIVE: "prod"
   GRPC_SERVER_PORT: "-1"
 
 extraSecretEnv:
