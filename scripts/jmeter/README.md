@@ -21,6 +21,7 @@ Use prod only when explicitly validating production:
 | `01-user-payment-setup.jmx` | Creates test users, adds a card, tops up wallet, validates payment state, and writes generated users to CSV. |
 | `02-charging-session-load.jmx` | Uses an existing user CSV and connector CSV to login, discover chargers, start sessions, monitor SSE, stop, and validate receipt. |
 | `03-full-e2e-charging-100-users.jmx` | Full flow in one run: create users, setup payment, discover stations, start charging, monitor SSE, dwell, stop, receipt. |
+| `04-sparky-ai-chat-regression.jmx` | Validates Sparky AI message creation, SSE completion, prompt routing, and live backend diagnostics. |
 
 ## Recommended Safe Dev Run
 
@@ -46,6 +47,51 @@ jmeter -n -t scripts/jmeter/03-full-e2e-charging-100-users.jmx `
   -Jramp_seconds=300 `
   -Jhold_seconds=900 `
   -Jsse_seconds=900
+```
+
+## Sparky AI Chat Regression
+
+Validates all current Sparky prompt families:
+
+- charging start unavailable / `503`
+- connector already active
+- session stuck in `PREPARING`
+- charger online/offline heartbeat
+- general charging help
+
+It also verifies that responses include live backend facts such as wallet state, active sessions, charger/connector availability, OCPP connection status, and heartbeat age.
+
+```powershell
+jmeter -n -t scripts/jmeter/04-sparky-ai-chat-regression.jmx `
+  -l outputs/jmeter/sparky-ai/results.jtl `
+  -j outputs/jmeter/sparky-ai/jmeter.log `
+  -Jbase_url=https://api.dev.electrahub.net `
+  -Jlogin_email=sysadmin.dev@electrahub.com `
+  -Jlogin_password=Admin@12345
+```
+
+Useful overrides:
+
+```text
+-Jsparky_charger_id=EH-SFO-CHG-001
+-Jsparky_connector_id=CON-SFO-001
+-Jsparky_location_id=US*EHB*LOC*SFO001
+-Jsparky_session_id=<optional-active-session-id>
+-Jsparky_require_charger_status=true
+```
+
+The legacy `justb4/jmeter:latest` image currently runs Java 8 and can fail Cloudflare TLS with `handshake_failure`.
+For local validation with that image, port-forward the gateway and use HTTP:
+
+```powershell
+wsl -d Ubuntu-24.04 -- kubectl --context k3d-electrahub-prod -n prod port-forward --address 0.0.0.0 svc/api-gateway 19090:8090
+
+docker run --rm -v C:\development\project\k8s-platform:/work -w /work justb4/jmeter:latest `
+  -n -t scripts/jmeter/04-sparky-ai-chat-regression.jmx `
+  -l outputs/jmeter/sparky-ai-prod-portforward/results.jtl `
+  -j outputs/jmeter/sparky-ai-prod-portforward/jmeter.log `
+  -Jbase_url=http://host.docker.internal:19090 `
+  -Jsparky_require_charger_status=true
 ```
 
 ## Production Run Guardrail
