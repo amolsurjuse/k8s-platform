@@ -1,0 +1,8 @@
+targetNamespace: prod
+clusterName: electrahub-k3d
+environment: prod
+
+splunk:
+  endpoint: http://splunk.prod.svc.cluster.local:8088/services/collector
+  index: main
+  sourceType: kubernetes:container

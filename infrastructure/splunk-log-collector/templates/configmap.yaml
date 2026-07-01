@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "splunk-log-collector.name" . }}-config
+  labels:
+    {{- include "splunk-log-collector.labels" . | nindent 4 }}
+data:
+  vector.yaml: |
+    data_dir: /vector-data-dir
+    api:
+      enabled: false
+    sources:
+      kubernetes_logs:
+        type: kubernetes_logs
+        auto_partial_merge: true
+    transforms:
+      only_target_namespace:
+        type: filter
+        inputs: [kubernetes_logs]
+        condition: '.kubernetes.pod_namespace == "{{ .Values.targetNamespace }}"'
+      enrich:
+        type: remap
+        inputs: [only_target_namespace]
+        source: |
+          .cluster = "{{ .Values.clusterName }}"
+          .environment = "{{ .Values.environment }}"
+          .service = .kubernetes.pod_labels."app.kubernetes.io/name" ?? .kubernetes.container_name ?? "unknown"
+          .app = .kubernetes.pod_labels."app.kubernetes.io/instance" ?? .service
+          .namespace = .kubernetes.pod_namespace
+          .pod = .kubernetes.pod_name
+          .container = .kubernetes.container_name
+          parsed, err = parse_regex(.message, r'^(?P<timestamp>\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}[.,]\d{3}(?:Z|[+-]\d{2}:?\d{2})?)\s+(?P<level>[A-Z]+)\s+.*\[(?P<traceId>[0-9a-fA-F]{32}|),\s*(?P<spanId>[0-9a-fA-F]{16}|)\].*$')
+          if err == null {
+            .level = parsed.level
+            .traceId = parsed.traceId
+            .spanId = parsed.spanId
+          }
+    sinks:
+      splunk_hec:
+        type: splunk_hec_logs
+        inputs: [enrich]
+        endpoint: "{{ .Values.splunk.endpoint }}"
+        token: "${SPLUNK_HEC_TOKEN}"
+        index: "{{ .Values.splunk.index }}"
+        sourcetype: "{{ .Values.splunk.sourceType }}"
+        encoding:
+          codec: json
+        healthcheck:
+          enabled: false

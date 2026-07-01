@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: splunk-dev
+  namespace: argocd
+spec:
+  project: electrahub-dev
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: infrastructure/splunk
+    helm:
+      releaseName: splunk
+      valueFiles:
+        - ../../platform-config/infrastructure/splunk/us/values/dev.yaml
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

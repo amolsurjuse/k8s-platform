@@ -1,0 +1,6 @@
+Splunk Web:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "splunk.name" . }} 8000:8000
+  http://localhost:8000
+
+HEC endpoint inside cluster:
+  http://{{ include "splunk.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:8088/services/collector

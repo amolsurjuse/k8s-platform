@@ -1,0 +1,6 @@
+apiVersion: v2
+name: splunk
+description: ElectraHub Splunk Enterprise single-node deployment for dev/prod log search
+type: application
+version: 1.0.0
+appVersion: "9.4.2"

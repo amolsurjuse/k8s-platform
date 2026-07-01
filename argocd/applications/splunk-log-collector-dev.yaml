@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: splunk-log-collector-dev
+  namespace: argocd
+spec:
+  project: electrahub-dev
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: infrastructure/splunk-log-collector
+    helm:
+      releaseName: splunk-log-collector
+      valueFiles:
+        - ../../platform-config/infrastructure/splunk-log-collector/us/values/dev.yaml
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

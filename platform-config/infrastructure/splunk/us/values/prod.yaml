@@ -1,0 +1,12 @@
+fullnameOverride: splunk
+
+persistence:
+  size: 50Gi
+
+resources:
+  requests:
+    cpu: "1"
+    memory: 3Gi
+  limits:
+    cpu: "2"
+    memory: 6Gi

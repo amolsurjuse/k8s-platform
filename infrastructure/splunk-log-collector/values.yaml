@@ -1,0 +1,25 @@
+fullnameOverride: splunk-log-collector
+
+targetNamespace: dev
+clusterName: electrahub-k3d
+environment: dev
+
+image:
+  repository: timberio/vector
+  tag: "0.45.0-debian"
+  pullPolicy: IfNotPresent
+
+splunk:
+  endpoint: http://splunk:8088/services/collector
+  index: main
+  sourceType: kubernetes
+  existingSecretName: splunk-hec-secret
+  tokenKey: SPLUNK_HEC_TOKEN
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

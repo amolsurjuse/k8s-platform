@@ -1,0 +1,48 @@
+fullnameOverride: splunk
+
+image:
+  repository: splunk/splunk
+  tag: "9.4.2"
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+admin:
+  existingSecretName: splunk-secret
+  passwordKey: SPLUNK_PASSWORD
+
+hec:
+  enabled: true
+  existingSecretName: splunk-hec-secret
+  tokenKey: SPLUNK_HEC_TOKEN
+
+service:
+  type: ClusterIP
+  webPort: 8000
+  hecPort: 8088
+  managementPort: 8089
+
+persistence:
+  enabled: true
+  size: 20Gi
+  storageClassName: ""
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 2Gi
+  limits:
+    cpu: "2"
+    memory: 4Gi
+
+startupProbe:
+  failureThreshold: 60
+  periodSeconds: 10
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+livenessProbe:
+  initialDelaySeconds: 120
+  periodSeconds: 30
