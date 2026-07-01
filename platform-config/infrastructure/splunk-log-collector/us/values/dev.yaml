@@ -3,6 +3,6 @@ clusterName: electrahub-k3d
 environment: dev
 
 splunk:
-  endpoint: http://splunk.dev.svc.cluster.local:8088/services/collector
+  endpoint: https://splunk.dev.svc.cluster.local:8088
   index: main
   sourceType: kubernetes:container

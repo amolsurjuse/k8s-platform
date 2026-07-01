@@ -10,7 +10,7 @@ image:
   pullPolicy: IfNotPresent
 
 splunk:
-  endpoint: http://splunk:8088/services/collector
+  endpoint: https://splunk:8088
   index: main
   sourceType: kubernetes
   existingSecretName: splunk-hec-secret

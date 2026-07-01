@@ -55,5 +55,7 @@ data:
         sourcetype: "{{ .Values.splunk.sourceType }}"
         encoding:
           codec: json
+        tls:
+          verify_certificate: false
         healthcheck:
           enabled: false
