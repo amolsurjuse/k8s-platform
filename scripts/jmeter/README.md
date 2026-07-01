@@ -117,6 +117,48 @@ jmeter -n -t scripts/jmeter/03-full-e2e-charging-100-users.jmx `
   -Jsse_seconds=900
 ```
 
+## Systematic Load Ladder
+
+Use the TeamCity `ElectraHub_Regression_JMeterLoadLadder` build to find the current setup's practical breaking point.
+The ladder runs the same end-to-end charging journey at progressively higher concurrency and stops when a stage exceeds
+the configured error threshold.
+
+Default prod ladder:
+
+```text
+5 users,   60s ramp,  60s hold, 30s SSE
+10 users, 120s ramp,  90s hold, 45s SSE
+20 users, 180s ramp, 120s hold, 60s SSE
+35 users, 240s ramp, 120s hold, 60s SSE
+50 users, 300s ramp, 120s hold, 60s SSE
+75 users, 450s ramp, 180s hold, 90s SSE
+100 users, 600s ramp, 180s hold, 90s SSE
+```
+
+Stop condition:
+
+```text
+jmeterLoadMaxErrorPercent = 5
+```
+
+Artifacts:
+
+```text
+jmeter-load/load-summary.csv
+jmeter-load/stage-<n>-u<users>/results.jtl
+jmeter-load/stage-<n>-u<users>/jmeter.log
+jmeter-load/stage-<n>-u<users>/report/index.html
+```
+
+Interpretation:
+
+- The first `BREAKPOINT` stage is the current environment's approximate limit.
+- Use the previous `PASS` stage as the safe operating point until the bottleneck is fixed.
+- Check `responseMessage` in the failing stage JTL for the bottleneck step: login, payment, charger GraphQL, start, SSE, stop, receipt, or dashboard.
+- If failures are mostly `409 Connector is not available`, the bottleneck is charger inventory/simulator capacity, not API throughput.
+- If failures are `SocketTimeoutException` on start/stop, inspect session-service to OCPP command routing and simulator responsiveness.
+- If failures are dashboard/receipt after successful stops, inspect billing CDR generation and analytics indexing.
+
 ## Properties
 
 | Property | Default | Description |

@@ -78,6 +78,8 @@ class PipelineConfig:
     regression_connector_start_attempts: str
     regression_request_timeout_ms: str
     regression_session_command_timeout_ms: str
+    jmeter_load_stages: str
+    jmeter_load_max_error_percent: str
 
     @staticmethod
     def from_json(raw: dict[str, Any]) -> "PipelineConfig":
@@ -135,6 +137,8 @@ class PipelineConfig:
             regression_connector_start_attempts=str(raw.get("regressionConnectorStartAttempts") or "12").strip(),
             regression_request_timeout_ms=str(raw.get("regressionRequestTimeoutMs") or "120000").strip(),
             regression_session_command_timeout_ms=str(raw.get("regressionSessionCommandTimeoutMs") or "180000").strip(),
+            jmeter_load_stages=str(raw.get("jmeterLoadStages") or "").strip(),
+            jmeter_load_max_error_percent=str(raw.get("jmeterLoadMaxErrorPercent") or "5").strip(),
         )
 
 
@@ -358,6 +362,8 @@ def set_parameters(tc: TeamCityClient, cfg: PipelineConfig) -> None:
         set_parameter(tc, cfg.build_type_id, "regression.connector.start.attempts", cfg.regression_connector_start_attempts)
         set_parameter(tc, cfg.build_type_id, "regression.request.timeout.ms", cfg.regression_request_timeout_ms)
         set_parameter(tc, cfg.build_type_id, "regression.session.command.timeout.ms", cfg.regression_session_command_timeout_ms)
+        set_parameter(tc, cfg.build_type_id, "jmeter.load.stages", cfg.jmeter_load_stages)
+        set_parameter(tc, cfg.build_type_id, "jmeter.load.max.error.percent", cfg.jmeter_load_max_error_percent)
     print("Set build parameters")
 
 
@@ -418,6 +424,10 @@ cd "{cfg.app_dir}"
 
 
 def create_jmeter_regression_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+    if cfg.jmeter_load_stages:
+        create_jmeter_load_ladder_step(tc, cfg)
+        return
+
     script = """set -eu
 
 RESULT_DIR="outputs/jmeter/teamcity/results"
@@ -493,6 +503,142 @@ fi
 echo "ElectraHub regression completed successfully."
 """
     create_script_step(tc, cfg, "JMeter Charging Regression", script)
+
+
+def create_jmeter_load_ladder_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+    script = """set -eu
+
+RESULT_ROOT="outputs/jmeter/teamcity-load"
+DOCKER_CONFIG_DIR="$RESULT_ROOT/docker-config"
+SUMMARY="$RESULT_ROOT/load-summary.csv"
+STAGES="%jmeter.load.stages%"
+MAX_ERROR_PERCENT="%jmeter.load.max.error.percent%"
+
+rm -rf "$RESULT_ROOT"
+mkdir -p "$RESULT_ROOT" "$DOCKER_CONFIG_DIR"
+printf "{}\n" > "$DOCKER_CONFIG_DIR/config.json"
+printf "stage,users,ramp_seconds,hold_seconds,sse_seconds,total_samples,failed_samples,error_percent,avg_elapsed_ms,max_elapsed_ms,result\n" > "$SUMMARY"
+
+echo "Running ElectraHub load ladder against %regression.base.url%"
+echo "Stages=$STAGES"
+echo "MaxErrorPercent=$MAX_ERROR_PERCENT"
+echo "DynamicConnectorSelection=%regression.dynamic.connector.selection% ConnectorStartAttempts=%regression.connector.start.attempts%"
+echo "JMeter image=%jmeter.image%"
+
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker pull "%jmeter.image%"
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm --entrypoint java "%jmeter.image%" -version
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm "%jmeter.image%" --version | head -25
+
+stage_number=0
+for stage in $STAGES; do
+  stage_number=$((stage_number + 1))
+  IFS=: read -r USERS RAMP HOLD SSE <<EOF_STAGE
+$stage
+EOF_STAGE
+
+  if [ -z "$USERS" ] || [ -z "$RAMP" ] || [ -z "$HOLD" ] || [ -z "$SSE" ]; then
+    echo "Invalid stage '$stage'. Expected users:rampSeconds:holdSeconds:sseSeconds"
+    exit 1
+  fi
+
+  STAGE_DIR="$RESULT_ROOT/stage-${stage_number}-u${USERS}"
+  JTL="$STAGE_DIR/results.jtl"
+  LOG="$STAGE_DIR/jmeter.log"
+  REPORT="$STAGE_DIR/report"
+  mkdir -p "$STAGE_DIR" "$REPORT"
+
+  echo "== Stage ${stage_number}: users=$USERS ramp=${RAMP}s hold=${HOLD}s sse=${SSE}s =="
+  CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
+    -w /work \
+    -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2" \
+    "%jmeter.image%" \
+    -n \
+    -t "%jmeter.plan%" \
+    -l "$JTL" \
+    -j "$LOG" \
+    -e \
+    -o "$REPORT" \
+    -Jbase_url="%regression.base.url%" \
+    -Jusers="$USERS" \
+    -Jramp_seconds="$RAMP" \
+    -Jhold_seconds="$HOLD" \
+    -Jsse_seconds="$SSE" \
+    -Jrequest_host_header="%regression.host.header%" \
+    -Jdynamic_connector_selection="%regression.dynamic.connector.selection%" \
+    -Jconnector_start_attempts="%regression.connector.start.attempts%" \
+    -Jrequest_timeout_ms="%regression.request.timeout.ms%" \
+    -Jsession_command_timeout_ms="%regression.session.command.timeout.ms%" \
+    -Jrun_id="tc-%build.number%-stage${stage_number}-u${USERS}" \
+    -Jjmeter.save.saveservice.output_format=csv \
+    -Jjmeter.save.saveservice.print_field_names=true \
+    -Jjmeter.save.saveservice.response_data.on_error=true)"
+
+  tar --exclude=.git --exclude=outputs -cf - . | DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker cp - "$CID":/work
+  status=0
+  DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker start -a "$CID" || status=$?
+  DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker cp "$CID":/work/"$STAGE_DIR" "$RESULT_ROOT/" || true
+  DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker rm -f "$CID" >/dev/null 2>&1 || true
+
+  if [ ! -f "$JTL" ]; then
+    echo "Stage ${stage_number} produced no JTL"
+    printf "%s,%s,%s,%s,%s,0,0,100,0,0,NO_JTL\n" "$stage_number" "$USERS" "$RAMP" "$HOLD" "$SSE" >> "$SUMMARY"
+    exit 1
+  fi
+
+  stats="$(awk -F, '
+    NR==1 {
+      for (i=1; i<=NF; i++) {
+        if ($i == "success") success=i
+        if ($i == "elapsed") elapsed=i
+      }
+      next
+    }
+    {
+      total++
+      if (success && $success == "false") failed++
+      if (elapsed) {
+        sum += $elapsed
+        if ($elapsed > max) max = $elapsed
+      }
+    }
+    END {
+      err = total ? failed * 100 / total : 100
+      avg = total ? sum / total : 0
+      printf "%d,%d,%.2f,%.0f,%.0f", total, failed, err, avg, max
+    }
+  ' "$JTL")"
+
+  total="$(echo "$stats" | cut -d, -f1)"
+  failed="$(echo "$stats" | cut -d, -f2)"
+  error_percent="$(echo "$stats" | cut -d, -f3)"
+  avg_elapsed="$(echo "$stats" | cut -d, -f4)"
+  max_elapsed="$(echo "$stats" | cut -d, -f5)"
+
+  if [ "$status" -ne 0 ]; then
+    result="JMETER_EXIT_${status}"
+  elif awk "BEGIN { exit !($error_percent > $MAX_ERROR_PERCENT) }"; then
+    result="BREAKPOINT"
+  else
+    result="PASS"
+  fi
+
+  printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" "$stage_number" "$USERS" "$RAMP" "$HOLD" "$SSE" "$total" "$failed" "$error_percent" "$avg_elapsed" "$max_elapsed" "$result" >> "$SUMMARY"
+  echo "Stage ${stage_number} result=$result total=$total failed=$failed errorPercent=$error_percent avgMs=$avg_elapsed maxMs=$max_elapsed"
+
+  if [ "$result" != "PASS" ]; then
+    echo "Load ladder stopped at stage ${stage_number}; breakpoint is around users=$USERS."
+    echo "Recent failures:"
+    awk -F, 'NR==1 { for (i=1; i<=NF; i++) { if ($i == "label") label=i; if ($i == "responseMessage") msg=i; if ($i == "success") success=i } next } success && $success == "false" { print "FAILED: " $label " - " $msg }' "$JTL" | head -20 || true
+    echo "##teamcity[publishArtifacts '$RESULT_ROOT/** => jmeter-load']"
+    exit 1
+  fi
+done
+
+echo "Load ladder completed all stages below failure threshold."
+cat "$SUMMARY"
+echo "##teamcity[publishArtifacts '$RESULT_ROOT/** => jmeter-load']"
+"""
+    create_script_step(tc, cfg, "JMeter Load Ladder", script)
 
 
 def clear_steps(tc: TeamCityClient, cfg: PipelineConfig) -> None:
