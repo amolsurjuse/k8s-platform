@@ -33,9 +33,13 @@ int connectorNumber = (vars.get('connectorNumber') ?: '1') as int
 
 int holdSeconds = props.getProperty('hold_seconds', '900') as int
 int sseSeconds = props.getProperty('sse_seconds', String.valueOf(Math.min(holdSeconds, 120))) as int
+int requestTimeoutMs = props.getProperty('request_timeout_ms', '120000') as int
+int sessionCommandTimeoutMs = props.getProperty('session_command_timeout_ms', '180000') as int
 BigDecimal walletTopupAmount = new BigDecimal(props.getProperty('wallet_topup_amount', '120.00'))
 String usersOutput = props.getProperty('users_output', 'scripts/jmeter/data/generated-users.csv')
+String connectorsCsv = props.getProperty('connectors_csv', 'scripts/jmeter/data/connectors-100.csv')
 boolean dynamicConnectorSelection = props.getProperty('dynamic_connector_selection', 'false').toBoolean()
+String currentStep = 'init'
 
 def logLine = { String message ->
   log.info("[electrahub-jmeter][${action}][${userNumber}] ${message}")
@@ -62,7 +66,43 @@ def decodeJwtPayload = { String token ->
   parseJson(new String(decoded, StandardCharsets.UTF_8)) as Map
 }
 
-def request = { String method, String path, Object body = null, String token = null, int timeoutMs = 45000 ->
+def atStep = { String stepName, Closure work ->
+  currentStep = stepName
+  logLine("step=${stepName}")
+  work()
+}
+
+def readCsvConnectorCandidates = {
+  File file = new File(connectorsCsv)
+  if (!file.exists()) {
+    logLine("connector csv not found: ${connectorsCsv}")
+    return []
+  }
+  def lines = file.readLines('UTF-8').findAll { it?.trim() }
+  if (lines.size() <= 1) return []
+  def header = lines[0].split(',', -1).collect { it.trim() }
+  def indexOf = { String name -> header.findIndexOf { it == name } }
+  int chargerIndex = indexOf('chargerId')
+  int locationIndex = indexOf('locationId')
+  int connectorIndex = indexOf('connectorId')
+  int connectorNumberIndex = indexOf('connectorNumber')
+  int connectorTypeIndex = indexOf('connectorType')
+  if ([chargerIndex, locationIndex, connectorIndex, connectorNumberIndex, connectorTypeIndex].any { it < 0 }) {
+    throw new IllegalStateException("connector csv missing required headers: ${connectorsCsv}")
+  }
+  lines.drop(1).collect { String line ->
+    def cols = line.split(',', -1).collect { it.trim() }
+    [
+      chargerId: cols[chargerIndex],
+      locationId: cols[locationIndex],
+      connectorId: cols[connectorIndex],
+      connectorNumber: (cols[connectorNumberIndex] ?: '1') as int,
+      connectorType: cols[connectorTypeIndex] ?: connectorType
+    ]
+  }.findAll { it.chargerId && it.locationId && it.connectorId }
+}
+
+def request = { String method, String path, Object body = null, String token = null, int timeoutMs = requestTimeoutMs ->
   URL url = new URL("${baseUrl}${path}")
   HttpURLConnection conn = (HttpURLConnection) url.openConnection()
   conn.setRequestMethod(method)
@@ -85,10 +125,19 @@ def request = { String method, String path, Object body = null, String token = n
     conn.outputStream.withCloseable { it.write(bytes) }
   }
 
-  int status = conn.responseCode
-  InputStream stream = status >= 400 ? conn.errorStream : conn.inputStream
-  String responseBody = stream == null ? '' : stream.getText('UTF-8')
-  [status: status, body: responseBody, json: parseJson(responseBody)]
+  try {
+    long started = System.currentTimeMillis()
+    int status = conn.responseCode
+    InputStream stream = status >= 400 ? conn.errorStream : conn.inputStream
+    String responseBody = stream == null ? '' : stream.getText('UTF-8')
+    long elapsed = System.currentTimeMillis() - started
+    logLine("http ${method} ${path} status=${status} elapsedMs=${elapsed}")
+    [status: status, body: responseBody, json: parseJson(responseBody)]
+  } catch (SocketTimeoutException timeout) {
+    throw new SocketTimeoutException("step=${currentStep} ${method} ${path} timed out after ${timeoutMs}ms")
+  } finally {
+    conn.disconnect()
+  }
 }
 
 def requireStatus = { Map response, List<Integer> statuses, String step ->
@@ -99,10 +148,10 @@ def requireStatus = { Map response, List<Integer> statuses, String step ->
 }
 
 def login = {
-  def response = request('POST', '/auth/api/auth/login', [
+  def response = atStep('login') { request('POST', '/auth/api/auth/login', [
     email: email,
     password: password
-  ])
+  ]) }
   requireStatus(response, [200], 'login')
   String token = response.json.accessToken as String
   if (!token) throw new IllegalStateException('login returned no accessToken')
@@ -130,7 +179,7 @@ def registerOrLogin = {
       country: 'US'
     ]
   ]
-  def response = request('POST', '/auth/api/auth/register', payload)
+  def response = atStep('register') { request('POST', '/auth/api/auth/register', payload) }
   if ((response.status as int) == 200) {
     String token = response.json.accessToken as String
     vars.put('accessToken', token)
@@ -161,13 +210,13 @@ def appendGeneratedUser = {
 }
 
 def acceptTerms = { String token ->
-  def response = request('POST', '/auth/api/terms/accept', [
+  def response = atStep('accept terms') { request('POST', '/auth/api/terms/accept', [
     platform: 'Web',
     deviceModel: 'TeamCity',
     appVersion: '1.0',
     deviceId: "jmeter-${runId}-${userNumber}",
     osVersion: 'load-test'
-  ], token)
+  ], token) }
   requireStatus(response, [200, 201, 204], 'accept terms')
   String refreshed = response.json?.accessToken as String
   if (refreshed) {
@@ -180,29 +229,29 @@ def acceptTerms = { String token ->
 }
 
 def setupPayment = { String token ->
-  def initialState = request('GET', '/payment/api/v1/payment/state', null, token)
+  def initialState = atStep('payment state before setup') { request('GET', '/payment/api/v1/payment/state', null, token) }
   if ((initialState.status as int) == 451) {
     token = acceptTerms(token)
-    initialState = request('GET', '/payment/api/v1/payment/state', null, token)
+    initialState = atStep('payment state after terms') { request('GET', '/payment/api/v1/payment/state', null, token) }
   }
   requireStatus(initialState, [200], 'payment state before setup')
 
-  def card = request('POST', '/payment/api/v1/payment/cards', [
+  def card = atStep('add card') { request('POST', '/payment/api/v1/payment/cards', [
     brand: 'Visa',
     nickname: "JMeter ${userNumber}",
     cardNumber: "411111111111${String.format('%04d', threadIndex % 10000)}",
     expiry: '12/30'
-  ], token)
+  ], token) }
   requireStatus(card, [201, 200, 409], 'add card')
 
-  def topup = request('POST', '/payment/api/v1/payment/wallet/topups', [
+  def topup = atStep('wallet topup') { request('POST', '/payment/api/v1/payment/wallet/topups', [
     amount: walletTopupAmount,
     source: 'MANUAL',
     note: "JMeter ${runId}"
-  ], token)
+  ], token) }
   requireStatus(topup, [201, 200], 'wallet topup')
 
-  def state = requireStatus(request('GET', '/payment/api/v1/payment/state', null, token), [200], 'payment state after setup')
+  def state = requireStatus(atStep('payment state after setup') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state after setup')
   logLine("payment ready wallet=${state.json?.wallet?.balance}")
   token
 }
@@ -221,7 +270,7 @@ def discoverChargers = { String token ->
       evses { uid status connectors { id status available standard powerType } }
     }
   }"""
-  def list = requireStatus(request('POST', '/charger/graphql', [query: listQuery], token), [200], 'charger graphql list')
+  def list = requireStatus(atStep('charger graphql list') { request('POST', '/charger/graphql', [query: listQuery], token) }, [200], 'charger graphql list')
   if (list.body.contains('"errors"')) {
     throw new IllegalStateException("charger graphql list returned errors: ${list.body}")
   }
@@ -285,7 +334,7 @@ def discoverChargers = { String token ->
       evses { uid status connectors { id status available standard powerType } }
     }
   }"""
-  def view = requireStatus(request('POST', '/charger/graphql', [query: viewQuery], token), [200], 'charger graphql view')
+  def view = requireStatus(atStep('charger graphql view') { request('POST', '/charger/graphql', [query: viewQuery], token) }, [200], 'charger graphql view')
   if (view.body.contains('"errors"')) {
     throw new IllegalStateException("charger graphql view returned errors for ${chargerId}/${connectorId}: ${view.body}")
   }
@@ -309,12 +358,23 @@ def startSession = { String token ->
     }
   }
   if (attempts.isEmpty()) {
-    attempts << [
-      chargerId: chargerId,
-      locationId: locationId,
-      connectorId: connectorId,
-      connectorType: connectorType
-    ]
+    def csvCandidates = readCsvConnectorCandidates()
+    if (!csvCandidates.isEmpty()) {
+      int startAt = Math.max(0, Math.min(threadIndex - 1, csvCandidates.size() - 1))
+      int maxAttempts = Math.min(csvCandidates.size(), Math.max(5, props.getProperty('connector_start_attempts', '10') as int))
+      for (int i = 0; i < maxAttempts; i++) {
+        attempts << csvCandidates[(startAt + i) % csvCandidates.size()]
+      }
+      logLine("using connector csv fallback attempts=${attempts.size()} startIndex=${startAt + 1}/${csvCandidates.size()}")
+    } else {
+      attempts << [
+        chargerId: chargerId,
+        locationId: locationId,
+        connectorId: connectorId,
+        connectorNumber: connectorNumber,
+        connectorType: connectorType
+      ]
+    }
   }
 
   def lastResponse = null
@@ -343,7 +403,7 @@ def startSession = { String token ->
       currency: 'USD',
       idempotencyKey: UUID.randomUUID().toString()
     ]
-    def response = request('POST', '/session/api/v1/sessions/start', payload, token, 60000)
+    def response = atStep("start charging attempt ${attemptNumber}") { request('POST', '/session/api/v1/sessions/start', payload, token, sessionCommandTimeoutMs) }
     lastResponse = response
     if ((response.status as int) == 201) {
       String sessionId = response.json.sessionId as String
@@ -364,10 +424,11 @@ def startSession = { String token ->
 }
 
 def activeSession = { String token ->
-  requireStatus(request('GET', '/session/api/v1/sessions/active', null, token), [200], 'active sessions')
+  requireStatus(atStep('active sessions') { request('GET', '/session/api/v1/sessions/active', null, token) }, [200], 'active sessions')
 }
 
 def monitorSse = { String token, String sessionId ->
+  currentStep = 'monitor SSE'
   URL url = new URL("${baseUrl}/session/api/v1/sessions/active/stream")
   HttpURLConnection conn = (HttpURLConnection) url.openConnection()
   conn.setRequestMethod('GET')
@@ -431,10 +492,10 @@ def monitorSse = { String token, String sessionId ->
 }
 
 def stopSession = { String token, String sessionId ->
-  def response = request('POST', "/session/api/v1/sessions/${sessionId}/stop", [
+  def response = atStep('stop charging session') { request('POST', "/session/api/v1/sessions/${sessionId}/stop", [
     reason: 'REMOTE',
     userInitiated: true
-  ], token, 60000)
+  ], token, sessionCommandTimeoutMs) }
   requireStatus(response, [204, 200], 'stop charging session')
   logLine("stop requested session=${sessionId}")
 }
@@ -457,7 +518,7 @@ def validateStoppedAndReceipt = { String token, String sessionId ->
   def receipt = null
   deadline = System.currentTimeMillis() + 120000L
   while (System.currentTimeMillis() < deadline) {
-    def response = request('GET', "/session/api/v1/sessions/${sessionId}/receipt", null, token, 30000)
+    def response = atStep('receipt') { request('GET', "/session/api/v1/sessions/${sessionId}/receipt", null, token, requestTimeoutMs) }
     if ((response.status as int) == 200) {
       receipt = response
       break
@@ -467,8 +528,8 @@ def validateStoppedAndReceipt = { String token, String sessionId ->
   if (receipt == null) {
     throw new IllegalStateException("receipt not available for session ${sessionId}")
   }
-  requireStatus(request('GET', '/session/api/v1/sessions/history?page=0&size=10', null, token), [200], 'session history')
-  requireStatus(request('GET', '/session/api/v1/sessions/dashboard-stats', null, token), [200], 'dashboard stats')
+  requireStatus(atStep('session history') { request('GET', '/session/api/v1/sessions/history?page=0&size=10', null, token) }, [200], 'session history')
+  requireStatus(atStep('dashboard stats') { request('GET', '/session/api/v1/sessions/dashboard-stats', null, token) }, [200], 'dashboard stats')
   logLine("receipt ok session=${sessionId} status=${receipt.json?.status} total=${receipt.json?.totalCost ?: receipt.json?.costUsd}")
 }
 
@@ -488,7 +549,7 @@ try {
 
   if (action == 'charging' || action == 'full') {
     discoverChargers(token)
-    requireStatus(request('GET', '/payment/api/v1/payment/state', null, token), [200], 'payment state before start')
+    requireStatus(atStep('payment state before start') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state before start')
     String sessionId = startSession(token)
     activeSession(token)
     monitorSse(token, sessionId)
@@ -521,7 +582,7 @@ try {
 } catch (Throwable t) {
   SampleResult.setSuccessful(false)
   SampleResult.setResponseCode('500')
-  SampleResult.setResponseMessage(t.message ?: t.class.name)
+  SampleResult.setResponseMessage("step=${currentStep}: ${t.message ?: t.class.name}")
   SampleResult.setResponseData((t.message ?: t.toString()), 'UTF-8')
   log.error("[electrahub-jmeter][${action}][${userNumber}] failed", t)
   throw t

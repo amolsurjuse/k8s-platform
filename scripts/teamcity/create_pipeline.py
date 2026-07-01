@@ -76,6 +76,8 @@ class PipelineConfig:
     regression_host_header: str
     regression_dynamic_connector_selection: str
     regression_connector_start_attempts: str
+    regression_request_timeout_ms: str
+    regression_session_command_timeout_ms: str
 
     @staticmethod
     def from_json(raw: dict[str, Any]) -> "PipelineConfig":
@@ -131,6 +133,8 @@ class PipelineConfig:
             regression_host_header=str(raw.get("regressionHostHeader") or "").strip(),
             regression_dynamic_connector_selection=str(raw.get("regressionDynamicConnectorSelection") or "true").strip().lower(),
             regression_connector_start_attempts=str(raw.get("regressionConnectorStartAttempts") or "12").strip(),
+            regression_request_timeout_ms=str(raw.get("regressionRequestTimeoutMs") or "120000").strip(),
+            regression_session_command_timeout_ms=str(raw.get("regressionSessionCommandTimeoutMs") or "180000").strip(),
         )
 
 
@@ -352,6 +356,8 @@ def set_parameters(tc: TeamCityClient, cfg: PipelineConfig) -> None:
         set_parameter(tc, cfg.build_type_id, "regression.host.header", cfg.regression_host_header)
         set_parameter(tc, cfg.build_type_id, "regression.dynamic.connector.selection", cfg.regression_dynamic_connector_selection)
         set_parameter(tc, cfg.build_type_id, "regression.connector.start.attempts", cfg.regression_connector_start_attempts)
+        set_parameter(tc, cfg.build_type_id, "regression.request.timeout.ms", cfg.regression_request_timeout_ms)
+        set_parameter(tc, cfg.build_type_id, "regression.session.command.timeout.ms", cfg.regression_session_command_timeout_ms)
     print("Set build parameters")
 
 
@@ -459,6 +465,8 @@ CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -Jrequest_host_header="%regression.host.header%" \
   -Jdynamic_connector_selection="%regression.dynamic.connector.selection%" \
   -Jconnector_start_attempts="%regression.connector.start.attempts%" \
+  -Jrequest_timeout_ms="%regression.request.timeout.ms%" \
+  -Jsession_command_timeout_ms="%regression.session.command.timeout.ms%" \
   -Jrun_id="tc-%build.number%" \
   -Jjmeter.save.saveservice.output_format=csv \
   -Jjmeter.save.saveservice.print_field_names=true \

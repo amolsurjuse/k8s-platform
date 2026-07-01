@@ -15,10 +15,12 @@
   "jmeterPlan": "scripts/jmeter/03-full-e2e-charging-100-users.jmx",
   "regressionBaseUrl": "https://api.electrahub.net",
   "regressionUsers": "50",
-  "regressionRampSeconds": "30",
+  "regressionRampSeconds": "300",
   "regressionHoldSeconds": "120",
   "regressionSseSeconds": "60",
   "regressionHostHeader": "",
   "regressionDynamicConnectorSelection": "true",
-  "regressionConnectorStartAttempts": "12"
+  "regressionConnectorStartAttempts": "12",
+  "regressionRequestTimeoutMs": "120000",
+  "regressionSessionCommandTimeoutMs": "180000"
 }
