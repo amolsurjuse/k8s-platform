@@ -427,6 +427,7 @@ printf "{}\n" > "$DOCKER_CONFIG_DIR/config.json"
 echo "Running ElectraHub regression against %regression.base.url%"
 echo "Users=%regression.users% Ramp=%regression.ramp.seconds%s Hold=%regression.hold.seconds%s SSE=%regression.sse.seconds%s"
 echo "DynamicConnectorSelection=%regression.dynamic.connector.selection% ConnectorStartAttempts=%regression.connector.start.attempts%"
+echo "JMeter image=%jmeter.image%"
 
 status=0
 CID=""
@@ -438,6 +439,8 @@ cleanup() {
 trap cleanup EXIT
 
 DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker pull "%jmeter.image%"
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm --entrypoint java "%jmeter.image%" -version
+DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm "%jmeter.image%" --version | head -25
 CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -w /work \
   -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2" \
