@@ -26,9 +26,16 @@ if (-not $TeamCityToken) {
 
 $repoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")
 $configPath = Resolve-Path -LiteralPath (Join-Path $repoRoot $Config)
+$configJson = Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
 $createScript = Join-Path $PSScriptRoot "create_pipeline.ps1"
-$expectedImage = "amolsurjuse/electrahub-jmeter:5.6.3-java17"
-$buildTypeId = "ElectraHub_Regression_JMeterChargingFlow"
+$expectedImage = [string]$configJson.jmeterImage
+$buildTypeId = [string]$configJson.buildTypeId
+if (-not $expectedImage) {
+    $expectedImage = "amolsurjuse/electrahub-jmeter:5.6.3-java17"
+}
+if (-not $buildTypeId) {
+    $buildTypeId = "ElectraHub_Regression_JMeterChargingFlow"
+}
 
 Write-Host "Refreshing TeamCity regression pipeline..."
 & $createScript -Config $configPath -TeamCityUrl $TeamCityUrl -TeamCityToken $TeamCityToken
@@ -41,20 +48,46 @@ $headers = @{
     Accept = "application/json"
 }
 
-$parameterUrl = "$($TeamCityUrl.TrimEnd('/'))/app/rest/buildTypes/id:$buildTypeId/parameters/jmeter.image"
-$imageParameter = Invoke-RestMethod -Method Get -Uri $parameterUrl -Headers $headers
-$actualImage = [string]$imageParameter.value
-
-Write-Host "Live TeamCity jmeter.image=$actualImage"
-if ($actualImage -ne $expectedImage) {
-    throw "TeamCity still points at '$actualImage'. Expected '$expectedImage'."
+function Get-BuildParameter {
+    param([string]$Name)
+    $url = "$($TeamCityUrl.TrimEnd('/'))/app/rest/buildTypes/id:$buildTypeId/parameters/$([Uri]::EscapeDataString($Name))"
+    $parameter = Invoke-RestMethod -Method Get -Uri $url -Headers $headers
+    return [string]$parameter.value
 }
+
+function Assert-BuildParameter {
+    param(
+        [string]$Name,
+        [string]$Expected
+    )
+    if ($null -eq $Expected -or $Expected -eq "") {
+        return
+    }
+    $actual = Get-BuildParameter -Name $Name
+    Write-Host "Live TeamCity $Name=$actual"
+    if ($actual -ne $Expected) {
+        throw "TeamCity parameter '$Name' is '$actual'. Expected '$Expected'."
+    }
+}
+
+Assert-BuildParameter -Name "jmeter.image" -Expected $expectedImage
+Assert-BuildParameter -Name "regression.base.url" -Expected ([string]$configJson.regressionBaseUrl)
+Assert-BuildParameter -Name "regression.users" -Expected ([string]$configJson.regressionUsers)
+Assert-BuildParameter -Name "regression.ramp.seconds" -Expected ([string]$configJson.regressionRampSeconds)
+Assert-BuildParameter -Name "regression.hold.seconds" -Expected ([string]$configJson.regressionHoldSeconds)
+Assert-BuildParameter -Name "regression.sse.seconds" -Expected ([string]$configJson.regressionSseSeconds)
+Assert-BuildParameter -Name "regression.connector.start.attempts" -Expected ([string]$configJson.regressionConnectorStartAttempts)
+Assert-BuildParameter -Name "regression.request.timeout.ms" -Expected ([string]$configJson.regressionRequestTimeoutMs)
+Assert-BuildParameter -Name "regression.session.command.timeout.ms" -Expected ([string]$configJson.regressionSessionCommandTimeoutMs)
+Assert-BuildParameter -Name "jmeter.load.stages" -Expected ([string]$configJson.jmeterLoadStages)
+Assert-BuildParameter -Name "jmeter.load.max.error.percent" -Expected ([string]$configJson.jmeterLoadMaxErrorPercent)
 
 $stepsUrl = "$($TeamCityUrl.TrimEnd('/'))/app/rest/buildTypes/id:$buildTypeId/steps"
 $steps = Invoke-RestMethod -Method Get -Uri $stepsUrl -Headers $headers
-$step = @($steps.step) | Where-Object { $_.name -eq "JMeter Charging Regression" } | Select-Object -First 1
+$expectedStepName = if ([string]$configJson.jmeterLoadStages) { "JMeter Load Ladder" } else { "JMeter Charging Regression" }
+$step = @($steps.step) | Where-Object { $_.name -eq $expectedStepName } | Select-Object -First 1
 if (-not $step) {
-    throw "JMeter Charging Regression step was not found."
+    throw "$expectedStepName step was not found."
 }
 
 $stepUrl = "$($TeamCityUrl.TrimEnd('/'))/app/rest/buildTypes/id:$buildTypeId/steps/$($step.id)"
@@ -65,4 +98,8 @@ if ($scriptContent -notlike "*JMeter image=%jmeter.image%*" -or $scriptContent -
     throw "TeamCity step is missing the Java/JMeter preflight diagnostics. Re-run create_pipeline.ps1."
 }
 
-Write-Host "TeamCity JMeter regression pipeline is updated and ready."
+if ([string]$configJson.jmeterLoadStages -and $scriptContent -notlike "*Load ladder stopped at stage*") {
+    throw "TeamCity load ladder step is missing breakpoint detection. Re-run create_pipeline.ps1."
+}
+
+Write-Host "TeamCity JMeter pipeline '$buildTypeId' is updated and ready."
