@@ -24,8 +24,18 @@ data:
         source: |
           .cluster = "{{ .Values.clusterName }}"
           .environment = "{{ .Values.environment }}"
-          .service = .kubernetes.pod_labels."app.kubernetes.io/name" ?? .kubernetes.container_name ?? "unknown"
-          .app = .kubernetes.pod_labels."app.kubernetes.io/instance" ?? .service
+          if exists(.kubernetes.pod_labels."app.kubernetes.io/name") {
+            .service = .kubernetes.pod_labels."app.kubernetes.io/name"
+          } else if exists(.kubernetes.container_name) {
+            .service = .kubernetes.container_name
+          } else {
+            .service = "unknown"
+          }
+          if exists(.kubernetes.pod_labels."app.kubernetes.io/instance") {
+            .app = .kubernetes.pod_labels."app.kubernetes.io/instance"
+          } else {
+            .app = .service
+          }
           .namespace = .kubernetes.pod_namespace
           .pod = .kubernetes.pod_name
           .container = .kubernetes.container_name

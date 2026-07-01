@@ -22,6 +22,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args: ["--config", "/etc/vector/vector.yaml"]
           env:
+            - name: VECTOR_SELF_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
             - name: SPLUNK_HEC_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -30,6 +34,8 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+            - name: vector-data
+              mountPath: /vector-data-dir
             - name: config
               mountPath: /etc/vector
             - name: var-log
@@ -39,6 +45,8 @@ spec:
               mountPath: /var/lib/docker/containers
               readOnly: true
       volumes:
+        - name: vector-data
+          emptyDir: {}
         - name: config
           configMap:
             name: {{ include "splunk-log-collector.name" . }}-config
