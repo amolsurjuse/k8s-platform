@@ -121,7 +121,7 @@ class PipelineConfig:
             docker_username=str(raw.get("dockerUsername") or "amolsurjuse").strip(),
             agent_name=str(raw["agentName"] if "agentName" in raw else "teamcity-minimal-agent").strip(),
             add_vcs_trigger=bool(raw.get("addVcsTrigger", True)),
-            jmeter_image=str(raw.get("jmeterImage") or "justb4/jmeter:latest").strip(),
+            jmeter_image=str(raw.get("jmeterImage") or "amolsurjuse/electrahub-jmeter:5.6.3-java17").strip(),
             jmeter_plan=str(raw.get("jmeterPlan") or "scripts/jmeter/03-full-e2e-charging-100-users.jmx").strip(),
             regression_base_url=str(raw.get("regressionBaseUrl") or "https://api.dev.electrahub.net").strip(),
             regression_users=str(raw.get("regressionUsers") or "5").strip(),
@@ -440,6 +440,7 @@ trap cleanup EXIT
 DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker pull "%jmeter.image%"
 CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -w /work \
+  -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2" \
   "%jmeter.image%" \
   -n \
   -t "%jmeter.plan%" \

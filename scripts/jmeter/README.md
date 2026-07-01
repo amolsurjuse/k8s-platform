@@ -80,8 +80,15 @@ Useful overrides:
 -Jsparky_require_charger_status=true
 ```
 
-The legacy `justb4/jmeter:latest` image currently runs Java 8 and can fail Cloudflare TLS with `handshake_failure`.
-For local validation with that image, port-forward the gateway and use HTTP:
+TeamCity uses the ElectraHub-owned Java 17 image below. Keep this image on Java 17+ because the legacy
+`justb4/jmeter:latest` image currently runs Java 8 and can fail Cloudflare TLS with `handshake_failure`.
+
+```powershell
+docker build -t amolsurjuse/electrahub-jmeter:5.6.3-java17 -f scripts/jmeter/docker/Dockerfile scripts/jmeter/docker
+docker push amolsurjuse/electrahub-jmeter:5.6.3-java17
+```
+
+For local validation with the legacy image, port-forward the gateway and use HTTP:
 
 ```powershell
 wsl -d Ubuntu-24.04 -- kubectl --context k3d-electrahub-prod -n prod port-forward --address 0.0.0.0 svc/api-gateway 19090:8090
