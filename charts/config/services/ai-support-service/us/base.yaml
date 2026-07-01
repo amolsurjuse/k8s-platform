@@ -10,10 +10,22 @@ env:
   SPRING_PROFILES_ACTIVE: "dev"
   JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
 
+secrets:
+  existingSecretName: ai-support-openai-secret
+  optional: true
+  env:
+    OPENAI_API_KEY: OPENAI_API_KEY
+
 config:
   data:
     SERVER_PORT: "8094"
-    AI_PROVIDER_ENABLED: "false"
+    AI_PROVIDER_ENABLED: "true"
+    AI_PROVIDER: "openai"
+    OPENAI_BASE_URL: "https://api.openai.com"
+    AI_MODEL: "gpt-4.1-mini"
+    AI_TEMPERATURE: "0.2"
+    AI_MAX_OUTPUT_TOKENS: "900"
+    AI_LLM_TIMEOUT_MS: "12000"
     SUPPORT_EMAIL: "support@electrahub.com"
     AI_STREAM_TOKEN_DELAY_MS: "18"
     MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"

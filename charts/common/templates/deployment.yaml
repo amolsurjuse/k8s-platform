@@ -45,6 +45,7 @@ spec:
           {{- $secrets := .Values.secrets | default dict }}
           {{- $secretsEnv := $secrets.env | default dict }}
           {{- $secretName := $secrets.existingSecretName | default "" }}
+          {{- $secretOptional := $secrets.optional | default false }}
           {{- $extraSecretEnv := .Values.extraSecretEnv | default list }}
 
           {{- if and .Values.config.enabled (gt (len .Values.config.data) 0) }}
@@ -72,6 +73,7 @@ spec:
                 secretKeyRef:
                   name: {{ $secretName }}
                   key: {{ $secretKey }}
+                  optional: {{ $secretOptional }}
             {{- end }}
             {{- end }}
 
