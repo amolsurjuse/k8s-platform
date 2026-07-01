@@ -22,7 +22,7 @@ secrets:
 config:
   data:
     SERVER_PORT: "8082"
-    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
     ENV_USER_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
     SPRING_LIQUIBASE_ENABLED: "true"
     SPRING_LIQUIBASE_DEFAULT_SCHEMA: "user_mgmt"

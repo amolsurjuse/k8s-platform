@@ -22,7 +22,7 @@ secrets:
 config:
   data:
     SERVER_PORT: "8083"
-    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
     ENV_PAYMENT_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/appdb"
     SPRING_LIQUIBASE_ENABLED: "true"
     SPRING_LIQUIBASE_DEFAULT_SCHEMA: "public"

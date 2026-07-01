@@ -1,0 +1,58 @@
+targetNamespace: dev
+scrapeTargets:
+  - name: api-gateway
+    namespace: dev
+    environment: dev
+    targets: ["api-gateway.dev.svc.cluster.local:8090"]
+  - name: auth-service
+    namespace: dev
+    environment: dev
+    targets: ["auth-service.dev.svc.cluster.local:8080"]
+  - name: user-service
+    namespace: dev
+    environment: dev
+    targets: ["user-service.dev.svc.cluster.local:8082"]
+  - name: session-service
+    namespace: dev
+    environment: dev
+    targets: ["session-service.dev.svc.cluster.local:8083"]
+  - name: payment-service
+    namespace: dev
+    environment: dev
+    targets: ["payment-service.dev.svc.cluster.local:8083"]
+  - name: billing-service
+    namespace: dev
+    environment: dev
+    targets: ["billing-service.dev.svc.cluster.local:8085"]
+  - name: charger-management-service
+    namespace: dev
+    environment: dev
+    targets: ["charger-management-service.dev.svc.cluster.local:8086"]
+  - name: station-management-service
+    namespace: dev
+    environment: dev
+    targets: ["station-management-service.dev.svc.cluster.local:8081"]
+  - name: ocpp-service
+    namespace: dev
+    environment: dev
+    targets: ["ocpp-service.dev.svc.cluster.local:8082"]
+  - name: ocpi-service
+    namespace: dev
+    environment: dev
+    targets: ["ocpi-service.dev.svc.cluster.local:8084"]
+  - name: pricing-service
+    namespace: dev
+    environment: dev
+    targets: ["pricing-service.dev.svc.cluster.local:8092"]
+  - name: subscription-service
+    namespace: dev
+    environment: dev
+    targets: ["subscription-service.dev.svc.cluster.local:8086"]
+  - name: notification-service
+    namespace: dev
+    environment: dev
+    targets: ["notification-service.dev.svc.cluster.local:8085"]
+  - name: ai-support-service
+    namespace: dev
+    environment: dev
+    targets: ["ai-support-service.dev.svc.cluster.local:8094"]

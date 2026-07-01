@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana-dev
+  namespace: argocd
+spec:
+  project: electrahub-dev
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: infrastructure/grafana
+    helm:
+      releaseName: grafana
+      valueFiles:
+        - ../../platform-config/infrastructure/grafana/us/values/dev.yaml
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

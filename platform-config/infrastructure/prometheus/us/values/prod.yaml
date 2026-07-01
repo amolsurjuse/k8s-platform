@@ -1,0 +1,58 @@
+targetNamespace: prod
+scrapeTargets:
+  - name: api-gateway
+    namespace: prod
+    environment: prod
+    targets: ["api-gateway.prod.svc.cluster.local:8090"]
+  - name: auth-service
+    namespace: prod
+    environment: prod
+    targets: ["auth-service.prod.svc.cluster.local:8080"]
+  - name: user-service
+    namespace: prod
+    environment: prod
+    targets: ["user-service.prod.svc.cluster.local:8082"]
+  - name: session-service
+    namespace: prod
+    environment: prod
+    targets: ["session-service.prod.svc.cluster.local:8083"]
+  - name: payment-service
+    namespace: prod
+    environment: prod
+    targets: ["payment-service.prod.svc.cluster.local:8083"]
+  - name: billing-service
+    namespace: prod
+    environment: prod
+    targets: ["billing-service.prod.svc.cluster.local:8085"]
+  - name: charger-management-service
+    namespace: prod
+    environment: prod
+    targets: ["charger-management-service.prod.svc.cluster.local:8086"]
+  - name: station-management-service
+    namespace: prod
+    environment: prod
+    targets: ["station-management-service.prod.svc.cluster.local:8081"]
+  - name: ocpp-service
+    namespace: prod
+    environment: prod
+    targets: ["ocpp-service.prod.svc.cluster.local:8082"]
+  - name: ocpi-service
+    namespace: prod
+    environment: prod
+    targets: ["ocpi-service.prod.svc.cluster.local:8084"]
+  - name: pricing-service
+    namespace: prod
+    environment: prod
+    targets: ["pricing-service.prod.svc.cluster.local:8092"]
+  - name: subscription-service
+    namespace: prod
+    environment: prod
+    targets: ["subscription-service.prod.svc.cluster.local:8086"]
+  - name: notification-service
+    namespace: prod
+    environment: prod
+    targets: ["notification-service.prod.svc.cluster.local:8085"]
+  - name: ai-support-service
+    namespace: prod
+    environment: prod
+    targets: ["ai-support-service.prod.svc.cluster.local:8094"]

@@ -13,7 +13,7 @@ env:
 config:
   data:
     SERVER_PORT: "8090"
-    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
     LOGGING_LEVEL_COM_ELECTRAHUB_GATEWAY: "DEBUG"
 
     # Redis (shared with auth-service)

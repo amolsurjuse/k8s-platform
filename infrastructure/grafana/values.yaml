@@ -1,0 +1,36 @@
+fullnameOverride: grafana
+
+image:
+  repository: grafana/grafana
+  tag: 11.2.2
+  pullPolicy: IfNotPresent
+
+admin:
+  existingSecretName: grafana-admin-secret
+  userKey: GF_SECURITY_ADMIN_USER
+  passwordKey: GF_SECURITY_ADMIN_PASSWORD
+
+service:
+  type: ClusterIP
+  port: 3000
+
+persistence:
+  enabled: true
+  size: 5Gi
+
+prometheus:
+  url: http://prometheus.monitoring.svc.cluster.local:9090
+
+ingress:
+  enabled: false
+  className: nginx
+  host: grafana.electrahub.net
+  tls: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 768Mi

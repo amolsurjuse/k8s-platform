@@ -1,0 +1,6 @@
+apiVersion: v2
+name: grafana
+version: 1.0.0
+appVersion: "11.2.2"
+description: Grafana for ElectraHub dashboards.
+type: application

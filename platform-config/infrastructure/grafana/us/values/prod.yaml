@@ -1,0 +1,11 @@
+prometheus:
+  url: http://prometheus.monitoring.svc.cluster.local:9090
+
+ingress:
+  enabled: true
+  className: nginx
+  host: grafana.electrahub.net
+
+persistence:
+  enabled: true
+  size: 5Gi
