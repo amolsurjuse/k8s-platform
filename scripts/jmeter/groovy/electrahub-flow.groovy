@@ -11,6 +11,7 @@ import java.util.UUID
 def slurper = new JsonSlurper()
 def action = (Parameters ?: 'full').trim()
 def baseUrl = props.getProperty('base_url', 'https://api.dev.electrahub.net').replaceAll('/+$', '')
+def simulatorUrl = props.getProperty('simulator_url', 'https://ocpp-simulator-dev.electrahub.net').replaceAll('/+$', '')
 def requestHostHeader = props.getProperty('request_host_header', '').trim()
 def runId = props.getProperty('run_id')
 if (!runId) {
@@ -140,6 +141,38 @@ def request = { String method, String path, Object body = null, String token = n
   }
 }
 
+def simulatorRequest = { String method, String path, Object body = null, int timeoutMs = requestTimeoutMs ->
+  URL url = new URL("${simulatorUrl}${path}")
+  HttpURLConnection conn = (HttpURLConnection) url.openConnection()
+  conn.setRequestMethod(method)
+  conn.setConnectTimeout(timeoutMs)
+  conn.setReadTimeout(timeoutMs)
+  conn.setRequestProperty('Accept', 'application/json')
+  conn.setRequestProperty('User-Agent', 'ElectraHubRegression/1.0')
+  conn.setRequestProperty('X-ElectraHub-Test-Run', runId)
+  if (body != null) {
+    conn.setDoOutput(true)
+    conn.setRequestProperty('Content-Type', 'application/json')
+    byte[] bytes = json(body).getBytes(StandardCharsets.UTF_8)
+    conn.setRequestProperty('Content-Length', String.valueOf(bytes.length))
+    conn.outputStream.withCloseable { it.write(bytes) }
+  }
+
+  try {
+    long started = System.currentTimeMillis()
+    int status = conn.responseCode
+    InputStream stream = status >= 400 ? conn.errorStream : conn.inputStream
+    String responseBody = stream == null ? '' : stream.getText('UTF-8')
+    long elapsed = System.currentTimeMillis() - started
+    logLine("simulator ${method} ${path} status=${status} elapsedMs=${elapsed}")
+    [status: status, body: responseBody, json: parseJson(responseBody)]
+  } catch (SocketTimeoutException timeout) {
+    throw new SocketTimeoutException("step=${currentStep} simulator ${method} ${path} timed out after ${timeoutMs}ms")
+  } finally {
+    conn.disconnect()
+  }
+}
+
 def requireStatus = { Map response, List<Integer> statuses, String step ->
   if (!statuses.contains(response.status as int)) {
     throw new IllegalStateException("${step} failed with HTTP ${response.status}: ${response.body}")
@@ -258,6 +291,9 @@ def setupPayment = { String token ->
 
 def discoverChargers = { String token ->
   String countryArg = props.getProperty('charger_country_code', '').trim()
+  if (!countryArg && action == 'idle-fee') {
+    countryArg = 'US'
+  }
   String countryFilter = countryArg ? "countryCode: \"${countryArg}\", " : ''
   def listQuery = """query {
     ocpiChargers(${countryFilter}limit: 100, offset: 0) {
@@ -267,7 +303,8 @@ def discoverChargers = { String token ->
       availablePorts
       busyPorts
       location { ocpiLocationId name }
-      evses { uid status connectors { id status available standard powerType } }
+      pricing { idleFee { enabled pricePerMinute currency sourceTariffId } }
+      evses { uid status connectors { id status available standard powerType tariffIds tariffs { tariffId energyPrice parkingPrice currency } } }
     }
   }"""
   def list = requireStatus(atStep('charger graphql list') { request('POST', '/charger/graphql', [query: listQuery], token) }, [200], 'charger graphql list')
@@ -284,7 +321,8 @@ def discoverChargers = { String token ->
         for (def connector : (evse.connectors ?: [])) {
           String connectorStatus = String.valueOf(connector.status ?: '')
           boolean connectorAvailable = connector.available == true || connectorStatus.equalsIgnoreCase('AVAILABLE')
-          if (connectorAvailable) {
+          boolean idleFeeOk = action != 'idle-fee' || charger.pricing?.idleFee?.enabled == true
+          if (connectorAvailable && idleFeeOk) {
             candidates << [charger: charger, connector: connector]
           }
         }
@@ -318,6 +356,8 @@ def discoverChargers = { String token ->
       vars.put('connectorNumber', String.valueOf(connectorNumber))
       vars.put('connectorType', connectorType)
       logLine("selected available connector ${chargerId}/${connectorId} location=${locationId} candidate=${Math.floorMod(threadIndex - 1, candidates.size()) + 1}/${candidates.size()}")
+    } else if (action == 'idle-fee') {
+      throw new IllegalStateException('dynamic connector selection found no available idle-fee connector')
     } else {
       logLine('dynamic connector selection found no available connector; using CSV connector')
     }
@@ -331,12 +371,26 @@ def discoverChargers = { String token ->
       availablePorts
       busyPorts
       location { ocpiLocationId name }
-      evses { uid status connectors { id status available standard powerType } }
+      pricing { tariffs { tariffId energyPrice parkingPrice currency } idleFee { enabled pricePerMinute currency sourceTariffId } }
+      evses { uid status connectors { id status available standard powerType tariffIds tariffs { tariffId energyPrice parkingPrice currency } } }
     }
   }"""
   def view = requireStatus(atStep('charger graphql view') { request('POST', '/charger/graphql', [query: viewQuery], token) }, [200], 'charger graphql view')
   if (view.body.contains('"errors"')) {
     throw new IllegalStateException("charger graphql view returned errors for ${chargerId}/${connectorId}: ${view.body}")
+  }
+  if (action == 'idle-fee') {
+    def charger = view.json?.data?.ocpiCharger
+    def idleFee = charger?.pricing?.idleFee
+    if (idleFee?.enabled != true) {
+      throw new IllegalStateException("selected charger ${chargerId}/${connectorId} does not expose enabled idle fee: ${view.body}")
+    }
+    if ((idleFee?.pricePerMinute ?: 0) as BigDecimal <= 0) {
+      throw new IllegalStateException("selected charger ${chargerId}/${connectorId} has no positive idle fee rate: ${view.body}")
+    }
+    vars.put('idleFeePerMinute', String.valueOf(idleFee.pricePerMinute))
+    vars.put('idleFeeCurrency', String.valueOf(idleFee.currency ?: 'USD'))
+    logLine("idle fee discovery ok charger=${chargerId}/${connectorId} rate=${idleFee.pricePerMinute} ${idleFee.currency}")
   }
 }
 
@@ -425,6 +479,49 @@ def startSession = { String token ->
 
 def activeSession = { String token ->
   requireStatus(atStep('active sessions') { request('GET', '/session/api/v1/sessions/active', null, token) }, [200], 'active sessions')
+}
+
+def findActiveSession = { String token, String sessionId ->
+  def response = activeSession(token)
+  def sessions = response.json instanceof List ? response.json : []
+  sessions.find { String.valueOf(it.id ?: '') == sessionId }
+}
+
+def waitForActiveSessionPredicate = { String token, String sessionId, String description, int timeoutSeconds, Closure<Boolean> predicate ->
+  long deadline = System.currentTimeMillis() + (timeoutSeconds * 1000L)
+  def lastSession = null
+  while (System.currentTimeMillis() < deadline) {
+    lastSession = findActiveSession(token, sessionId)
+    if (lastSession != null && predicate(lastSession)) {
+      logLine("active session predicate ok ${description} session=${sessionId}")
+      return lastSession
+    }
+    sleep(3000)
+  }
+  throw new IllegalStateException("session ${sessionId} did not satisfy ${description}; last=${json(lastSession)}")
+}
+
+def sendSimulatorStatus = { String status, String errorCode = 'NoError' ->
+  int number = (vars.get('connectorNumber') ?: String.valueOf(connectorNumber ?: 1)) as int
+  def response = atStep("simulator status ${status}") {
+    simulatorRequest('POST', "/api/v1/chargers/${chargerId}/connectors/${number}/status", [
+      status: status,
+      errorCode: errorCode
+    ])
+  }
+  requireStatus(response, [200, 202], "simulator status ${status}")
+}
+
+def sendSimulatorMeterValue = { long meterWh ->
+  int number = (vars.get('connectorNumber') ?: String.valueOf(connectorNumber ?: 1)) as int
+  def response = atStep('simulator meter value') {
+    simulatorRequest('POST', "/api/v1/chargers/${chargerId}/connectors/${number}/meter-values/send", [
+      meterWh: meterWh,
+      energyWh: Math.max(0L, meterWh),
+      currentPowerW: props.getProperty('idle_flow_power_w', '44000') as long
+    ])
+  }
+  requireStatus(response, [200, 202], 'simulator meter value')
 }
 
 def monitorSse = { String token, String sessionId ->
@@ -533,36 +630,63 @@ def validateStoppedAndReceipt = { String token, String sessionId ->
   logLine("receipt ok session=${sessionId} status=${receipt.json?.status} total=${receipt.json?.totalCost ?: receipt.json?.costUsd}")
 }
 
+def validateIdleFeeFlow = { String token, String sessionId ->
+  waitForActiveSessionPredicate(token, sessionId, 'idle fee policy snapshot', 60) { session ->
+    session.idleFeeEnabled == true && ((session.idleFeePerMinute ?: 0) as BigDecimal) > 0
+  }
+
+  sendSimulatorMeterValue(props.getProperty('idle_flow_meter_wh', '1201500') as long)
+  sendSimulatorStatus(props.getProperty('idle_flow_status', 'SuspendedEV'))
+  def idleSession = waitForActiveSessionPredicate(token, sessionId, 'idle started', 90) { session ->
+    session.idleFeeEnabled == true && (session.idleStartedAt != null || ((session.idleSeconds ?: 0) as long) >= 0)
+  }
+  logLine("idle started session=${sessionId} idleSeconds=${idleSession.idleSeconds} idleStartedAt=${idleSession.idleStartedAt}")
+
+  stopSession(token, sessionId)
+  def afterRemoteStop = waitForActiveSessionPredicate(token, sessionId, 'remote stop requires unplug', 60) { session ->
+    session.idleFeeEnabled == true && session.unplugRequiredToStop == true
+  }
+  logLine("remote stop kept idle-fee session active session=${sessionId} idleSeconds=${afterRemoteStop.idleSeconds}")
+
+  sendSimulatorStatus('Available')
+  validateStoppedAndReceipt(token, sessionId)
+}
+
 try {
   long startedAt = System.currentTimeMillis()
   String token
 
-  if (action == 'setup' || action == 'full') {
+  if (action == 'setup' || action == 'full' || action == 'idle-fee') {
     token = registerOrLogin()
     appendGeneratedUser()
     token = setupPayment(token)
   } else if (action == 'charging') {
     token = login()
   } else {
-    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, or full.")
+    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, or idle-fee.")
   }
 
-  if (action == 'charging' || action == 'full') {
+  if (action == 'charging' || action == 'full' || action == 'idle-fee') {
     discoverChargers(token)
     requireStatus(atStep('payment state before start') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state before start')
     String sessionId = startSession(token)
     activeSession(token)
     monitorSse(token, sessionId)
 
-    long elapsedSeconds = (System.currentTimeMillis() - startedAt) / 1000L
-    long remaining = Math.max(0L, holdSeconds - elapsedSeconds)
-    if (remaining > 0L) {
-      logLine("holding session for ${remaining}s before stop")
-      sleep(remaining * 1000L)
-    }
+    if (action == 'idle-fee') {
+      validateIdleFeeFlow(token, sessionId)
+    } else {
 
-    stopSession(token, sessionId)
-    validateStoppedAndReceipt(token, sessionId)
+      long elapsedSeconds = (System.currentTimeMillis() - startedAt) / 1000L
+      long remaining = Math.max(0L, holdSeconds - elapsedSeconds)
+      if (remaining > 0L) {
+        logLine("holding session for ${remaining}s before stop")
+        sleep(remaining * 1000L)
+      }
+
+      stopSession(token, sessionId)
+      validateStoppedAndReceipt(token, sessionId)
+    }
   }
 
   SampleResult.setSuccessful(true)

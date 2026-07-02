@@ -23,6 +23,7 @@ Use prod only when explicitly validating production:
 | `03-full-e2e-charging-100-users.jmx` | Full flow in one run: create users, setup payment, discover stations, start charging, monitor SSE, dwell, stop, receipt. |
 | `04-sparky-ai-chat-regression.jmx` | Validates Sparky AI message creation, SSE completion, prompt routing, and live backend diagnostics. |
 | `05-card-present-charging-flow.jmx` | Validates simulated terminal card tap, dummy payment authorization, OCPP transaction start, dwell, and stop. |
+| `06-idle-fee-charging-flow.jmx` | Validates idle-fee pricing discovery, active-session idle fields, remote-stop unplug requirement, physical unplug completion, and receipt. |
 
 ## Recommended Safe Dev Run
 
@@ -94,6 +95,31 @@ jmeter -n -t scripts/jmeter/05-card-present-charging-flow.jmx `
   -Jconnector_number=1 `
   -Jusers=1 `
   -Jhold_seconds=15
+```
+
+## Idle-Fee Charging Regression
+
+This suite validates the driver-app idle-fee contract end to end:
+
+- charger GraphQL returns an enabled idle fee and positive idle-fee rate
+- session start snapshots the idle-fee policy
+- simulator status `SuspendedEV` starts the idle period
+- remote stop keeps the session active and marks `unplugRequiredToStop=true`
+- simulator status `Available` represents physical unplug and completes the session
+- receipt/history/dashboard APIs are available after completion
+
+```powershell
+jmeter -n -t scripts/jmeter/06-idle-fee-charging-flow.jmx `
+  -l outputs/jmeter/idle-fee/results.jtl `
+  -j outputs/jmeter/idle-fee/jmeter.log `
+  -Jbase_url=https://api.dev.electrahub.net `
+  -Jsimulator_url=https://ocpp-simulator-dev.electrahub.net `
+  -Jcharger_country_code=US `
+  -Jdynamic_connector_selection=true `
+  -Jusers=1 `
+  -Jramp_seconds=1 `
+  -Jhold_seconds=30 `
+  -Jsse_seconds=15
 ```
 
 TeamCity uses the ElectraHub-owned Java 17 image below. Keep this image on Java 17+ because the legacy
