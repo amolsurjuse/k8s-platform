@@ -22,6 +22,7 @@ Use prod only when explicitly validating production:
 | `02-charging-session-load.jmx` | Uses an existing user CSV and connector CSV to login, discover chargers, start sessions, monitor SSE, stop, and validate receipt. |
 | `03-full-e2e-charging-100-users.jmx` | Full flow in one run: create users, setup payment, discover stations, start charging, monitor SSE, dwell, stop, receipt. |
 | `04-sparky-ai-chat-regression.jmx` | Validates Sparky AI message creation, SSE completion, prompt routing, and live backend diagnostics. |
+| `05-card-present-charging-flow.jmx` | Validates simulated terminal card tap, dummy payment authorization, OCPP transaction start, dwell, and stop. |
 
 ## Recommended Safe Dev Run
 
@@ -78,6 +79,21 @@ Useful overrides:
 -Jsparky_location_id=US*EHB*LOC*SFO001
 -Jsparky_session_id=<optional-active-session-id>
 -Jsparky_require_charger_status=true
+```
+
+## Card-Present Charging Regression
+
+This suite starts from the simulator because a card-present tap is charger/terminal initiated, not driver-app initiated.
+
+```powershell
+jmeter -n -t scripts/jmeter/05-card-present-charging-flow.jmx `
+  -l outputs/jmeter/card-present/results.jtl `
+  -j outputs/jmeter/card-present/jmeter.log `
+  -Jsimulator_url=https://ocpp-simulator-dev.electrahub.net `
+  -Jcharger_id=EH-SFO-CHG-001 `
+  -Jconnector_number=1 `
+  -Jusers=1 `
+  -Jhold_seconds=15
 ```
 
 TeamCity uses the ElectraHub-owned Java 17 image below. Keep this image on Java 17+ because the legacy

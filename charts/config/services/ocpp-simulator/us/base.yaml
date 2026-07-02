@@ -13,6 +13,7 @@ config:
     BASE_URL: "http://ocpp-simulator:8081"
     WS_CONNECTOR_BASE_URL: "http://web-socket-connector:8091"
     DEFAULT_CSMS_URL: "ws://ocpp-service:8082/ws/ocpp"
+    PAYMENT_SERVICE_URL: "http://payment-service:8083"
     AUTO_SEED_CHARGERS: "true"
     AUTO_SYNC_ENVIRONMENT_CHARGERS: "true"
     ENVIRONMENT_SYNC_URL: "http://charger-management-service:8086"
