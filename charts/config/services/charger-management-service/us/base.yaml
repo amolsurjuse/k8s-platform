@@ -1,6 +1,7 @@
 fullnameOverride: "charger-management-service"
 image:
   repository: amolsurjuse/charger-management-service
+  pullPolicy: Always
 
 service:
   port: 8086
