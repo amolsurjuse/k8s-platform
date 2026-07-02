@@ -351,7 +351,7 @@ def startSession = { String token ->
     def parsedCandidates = parseJson(candidatesJson) ?: []
     if (!parsedCandidates.isEmpty()) {
       int startAt = Math.floorMod(threadIndex - 1, parsedCandidates.size())
-      int maxAttempts = Math.min(parsedCandidates.size(), Math.max(5, props.getProperty('connector_start_attempts', '10') as int))
+      int maxAttempts = Math.min(parsedCandidates.size(), Math.max(5, props.getProperty('connector_start_attempts', String.valueOf(parsedCandidates.size())) as int))
       for (int i = 0; i < maxAttempts; i++) {
         attempts << parsedCandidates[(startAt + i) % parsedCandidates.size()]
       }
@@ -361,7 +361,7 @@ def startSession = { String token ->
     def csvCandidates = readCsvConnectorCandidates()
     if (!csvCandidates.isEmpty()) {
       int startAt = Math.max(0, Math.min(threadIndex - 1, csvCandidates.size() - 1))
-      int maxAttempts = Math.min(csvCandidates.size(), Math.max(5, props.getProperty('connector_start_attempts', '10') as int))
+      int maxAttempts = Math.min(csvCandidates.size(), Math.max(5, props.getProperty('connector_start_attempts', String.valueOf(csvCandidates.size())) as int))
       for (int i = 0; i < maxAttempts; i++) {
         attempts << csvCandidates[(startAt + i) % csvCandidates.size()]
       }
