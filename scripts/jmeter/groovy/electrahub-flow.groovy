@@ -597,7 +597,7 @@ def stopSession = { String token, String sessionId ->
   logLine("stop requested session=${sessionId}")
 }
 
-def validateStoppedAndReceipt = { String token, String sessionId ->
+def validateStoppedAndReceipt = { String token, String sessionId, boolean expectSubscriptionDiscount = false ->
   long deadline = System.currentTimeMillis() + 120000L
   boolean goneFromActive = false
   while (System.currentTimeMillis() < deadline) {
@@ -625,9 +625,30 @@ def validateStoppedAndReceipt = { String token, String sessionId ->
   if (receipt == null) {
     throw new IllegalStateException("receipt not available for session ${sessionId}")
   }
+  if (expectSubscriptionDiscount) {
+    BigDecimal regularCost = ((receipt.json?.regularCost ?: 0) as BigDecimal)
+    BigDecimal totalCost = ((receipt.json?.totalCost ?: receipt.json?.costUsd ?: 0) as BigDecimal)
+    BigDecimal discount = ((receipt.json?.subscriptionDiscountAmount ?: 0) as BigDecimal)
+    if (!(discount > 0 && regularCost > totalCost && receipt.json?.subscriptionPlanCode)) {
+      throw new IllegalStateException("receipt missing expected subscription discount fields for ${sessionId}: regular=${regularCost} total=${totalCost} discount=${discount} plan=${receipt.json?.subscriptionPlanCode}")
+    }
+  }
   requireStatus(atStep('session history') { request('GET', '/session/api/v1/sessions/history?page=0&size=10', null, token) }, [200], 'session history')
   requireStatus(atStep('dashboard stats') { request('GET', '/session/api/v1/sessions/dashboard-stats', null, token) }, [200], 'dashboard stats')
   logLine("receipt ok session=${sessionId} status=${receipt.json?.status} total=${receipt.json?.totalCost ?: receipt.json?.costUsd}")
+}
+
+def validateSubscriptionDiscountFlow = { String token, String sessionId ->
+  def discounted = waitForActiveSessionPredicate(token, sessionId, 'subscription discount active price', 120) { session ->
+    BigDecimal regularCost = ((session.regularCost ?: 0) as BigDecimal)
+    BigDecimal discountedCost = ((session.discountedCost ?: session.estimatedCost ?: 0) as BigDecimal)
+    BigDecimal discount = ((session.subscriptionDiscountAmount ?: 0) as BigDecimal)
+    session.subscriptionDiscountApplied == true && discount > 0 && regularCost > discountedCost && session.subscriptionPlanCode != null
+  }
+  logLine("subscription discount active session=${sessionId} regular=${discounted.regularCost} discounted=${discounted.discountedCost ?: discounted.estimatedCost} discount=${discounted.subscriptionDiscountAmount} plan=${discounted.subscriptionPlanCode}")
+  stopSession(token, sessionId)
+  sendSimulatorStatus('Available')
+  validateStoppedAndReceipt(token, sessionId, true)
 }
 
 def validateIdleFeeFlow = { String token, String sessionId ->
@@ -656,17 +677,17 @@ try {
   long startedAt = System.currentTimeMillis()
   String token
 
-  if (action == 'setup' || action == 'full' || action == 'idle-fee') {
+  if (action == 'setup' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount') {
     token = registerOrLogin()
     appendGeneratedUser()
     token = setupPayment(token)
   } else if (action == 'charging') {
     token = login()
   } else {
-    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, or idle-fee.")
+    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, idle-fee, or subscription-discount.")
   }
 
-  if (action == 'charging' || action == 'full' || action == 'idle-fee') {
+  if (action == 'charging' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount') {
     discoverChargers(token)
     requireStatus(atStep('payment state before start') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state before start')
     String sessionId = startSession(token)
@@ -675,6 +696,8 @@ try {
 
     if (action == 'idle-fee') {
       validateIdleFeeFlow(token, sessionId)
+    } else if (action == 'subscription-discount') {
+      validateSubscriptionDiscountFlow(token, sessionId)
     } else {
 
       long elapsedSeconds = (System.currentTimeMillis() - startedAt) / 1000L

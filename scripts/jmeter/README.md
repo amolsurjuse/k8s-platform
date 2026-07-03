@@ -24,6 +24,7 @@ Use prod only when explicitly validating production:
 | `04-sparky-ai-chat-regression.jmx` | Validates Sparky AI message creation, SSE completion, prompt routing, and live backend diagnostics. |
 | `05-card-present-charging-flow.jmx` | Validates simulated terminal card tap, dummy payment authorization, OCPP transaction start, dwell, and stop. |
 | `06-idle-fee-charging-flow.jmx` | Validates idle-fee pricing discovery, active-session idle fields, remote-stop unplug requirement, physical unplug completion, and receipt. |
+| `07-subscription-discount-charging-flow.jmx` | Validates the default new-user 20% charging discount, quota-aware active-session pricing, and discounted receipt fields. |
 
 ## Recommended Safe Dev Run
 
@@ -119,6 +120,28 @@ jmeter -n -t scripts/jmeter/06-idle-fee-charging-flow.jmx `
   -Jusers=1 `
   -Jramp_seconds=1 `
   -Jhold_seconds=30 `
+  -Jsse_seconds=15
+```
+
+## Subscription Discount Regression
+
+This suite validates the new-user promotion contract:
+
+- fresh driver account receives the default `NEW_USER_20_OFF_500KWH_1Y` allocation lazily on first subscription preview
+- active session exposes `regularCost`, `discountedCost`, `subscriptionDiscountAmount`, plan details, and quota fields
+- cost is discounted in real time while quota remains
+- receipt carries the same discount summary after stop
+
+```powershell
+jmeter -n -t scripts/jmeter/07-subscription-discount-charging-flow.jmx `
+  -l outputs/jmeter/subscription-discount/results.jtl `
+  -j outputs/jmeter/subscription-discount/jmeter.log `
+  -Jbase_url=https://api.dev.electrahub.net `
+  -Jcharger_country_code=US `
+  -Jdynamic_connector_selection=true `
+  -Jusers=1 `
+  -Jramp_seconds=1 `
+  -Jhold_seconds=15 `
   -Jsse_seconds=15
 ```
 
