@@ -6,6 +6,7 @@ import java.net.SocketTimeoutException
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.util.Base64
+import java.util.Locale
 import java.util.UUID
 
 def slurper = new JsonSlurper()
@@ -512,6 +513,22 @@ def sendSimulatorStatus = { String status, String errorCode = 'NoError' ->
   requireStatus(response, [200, 202], "simulator status ${status}")
 }
 
+def sendBackendOcppStatus = { String status, String errorCode = 'NoError' ->
+  int number = (vars.get('connectorNumber') ?: String.valueOf(connectorNumber ?: 1)) as int
+  String token = vars.get('accessToken')
+  def response = atStep("backend ocpp status ${status}") {
+    request('POST', '/session/api/v1/sessions/ocpp/status-notification', [
+      chargePointId: chargerId,
+      connectorId: number,
+      status: status,
+      errorCode: errorCode,
+      timestamp: Instant.now().toString()
+    ], token)
+  }
+  requireStatus(response, [200, 202, 204], "backend ocpp status ${status}")
+  logLine("backend OCPP status accepted status=${status} charger=${chargerId} connectorNumber=${number}")
+}
+
 def sendSimulatorMeterValue = { long meterWh ->
   int number = (vars.get('connectorNumber') ?: String.valueOf(connectorNumber ?: 1)) as int
   def response = atStep('simulator meter value') {
@@ -522,6 +539,28 @@ def sendSimulatorMeterValue = { long meterWh ->
     ])
   }
   requireStatus(response, [200, 202], 'simulator meter value')
+}
+
+def sendSimulatorChargingStop = {
+  int number = (vars.get('connectorNumber') ?: String.valueOf(connectorNumber ?: 1)) as int
+  long meterStopWh = (props.getProperty('idle_flow_meter_stop_wh', props.getProperty('idle_flow_meter_wh', '1201500')) as long)
+  def response = atStep('simulator charging stop') {
+    simulatorRequest('POST', "/api/v1/chargers/${chargerId}/connectors/${number}/charging/stop", [
+      reason: 'EVDisconnected',
+      meterStopWh: meterStopWh,
+      forwardOcpp: true
+    ])
+  }
+  if ((response.status as int) == 404 && String.valueOf(response.body ?: '').toLowerCase(Locale.ROOT).contains('transaction not found')) {
+    logLine("simulator charging stop had no active transaction; falling back to OCPP Available unplug signal charger=${chargerId} connectorNumber=${number}")
+    sendSimulatorStatus('Available')
+    if ((props.getProperty('allow_backend_ocpp_status_fallback', 'false') as String).toBoolean()) {
+      sendBackendOcppStatus('Available')
+    }
+    return
+  }
+  requireStatus(response, [200, 202], 'simulator charging stop')
+  logLine("simulator charging stop accepted charger=${chargerId} connectorNumber=${number} meterStopWh=${meterStopWh}")
 }
 
 def monitorSse = { String token, String sessionId ->
@@ -657,24 +696,32 @@ def validateIdleFeeFlow = { String token, String sessionId ->
   }
 
   sendSimulatorMeterValue(props.getProperty('idle_flow_meter_wh', '1201500') as long)
-  sendSimulatorStatus(props.getProperty('idle_flow_status', 'SuspendedEV'))
-  def idleSession = waitForActiveSessionPredicate(token, sessionId, 'idle started', 90) { session ->
-    session.idleFeeEnabled == true && session.idleStartedAt != null && String.valueOf(session.status ?: '').equalsIgnoreCase('SUSPENDED')
-  }
-  logLine("idle started session=${sessionId} idleSeconds=${idleSession.idleSeconds} idleStartedAt=${idleSession.idleStartedAt}")
-
   stopSession(token, sessionId)
-  Thread.sleep(2500L)
   def afterRemoteStop = waitForActiveSessionPredicate(token, sessionId, 'remote stop requires unplug', 60) { session ->
     session.idleFeeEnabled == true &&
       session.unplugRequiredToStop == true &&
       String.valueOf(session.status ?: '').equalsIgnoreCase('SUSPENDED') &&
-      ((session.idleSeconds ?: 0) as long) > 0 &&
-      ((session.idleFeeAmount ?: 0) as BigDecimal) > 0
+      session.idleStartedAt != null
   }
   logLine("remote stop kept idle-fee session active session=${sessionId} status=${afterRemoteStop.status} idleSeconds=${afterRemoteStop.idleSeconds} idleFeeAmount=${afterRemoteStop.idleFeeAmount} estimatedCost=${afterRemoteStop.estimatedCost}")
 
-  sendSimulatorStatus('Available')
+  long idleTickWaitSeconds = (props.getProperty('idle_tick_wait_seconds', '70') as long)
+  logLine("waiting ${idleTickWaitSeconds}s for backend idle-fee ZSET ticker")
+  Thread.sleep(Math.max(60L, idleTickWaitSeconds) * 1000L)
+  def afterBackendTick = waitForActiveSessionPredicate(token, sessionId, 'backend idle ticker minute update', 30) { session ->
+    session.idleFeeEnabled == true &&
+      session.unplugRequiredToStop == true &&
+      String.valueOf(session.status ?: '').equalsIgnoreCase('SUSPENDED') &&
+      ((session.idleSeconds ?: 0) as long) >= 60L &&
+      ((session.idleFeeAmount ?: 0) as BigDecimal) > 0
+  }
+  long wholeIdleMinutes = (((afterBackendTick.idleSeconds ?: 0) as long) / 60L) as long
+  if (wholeIdleMinutes < 1L) {
+    throw new IllegalStateException("backend idle ticker did not reach a whole billable minute for ${sessionId}: ${afterBackendTick}")
+  }
+  logLine("backend idle tick ok session=${sessionId} billableMinutes=${wholeIdleMinutes} idleSeconds=${afterBackendTick.idleSeconds} idleFeeAmount=${afterBackendTick.idleFeeAmount} estimatedCost=${afterBackendTick.estimatedCost}")
+
+  sendSimulatorChargingStop()
   validateStoppedAndReceipt(token, sessionId)
 }
 
