@@ -659,15 +659,20 @@ def validateIdleFeeFlow = { String token, String sessionId ->
   sendSimulatorMeterValue(props.getProperty('idle_flow_meter_wh', '1201500') as long)
   sendSimulatorStatus(props.getProperty('idle_flow_status', 'SuspendedEV'))
   def idleSession = waitForActiveSessionPredicate(token, sessionId, 'idle started', 90) { session ->
-    session.idleFeeEnabled == true && (session.idleStartedAt != null || ((session.idleSeconds ?: 0) as long) >= 0)
+    session.idleFeeEnabled == true && session.idleStartedAt != null && String.valueOf(session.status ?: '').equalsIgnoreCase('SUSPENDED')
   }
   logLine("idle started session=${sessionId} idleSeconds=${idleSession.idleSeconds} idleStartedAt=${idleSession.idleStartedAt}")
 
   stopSession(token, sessionId)
+  Thread.sleep(2500L)
   def afterRemoteStop = waitForActiveSessionPredicate(token, sessionId, 'remote stop requires unplug', 60) { session ->
-    session.idleFeeEnabled == true && session.unplugRequiredToStop == true
+    session.idleFeeEnabled == true &&
+      session.unplugRequiredToStop == true &&
+      String.valueOf(session.status ?: '').equalsIgnoreCase('SUSPENDED') &&
+      ((session.idleSeconds ?: 0) as long) > 0 &&
+      ((session.idleFeeAmount ?: 0) as BigDecimal) > 0
   }
-  logLine("remote stop kept idle-fee session active session=${sessionId} idleSeconds=${afterRemoteStop.idleSeconds}")
+  logLine("remote stop kept idle-fee session active session=${sessionId} status=${afterRemoteStop.status} idleSeconds=${afterRemoteStop.idleSeconds} idleFeeAmount=${afterRemoteStop.idleFeeAmount} estimatedCost=${afterRemoteStop.estimatedCost}")
 
   sendSimulatorStatus('Available')
   validateStoppedAndReceipt(token, sessionId)
