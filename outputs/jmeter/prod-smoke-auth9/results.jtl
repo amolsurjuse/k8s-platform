@@ -1,0 +1,6 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1782350480103,131297,Full charging journey with SSE,200,full completed for jmeter+prod-auth9-smoke-001@electrahub.test,100 driver charging journeys 1-1,text,true,,371,0,5,5,null,0,0,0
+1782350486064,129487,Full charging journey with SSE,200,full completed for jmeter+prod-auth9-smoke-002@electrahub.test,100 driver charging journeys 1-2,text,true,,371,0,4,4,null,0,0,0
+1782350492067,129448,Full charging journey with SSE,200,full completed for jmeter+prod-auth9-smoke-003@electrahub.test,100 driver charging journeys 1-3,text,true,,371,0,3,3,null,0,0,0
+1782350498065,129572,Full charging journey with SSE,200,full completed for jmeter+prod-auth9-smoke-004@electrahub.test,100 driver charging journeys 1-4,text,true,,371,0,2,2,null,0,0,0
+1782350504065,129686,Full charging journey with SSE,200,full completed for jmeter+prod-auth9-smoke-005@electrahub.test,100 driver charging journeys 1-5,text,true,,371,0,1,1,null,0,0,0

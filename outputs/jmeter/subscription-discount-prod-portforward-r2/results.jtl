@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783040483655,65121,Subscription discount charging journey,200,subscription-discount completed for jmeter+subscription-discount-prod-portforward-r2-001@electrahub.test,Subscription-discount driver journeys 1-1,text,true,,419,0,1,1,null,0,0,0

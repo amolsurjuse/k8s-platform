@@ -1,0 +1,3 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783077765876,193682,Idle fee charging journey,500,"javax.script.ScriptException: java.lang.IllegalStateException: simulator charging stop failed with HTTP 404: transaction not found
+",Idle-fee driver journeys 1-1,text,false,,68,0,1,1,null,0,0,0

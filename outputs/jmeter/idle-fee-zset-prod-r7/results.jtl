@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783086968545,195001,Idle fee charging journey,500,"javax.script.ScriptException: java.lang.IllegalStateException: backend ocpp status Available failed with HTTP 401: {""code"":""INTERNAL_AUTH_REQUIRED"",""message"":""Internal service token is required""}",Idle-fee driver journeys 1-1,text,false,,132,0,1,1,null,0,0,0

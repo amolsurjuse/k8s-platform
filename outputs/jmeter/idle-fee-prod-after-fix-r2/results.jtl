@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783042796550,41504,Idle fee charging journey,200,idle-fee completed for jmeter+idle-fee-prod-after-fix-r2-001@electrahub.test,Idle-fee driver journeys 1-1,text,true,,391,0,1,1,null,0,0,0

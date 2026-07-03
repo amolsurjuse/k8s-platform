@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783032076217,3053,Idle fee charging journey,500,javax.script.ScriptException: java.lang.IllegalStateException: dynamic connector selection found no available idle-fee connector,Idle-fee driver journeys 1-1,text,false,,65,0,1,1,null,0,0,0

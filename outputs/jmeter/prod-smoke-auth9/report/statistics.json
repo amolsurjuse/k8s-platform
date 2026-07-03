@@ -1,0 +1,34 @@
+{
+  "Total" : {
+    "transaction" : "Total",
+    "sampleCount" : 5,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 129898.0,
+    "medianResTime" : 129572.0,
+    "minResTime" : 129448.0,
+    "maxResTime" : 131297.0,
+    "pct1ResTime" : 131297.0,
+    "pct2ResTime" : 131297.0,
+    "pct3ResTime" : 131297.0,
+    "throughput" : 0.03254191398521295,
+    "receivedKBytesPerSec" : 0.01179008797706446,
+    "sentKBytesPerSec" : 0.0
+  },
+  "Full charging journey with SSE" : {
+    "transaction" : "Full charging journey with SSE",
+    "sampleCount" : 5,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 129898.0,
+    "medianResTime" : 129572.0,
+    "minResTime" : 129448.0,
+    "maxResTime" : 131297.0,
+    "pct1ResTime" : 131297.0,
+    "pct2ResTime" : 131297.0,
+    "pct3ResTime" : 131297.0,
+    "throughput" : 0.03254191398521295,
+    "receivedKBytesPerSec" : 0.01179008797706446,
+    "sentKBytesPerSec" : 0.0
+  }
+}

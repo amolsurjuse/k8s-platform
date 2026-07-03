@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1782410691589,1082,Sparky AI prompt regression,500,javax.script.ScriptException: javax.net.ssl.SSLHandshakeException: Received fatal alert: handshake_failure,Sparky prompt matrix 1-1,text,false,,0,0,1,1,null,0,0,0

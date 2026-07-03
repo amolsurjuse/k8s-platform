@@ -1,0 +1,157 @@
+2026-07-02 22:41:15,566 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-07-02 22:41:15,594 INFO o.a.j.JMeter: Loading user properties from: /opt/apache-jmeter-5.6.3/bin/user.properties
+2026-07-02 22:41:15,596 INFO o.a.j.JMeter: Loading system properties from: /opt/apache-jmeter-5.6.3/bin/system.properties
+2026-07-02 22:41:15,597 INFO o.a.j.JMeter: Setting JMeter property: base_url=http://host.docker.internal:19093
+2026-07-02 22:41:15,597 INFO o.a.j.JMeter: Setting JMeter property: simulator_url=http://host.docker.internal:19094
+2026-07-02 22:41:15,598 INFO o.a.j.JMeter: Setting JMeter property: dynamic_connector_selection=true
+2026-07-02 22:41:15,599 INFO o.a.j.JMeter: Setting JMeter property: users=1
+2026-07-02 22:41:15,600 INFO o.a.j.JMeter: Setting JMeter property: ramp_seconds=1
+2026-07-02 22:41:15,600 INFO o.a.j.JMeter: Setting JMeter property: hold_seconds=30
+2026-07-02 22:41:15,601 INFO o.a.j.JMeter: Setting JMeter property: sse_seconds=15
+2026-07-02 22:41:15,602 INFO o.a.j.JMeter: Setting JMeter property: run_id=idle-fee-prod-portforward
+2026-07-02 22:41:15,608 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
+2026-07-02 22:41:15,609 INFO o.a.j.JMeter: Version 5.6.3
+2026-07-02 22:41:15,610 INFO o.a.j.JMeter: java.version=17.0.19
+2026-07-02 22:41:15,611 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-07-02 22:41:15,612 INFO o.a.j.JMeter: os.name=Linux
+2026-07-02 22:41:15,612 INFO o.a.j.JMeter: os.arch=amd64
+2026-07-02 22:41:15,613 INFO o.a.j.JMeter: os.version=6.18.33.1-microsoft-standard-WSL2
+2026-07-02 22:41:15,614 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-07-02 22:41:15,614 INFO o.a.j.JMeter: java.awt.headless=true
+2026-07-02 22:41:15,615 INFO o.a.j.JMeter: Max memory     =1073741824
+2026-07-02 22:41:15,616 INFO o.a.j.JMeter: Available Processors =16
+2026-07-02 22:41:15,627 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-07-02 22:41:15,628 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-07-02 22:41:15,629 INFO o.a.j.JMeter: JMeterHome=/opt/apache-jmeter-5.6.3
+2026-07-02 22:41:15,629 INFO o.a.j.JMeter: user.dir  =/work
+2026-07-02 22:41:15,630 INFO o.a.j.JMeter: PWD       =/work
+2026-07-02 22:41:15,631 INFO o.a.j.JMeter: IP: 172.17.0.36 Name: 02879f7a503a FullName: 02879f7a503a
+2026-07-02 22:41:15,645 INFO o.a.j.s.FileServer: Default base='/work'
+2026-07-02 22:41:15,648 INFO o.a.j.s.FileServer: Set new base='/work/scripts/jmeter'
+2026-07-02 22:41:15,811 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-07-02 22:41:15,837 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-07-02 22:41:15,839 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-07-02 22:41:15,843 INFO o.a.j.s.SaveService: Loading file: scripts/jmeter/06-idle-fee-charging-flow.jmx
+2026-07-02 22:41:15,907 INFO o.a.j.JMeter: Creating summariser <summary>
+2026-07-02 22:41:15,927 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-07-02 22:41:15,928 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-02 22:41:15,929 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-02 22:41:15,933 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-07-02 22:41:15,934 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-07-02 22:41:16,150 INFO o.a.j.JMeter: Running test (1783032076150)
+2026-07-02 22:41:16,168 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Idle-fee driver journeys
+2026-07-02 22:41:16,169 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Idle-fee driver journeys.
+2026-07-02 22:41:16,170 INFO o.a.j.e.StandardJMeterEngine: Test will stop on error
+2026-07-02 22:41:16,171 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=1 ramp-up=1 delayedStart=false
+2026-07-02 22:41:16,176 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-07-02 22:41:16,177 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-07-02 22:41:16,181 INFO o.a.j.t.JMeterThread: Thread started: Idle-fee driver journeys 1-1
+2026-07-02 22:41:16,192 INFO o.a.j.s.FileServer: Stored: scripts/jmeter/data/connectors-100.csv
+2026-07-02 22:41:16,213 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-07-02 22:41:16,214 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
+2026-07-02 22:41:16,215 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-07-02 22:41:16,216 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-07-02 22:41:17,462 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=register
+2026-07-02 22:41:18,473 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/auth/register status=200 elapsedMs=961
+2026-07-02 22:41:18,496 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] registered uid=7b16690d-9765-4eae-96a9-2450eb0bc817
+2026-07-02 22:41:18,518 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state before setup
+2026-07-02 22:41:18,538 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=451 elapsedMs=18
+2026-07-02 22:41:18,540 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=accept terms
+2026-07-02 22:41:18,617 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/terms/accept status=201 elapsedMs=75
+2026-07-02 22:41:18,626 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] accepted terms; refreshing token through login
+2026-07-02 22:41:18,627 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=login
+2026-07-02 22:41:18,833 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/auth/login status=200 elapsedMs=205
+2026-07-02 22:41:18,834 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] logged in uid=7b16690d-9765-4eae-96a9-2450eb0bc817
+2026-07-02 22:41:18,836 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state after terms
+2026-07-02 22:41:18,861 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=24
+2026-07-02 22:41:18,863 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=add card
+2026-07-02 22:41:18,884 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /payment/api/v1/payment/cards status=201 elapsedMs=20
+2026-07-02 22:41:18,886 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=wallet topup
+2026-07-02 22:41:18,908 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=21
+2026-07-02 22:41:18,910 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state after setup
+2026-07-02 22:41:18,969 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=58
+2026-07-02 22:41:18,971 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] payment ready wallet=120.00
+2026-07-02 22:41:18,972 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=charger graphql list
+2026-07-02 22:41:19,242 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /charger/graphql status=200 elapsedMs=269
+2026-07-02 22:41:19,263 ERROR o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] failed
+java.lang.IllegalStateException: dynamic connector selection found no available idle-fee connector
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:72) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrapNoCoerce.callConstructor(ConstructorSite.java:105) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:263) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:277) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure15.doCall(Script1.groovy:357) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) [groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) [groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:139) [groovy-3.0.20.jar:3.0.20]
+	at Script1.run(Script1.groovy:667) [script:?]
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:317) [groovy-jsr223-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.jsr223.GroovyCompiledScript.eval(GroovyCompiledScript.java:71) [groovy-jsr223-3.0.20.jar:3.0.20]
+	at java.scripting/javax.script.CompiledScript.eval(Unknown Source) [java.scripting:?]
+	at org.apache.jmeter.util.JSR223TestElement.processFileOrScript(JSR223TestElement.java:216) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.protocol.java.sampler.JSR223Sampler.sample(JSR223Sampler.java:72) [ApacheJMeter_java.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.doSampling(JMeterThread.java:651) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.executeSamplePackage(JMeterThread.java:570) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.processSampler(JMeterThread.java:501) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.run(JMeterThread.java:268) [ApacheJMeter_core.jar:5.6.3]
+	at java.base/java.lang.Thread.run(Unknown Source) [?:?]
+2026-07-02 22:41:19,268 ERROR o.a.j.p.j.s.JSR223Sampler: Problem in JSR223 script Idle fee charging journey, message: javax.script.ScriptException: java.lang.IllegalStateException: dynamic connector selection found no available idle-fee connector
+javax.script.ScriptException: java.lang.IllegalStateException: dynamic connector selection found no available idle-fee connector
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:320) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.jsr223.GroovyCompiledScript.eval(GroovyCompiledScript.java:71) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	at java.scripting/javax.script.CompiledScript.eval(Unknown Source) ~[java.scripting:?]
+	at org.apache.jmeter.util.JSR223TestElement.processFileOrScript(JSR223TestElement.java:216) ~[ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.protocol.java.sampler.JSR223Sampler.sample(JSR223Sampler.java:72) [ApacheJMeter_java.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.doSampling(JMeterThread.java:651) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.executeSamplePackage(JMeterThread.java:570) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.processSampler(JMeterThread.java:501) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.run(JMeterThread.java:268) [ApacheJMeter_core.jar:5.6.3]
+	at java.base/java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: java.lang.IllegalStateException: dynamic connector selection found no available idle-fee connector
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:72) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrapNoCoerce.callConstructor(ConstructorSite.java:105) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:263) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:277) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure15.doCall(Script1.groovy:357) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:139) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1.run(Script1.groovy:667) ~[?:?]
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:317) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	... 9 more
+2026-07-02 22:41:19,272 INFO o.a.j.t.JMeterThread: Shutdown Test detected by thread: Idle-fee driver journeys 1-1
+2026-07-02 22:41:19,274 INFO o.a.j.t.JMeterThread: Thread is done: Idle-fee driver journeys 1-1
+2026-07-02 22:41:19,274 INFO o.a.j.t.JMeterThread: Stopping: Idle-fee driver journeys 1-1
+2026-07-02 22:41:19,274 INFO o.a.j.t.JMeterThread: Thread finished: Idle-fee driver journeys 1-1
+2026-07-02 22:41:19,276 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2026-07-02 22:41:19,276 INFO o.a.j.s.FileServer: Close: scripts/jmeter/data/connectors-100.csv
+2026-07-02 22:41:19,282 INFO o.a.j.r.Summariser: summary =      1 in 00:00:03 =    0.3/s Avg:  3053 Min:  3053 Max:  3053 Err:     1 (100.00%)

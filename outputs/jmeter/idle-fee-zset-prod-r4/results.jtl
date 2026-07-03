@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783078028030,303074,Idle fee charging journey,500,javax.script.ScriptException: java.lang.IllegalStateException: session ce6118be-73b7-4d25-8d00-388136074074 still appears in /sessions/active after stop,Idle-fee driver journeys 1-1,text,false,,89,0,1,1,null,0,0,0

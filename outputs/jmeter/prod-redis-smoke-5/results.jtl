@@ -1,0 +1,6 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1782953559484,71989,Full charging journey with SSE,200,full completed for jmeter+redis-smoke-5-001@electrahub.test,100 driver charging journeys 1-1,text,true,,374,0,5,5,null,0,0,0
+1782953571441,69008,Full charging journey with SSE,200,full completed for jmeter+redis-smoke-5-002@electrahub.test,100 driver charging journeys 1-2,text,true,,374,0,4,4,null,0,0,0
+1782953583439,67031,Full charging journey with SSE,200,full completed for jmeter+redis-smoke-5-003@electrahub.test,100 driver charging journeys 1-3,text,true,,374,0,3,3,null,0,0,0
+1782953595439,68010,Full charging journey with SSE,200,full completed for jmeter+redis-smoke-5-004@electrahub.test,100 driver charging journeys 1-4,text,true,,374,0,2,2,null,0,0,0
+1782953607437,66085,Full charging journey with SSE,200,full completed for jmeter+redis-smoke-5-005@electrahub.test,100 driver charging journeys 1-5,text,true,,374,0,1,1,null,0,0,0

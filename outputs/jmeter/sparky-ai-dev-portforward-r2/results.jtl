@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1782410926055,19623,Sparky AI prompt regression,200,Validated 5 Sparky prompt families in 19744 ms,Sparky prompt matrix 1-1,text,true,,922,0,1,1,null,0,0,0

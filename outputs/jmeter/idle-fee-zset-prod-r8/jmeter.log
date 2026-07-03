@@ -1,0 +1,234 @@
+2026-07-03 14:01:05,291 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-07-03 14:01:05,317 INFO o.a.j.JMeter: Loading user properties from: /opt/apache-jmeter-5.6.3/bin/user.properties
+2026-07-03 14:01:05,319 INFO o.a.j.JMeter: Loading system properties from: /opt/apache-jmeter-5.6.3/bin/system.properties
+2026-07-03 14:01:05,320 INFO o.a.j.JMeter: Setting JMeter property: base_url=https://api.electrahub.net
+2026-07-03 14:01:05,321 INFO o.a.j.JMeter: Setting JMeter property: simulator_url=https://ocpp-simulator.electrahub.net
+2026-07-03 14:01:05,322 INFO o.a.j.JMeter: Setting JMeter property: users=1
+2026-07-03 14:01:05,323 INFO o.a.j.JMeter: Setting JMeter property: ramp_seconds=1
+2026-07-03 14:01:05,323 INFO o.a.j.JMeter: Setting JMeter property: request_timeout_ms=30000
+2026-07-03 14:01:05,324 INFO o.a.j.JMeter: Setting JMeter property: session_command_timeout_ms=45000
+2026-07-03 14:01:05,325 INFO o.a.j.JMeter: Setting JMeter property: dynamic_connector_selection=true
+2026-07-03 14:01:05,325 INFO o.a.j.JMeter: Setting JMeter property: idle_tick_wait_seconds=70
+2026-07-03 14:01:05,326 INFO o.a.j.JMeter: Setting JMeter property: run_id=idle-zset-20260703-r8
+2026-07-03 14:01:05,331 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
+2026-07-03 14:01:05,332 INFO o.a.j.JMeter: Version 5.6.3
+2026-07-03 14:01:05,333 INFO o.a.j.JMeter: java.version=17.0.19
+2026-07-03 14:01:05,334 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-07-03 14:01:05,335 INFO o.a.j.JMeter: os.name=Linux
+2026-07-03 14:01:05,336 INFO o.a.j.JMeter: os.arch=amd64
+2026-07-03 14:01:05,336 INFO o.a.j.JMeter: os.version=6.18.33.1-microsoft-standard-WSL2
+2026-07-03 14:01:05,337 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-07-03 14:01:05,338 INFO o.a.j.JMeter: java.awt.headless=true
+2026-07-03 14:01:05,340 INFO o.a.j.JMeter: Max memory     =1073741824
+2026-07-03 14:01:05,341 INFO o.a.j.JMeter: Available Processors =16
+2026-07-03 14:01:05,357 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-07-03 14:01:05,358 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-07-03 14:01:05,359 INFO o.a.j.JMeter: JMeterHome=/opt/apache-jmeter-5.6.3
+2026-07-03 14:01:05,360 INFO o.a.j.JMeter: user.dir  =/work
+2026-07-03 14:01:05,361 INFO o.a.j.JMeter: PWD       =/work
+2026-07-03 14:01:05,362 INFO o.a.j.JMeter: IP: 172.17.0.39 Name: 7282d23d42f7 FullName: 7282d23d42f7
+2026-07-03 14:01:05,380 INFO o.a.j.s.FileServer: Default base='/work'
+2026-07-03 14:01:05,382 INFO o.a.j.s.FileServer: Set new base='/work/scripts/jmeter'
+2026-07-03 14:01:05,539 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-07-03 14:01:05,564 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-07-03 14:01:05,568 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-07-03 14:01:05,574 INFO o.a.j.s.SaveService: Loading file: scripts/jmeter/06-idle-fee-charging-flow.jmx
+2026-07-03 14:01:05,627 INFO o.a.j.JMeter: Creating summariser <summary>
+2026-07-03 14:01:05,645 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-07-03 14:01:05,646 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-03 14:01:05,647 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-03 14:01:05,653 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-07-03 14:01:05,654 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-07-03 14:01:05,870 INFO o.a.j.JMeter: Running test (1783087265870)
+2026-07-03 14:01:05,891 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Idle-fee driver journeys
+2026-07-03 14:01:05,892 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Idle-fee driver journeys.
+2026-07-03 14:01:05,893 INFO o.a.j.e.StandardJMeterEngine: Test will stop on error
+2026-07-03 14:01:05,893 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=1 ramp-up=1 delayedStart=false
+2026-07-03 14:01:05,897 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-07-03 14:01:05,898 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-07-03 14:01:05,901 INFO o.a.j.t.JMeterThread: Thread started: Idle-fee driver journeys 1-1
+2026-07-03 14:01:05,909 INFO o.a.j.s.FileServer: Stored: scripts/jmeter/data/connectors-100.csv
+2026-07-03 14:01:05,929 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-07-03 14:01:05,930 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
+2026-07-03 14:01:05,930 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-07-03 14:01:05,931 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-07-03 14:01:10,011 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=register
+2026-07-03 14:01:10,798 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/auth/register status=200 elapsedMs=449
+2026-07-03 14:01:10,818 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] registered uid=c7ecc766-813d-4ea1-b3fd-c2f07f51629e
+2026-07-03 14:01:10,838 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state before setup
+2026-07-03 14:01:10,900 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=451 elapsedMs=61
+2026-07-03 14:01:10,902 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=accept terms
+2026-07-03 14:01:10,974 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/terms/accept status=201 elapsedMs=71
+2026-07-03 14:01:10,982 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] accepted terms; refreshing token through login
+2026-07-03 14:01:10,984 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=login
+2026-07-03 14:01:11,142 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/auth/login status=200 elapsedMs=156
+2026-07-03 14:01:11,143 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] logged in uid=c7ecc766-813d-4ea1-b3fd-c2f07f51629e
+2026-07-03 14:01:11,144 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state after terms
+2026-07-03 14:01:11,208 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=63
+2026-07-03 14:01:11,210 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=add card
+2026-07-03 14:01:11,275 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /payment/api/v1/payment/cards status=201 elapsedMs=63
+2026-07-03 14:01:11,276 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=wallet topup
+2026-07-03 14:01:11,337 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=59
+2026-07-03 14:01:11,338 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state after setup
+2026-07-03 14:01:11,390 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=51
+2026-07-03 14:01:11,391 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] payment ready wallet=120.00
+2026-07-03 14:01:11,392 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=charger graphql list
+2026-07-03 14:01:11,577 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /charger/graphql status=200 elapsedMs=183
+2026-07-03 14:01:11,599 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] selected available connector EH-SFO-CHG-001/CON-SFO-001 location=US*EHB*LOC*SFO001 candidate=1/75
+2026-07-03 14:01:11,600 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=charger graphql view
+2026-07-03 14:01:11,749 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /charger/graphql status=200 elapsedMs=147
+2026-07-03 14:01:11,751 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] idle fee discovery ok charger=EH-SFO-CHG-001/CON-SFO-001 rate=2.0 USD
+2026-07-03 14:01:11,753 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state before start
+2026-07-03 14:01:11,814 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=59
+2026-07-03 14:01:11,820 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=start charging attempt 1
+2026-07-03 14:01:12,052 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /session/api/v1/sessions/start status=201 elapsedMs=231
+2026-07-03 14:01:12,053 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] started session=f8814fac-611c-4d80-81eb-ad47db2592b7 charger=EH-SFO-CHG-001/CON-SFO-001 status=PREPARING remote=Accepted attempt=1/75
+2026-07-03 14:01:12,055 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:01:13,060 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1004
+2026-07-03 14:03:17,216 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] sse ok connected=1 snapshot=2 updates=57 receipts=0 heartbeats=0
+2026-07-03 14:03:17,218 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:21,101 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=3882
+2026-07-03 14:03:21,104 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] active session predicate ok idle fee policy snapshot session=f8814fac-611c-4d80-81eb-ad47db2592b7
+2026-07-03 14:03:21,105 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=simulator meter value
+2026-07-03 14:03:21,219 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] simulator POST /api/v1/chargers/EH-SFO-CHG-001/connectors/1/meter-values/send status=202 elapsedMs=59
+2026-07-03 14:03:21,222 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=stop charging session
+2026-07-03 14:03:22,109 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /session/api/v1/sessions/f8814fac-611c-4d80-81eb-ad47db2592b7/stop status=204 elapsedMs=884
+2026-07-03 14:03:22,109 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] stop requested session=f8814fac-611c-4d80-81eb-ad47db2592b7
+2026-07-03 14:03:22,111 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:23,114 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1003
+2026-07-03 14:03:26,116 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:27,135 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1018
+2026-07-03 14:03:30,137 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:31,150 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1012
+2026-07-03 14:03:34,151 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:35,155 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1002
+2026-07-03 14:03:38,156 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:39,180 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1019
+2026-07-03 14:03:44,097 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:45,119 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1021
+2026-07-03 14:03:48,121 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:49,137 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1015
+2026-07-03 14:03:52,138 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:54,051 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1912
+2026-07-03 14:03:57,053 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:03:58,059 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1005
+2026-07-03 14:04:01,060 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:04:02,071 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1009
+2026-07-03 14:04:05,072 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:04:06,085 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1012
+2026-07-03 14:04:09,086 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:04:10,107 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1020
+2026-07-03 14:04:13,109 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:04:14,115 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1005
+2026-07-03 14:04:17,117 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:04:18,143 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1025
+2026-07-03 14:04:21,145 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 14:04:22,145 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=999
+2026-07-03 14:04:28,181 ERROR o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] failed
+java.lang.IllegalStateException: session f8814fac-611c-4d80-81eb-ad47db2592b7 did not satisfy remote stop requires unplug; last={"id":"f8814fac-611c-4d80-81eb-ad47db2592b7","stationId":"8ea3966b-8279-315c-a5b2-001ab12b75a7","stationName":"US*EHB*LOC*SFO001","connectorId":"CON-SFO-001","connectorType":"CON-SFO-001","startedAt":"2026-07-03T14:01:12.206634Z","energyDeliveredKwh":1201.5,"currentPowerKw":44.0,"estimatedCost":430.8077,"batteryPercent":null,"estimatedTimeRemainingMin":null,"status":"CHARGING","idleFeeEnabled":true,"idleSeconds":3,"idleFeePerMinute":3.0,"idleFeeAmount":0.0,"idleStartedAt":"-","unplugRequiredToStop":false,"subscriptionDiscountApplied":true,"regularCost":469.9187,"discountedCost":430.8077,"subscriptionDiscountAmount":39.111,"subscriptionPlanCode":"NEW_USER_20_OFF_500KWH_1Y","subscriptionPlanName":"New Driver 20% Charging Discount","subscriptionQuotaUnit":"KWH","subscriptionQuotaConsumed":500.0,"subscriptionCoveredEnergyKwh":500.0,"subscriptionUncoveredEnergyKwh":701.5,"subscriptionQuotaExhausted":true}
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:72) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.reflection.CachedConstructor.doConstructorInvoke(CachedConstructor.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrap.callConstructor(ConstructorSite.java:84) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:263) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:277) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure19.doCall(Script1.groovy:502) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure28.doCall(Script1.groovy:698) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) [groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) [groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:148) [groovy-3.0.20.jar:3.0.20]
+	at Script1.run(Script1.groovy:748) [script:?]
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:317) [groovy-jsr223-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.jsr223.GroovyCompiledScript.eval(GroovyCompiledScript.java:71) [groovy-jsr223-3.0.20.jar:3.0.20]
+	at java.scripting/javax.script.CompiledScript.eval(Unknown Source) [java.scripting:?]
+	at org.apache.jmeter.util.JSR223TestElement.processFileOrScript(JSR223TestElement.java:216) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.protocol.java.sampler.JSR223Sampler.sample(JSR223Sampler.java:72) [ApacheJMeter_java.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.doSampling(JMeterThread.java:651) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.executeSamplePackage(JMeterThread.java:570) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.processSampler(JMeterThread.java:501) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.run(JMeterThread.java:268) [ApacheJMeter_core.jar:5.6.3]
+	at java.base/java.lang.Thread.run(Unknown Source) [?:?]
+2026-07-03 14:04:28,186 ERROR o.a.j.p.j.s.JSR223Sampler: Problem in JSR223 script Idle fee charging journey, message: javax.script.ScriptException: java.lang.IllegalStateException: session f8814fac-611c-4d80-81eb-ad47db2592b7 did not satisfy remote stop requires unplug; last={"id":"f8814fac-611c-4d80-81eb-ad47db2592b7","stationId":"8ea3966b-8279-315c-a5b2-001ab12b75a7","stationName":"US*EHB*LOC*SFO001","connectorId":"CON-SFO-001","connectorType":"CON-SFO-001","startedAt":"2026-07-03T14:01:12.206634Z","energyDeliveredKwh":1201.5,"currentPowerKw":44.0,"estimatedCost":430.8077,"batteryPercent":null,"estimatedTimeRemainingMin":null,"status":"CHARGING","idleFeeEnabled":true,"idleSeconds":3,"idleFeePerMinute":3.0,"idleFeeAmount":0.0,"idleStartedAt":"-","unplugRequiredToStop":false,"subscriptionDiscountApplied":true,"regularCost":469.9187,"discountedCost":430.8077,"subscriptionDiscountAmount":39.111,"subscriptionPlanCode":"NEW_USER_20_OFF_500KWH_1Y","subscriptionPlanName":"New Driver 20% Charging Discount","subscriptionQuotaUnit":"KWH","subscriptionQuotaConsumed":500.0,"subscriptionCoveredEnergyKwh":500.0,"subscriptionUncoveredEnergyKwh":701.5,"subscriptionQuotaExhausted":true}
+javax.script.ScriptException: java.lang.IllegalStateException: session f8814fac-611c-4d80-81eb-ad47db2592b7 did not satisfy remote stop requires unplug; last={"id":"f8814fac-611c-4d80-81eb-ad47db2592b7","stationId":"8ea3966b-8279-315c-a5b2-001ab12b75a7","stationName":"US*EHB*LOC*SFO001","connectorId":"CON-SFO-001","connectorType":"CON-SFO-001","startedAt":"2026-07-03T14:01:12.206634Z","energyDeliveredKwh":1201.5,"currentPowerKw":44.0,"estimatedCost":430.8077,"batteryPercent":null,"estimatedTimeRemainingMin":null,"status":"CHARGING","idleFeeEnabled":true,"idleSeconds":3,"idleFeePerMinute":3.0,"idleFeeAmount":0.0,"idleStartedAt":"-","unplugRequiredToStop":false,"subscriptionDiscountApplied":true,"regularCost":469.9187,"discountedCost":430.8077,"subscriptionDiscountAmount":39.111,"subscriptionPlanCode":"NEW_USER_20_OFF_500KWH_1Y","subscriptionPlanName":"New Driver 20% Charging Discount","subscriptionQuotaUnit":"KWH","subscriptionQuotaConsumed":500.0,"subscriptionCoveredEnergyKwh":500.0,"subscriptionUncoveredEnergyKwh":701.5,"subscriptionQuotaExhausted":true}
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:320) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.jsr223.GroovyCompiledScript.eval(GroovyCompiledScript.java:71) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	at java.scripting/javax.script.CompiledScript.eval(Unknown Source) ~[java.scripting:?]
+	at org.apache.jmeter.util.JSR223TestElement.processFileOrScript(JSR223TestElement.java:216) ~[ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.protocol.java.sampler.JSR223Sampler.sample(JSR223Sampler.java:72) [ApacheJMeter_java.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.doSampling(JMeterThread.java:651) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.executeSamplePackage(JMeterThread.java:570) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.processSampler(JMeterThread.java:501) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.run(JMeterThread.java:268) [ApacheJMeter_core.jar:5.6.3]
+	at java.base/java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: java.lang.IllegalStateException: session f8814fac-611c-4d80-81eb-ad47db2592b7 did not satisfy remote stop requires unplug; last={"id":"f8814fac-611c-4d80-81eb-ad47db2592b7","stationId":"8ea3966b-8279-315c-a5b2-001ab12b75a7","stationName":"US*EHB*LOC*SFO001","connectorId":"CON-SFO-001","connectorType":"CON-SFO-001","startedAt":"2026-07-03T14:01:12.206634Z","energyDeliveredKwh":1201.5,"currentPowerKw":44.0,"estimatedCost":430.8077,"batteryPercent":null,"estimatedTimeRemainingMin":null,"status":"CHARGING","idleFeeEnabled":true,"idleSeconds":3,"idleFeePerMinute":3.0,"idleFeeAmount":0.0,"idleStartedAt":"-","unplugRequiredToStop":false,"subscriptionDiscountApplied":true,"regularCost":469.9187,"discountedCost":430.8077,"subscriptionDiscountAmount":39.111,"subscriptionPlanCode":"NEW_USER_20_OFF_500KWH_1Y","subscriptionPlanName":"New Driver 20% Charging Discount","subscriptionQuotaUnit":"KWH","subscriptionQuotaConsumed":500.0,"subscriptionCoveredEnergyKwh":500.0,"subscriptionUncoveredEnergyKwh":701.5,"subscriptionQuotaExhausted":true}
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:72) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.reflection.CachedConstructor.doConstructorInvoke(CachedConstructor.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrap.callConstructor(ConstructorSite.java:84) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:263) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:277) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure19.doCall(Script1.groovy:502) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure28.doCall(Script1.groovy:698) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:148) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1.run(Script1.groovy:748) ~[?:?]
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:317) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	... 9 more
+2026-07-03 14:04:28,192 INFO o.a.j.t.JMeterThread: Shutdown Test detected by thread: Idle-fee driver journeys 1-1
+2026-07-03 14:04:28,194 INFO o.a.j.t.JMeterThread: Thread is done: Idle-fee driver journeys 1-1
+2026-07-03 14:04:28,194 INFO o.a.j.t.JMeterThread: Thread finished: Idle-fee driver journeys 1-1
+2026-07-03 14:04:28,195 INFO o.a.j.t.JMeterThread: Stopping: Idle-fee driver journeys 1-1
+2026-07-03 14:04:28,195 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2026-07-03 14:04:28,196 INFO o.a.j.s.FileServer: Close: scripts/jmeter/data/connectors-100.csv
+2026-07-03 14:04:28,204 INFO o.a.j.r.Summariser: summary =      1 in 00:03:22 =    0.0/s Avg: 182003 Min: 182003 Max: 182003 Err:     1 (100.00%)

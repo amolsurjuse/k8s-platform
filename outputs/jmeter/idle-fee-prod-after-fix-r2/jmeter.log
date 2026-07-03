@@ -1,0 +1,126 @@
+2026-07-03 01:39:55,818 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-07-03 01:39:55,849 INFO o.a.j.JMeter: Loading user properties from: /opt/apache-jmeter-5.6.3/bin/user.properties
+2026-07-03 01:39:55,850 INFO o.a.j.JMeter: Loading system properties from: /opt/apache-jmeter-5.6.3/bin/system.properties
+2026-07-03 01:39:55,852 INFO o.a.j.JMeter: Setting JMeter property: base_url=http://host.docker.internal:19093
+2026-07-03 01:39:55,853 INFO o.a.j.JMeter: Setting JMeter property: simulator_url=http://host.docker.internal:19094
+2026-07-03 01:39:55,853 INFO o.a.j.JMeter: Setting JMeter property: charger_country_code=US
+2026-07-03 01:39:55,854 INFO o.a.j.JMeter: Setting JMeter property: dynamic_connector_selection=true
+2026-07-03 01:39:55,855 INFO o.a.j.JMeter: Setting JMeter property: users=1
+2026-07-03 01:39:55,856 INFO o.a.j.JMeter: Setting JMeter property: ramp_seconds=1
+2026-07-03 01:39:55,859 INFO o.a.j.JMeter: Setting JMeter property: hold_seconds=15
+2026-07-03 01:39:55,860 INFO o.a.j.JMeter: Setting JMeter property: sse_seconds=15
+2026-07-03 01:39:55,861 INFO o.a.j.JMeter: Setting JMeter property: run_id=idle-fee-prod-after-fix-r2
+2026-07-03 01:39:55,866 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
+2026-07-03 01:39:55,867 INFO o.a.j.JMeter: Version 5.6.3
+2026-07-03 01:39:55,868 INFO o.a.j.JMeter: java.version=17.0.19
+2026-07-03 01:39:55,868 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-07-03 01:39:55,869 INFO o.a.j.JMeter: os.name=Linux
+2026-07-03 01:39:55,870 INFO o.a.j.JMeter: os.arch=amd64
+2026-07-03 01:39:55,872 INFO o.a.j.JMeter: os.version=6.18.33.1-microsoft-standard-WSL2
+2026-07-03 01:39:55,873 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-07-03 01:39:55,874 INFO o.a.j.JMeter: java.awt.headless=true
+2026-07-03 01:39:55,875 INFO o.a.j.JMeter: Max memory     =1073741824
+2026-07-03 01:39:55,877 INFO o.a.j.JMeter: Available Processors =16
+2026-07-03 01:39:55,886 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-07-03 01:39:55,888 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-07-03 01:39:55,890 INFO o.a.j.JMeter: JMeterHome=/opt/apache-jmeter-5.6.3
+2026-07-03 01:39:55,890 INFO o.a.j.JMeter: user.dir  =/work
+2026-07-03 01:39:55,891 INFO o.a.j.JMeter: PWD       =/work
+2026-07-03 01:39:55,892 INFO o.a.j.JMeter: IP: 172.17.0.38 Name: fb62106dc95b FullName: fb62106dc95b
+2026-07-03 01:39:55,909 INFO o.a.j.s.FileServer: Default base='/work'
+2026-07-03 01:39:55,912 INFO o.a.j.s.FileServer: Set new base='/work/scripts/jmeter'
+2026-07-03 01:39:56,083 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-07-03 01:39:56,109 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-07-03 01:39:56,113 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-07-03 01:39:56,118 INFO o.a.j.s.SaveService: Loading file: scripts/jmeter/06-idle-fee-charging-flow.jmx
+2026-07-03 01:39:56,185 INFO o.a.j.JMeter: Creating summariser <summary>
+2026-07-03 01:39:56,212 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-07-03 01:39:56,213 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-03 01:39:56,214 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-03 01:39:56,218 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-07-03 01:39:56,219 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-07-03 01:39:56,467 INFO o.a.j.JMeter: Running test (1783042796467)
+2026-07-03 01:39:56,494 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Idle-fee driver journeys
+2026-07-03 01:39:56,495 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Idle-fee driver journeys.
+2026-07-03 01:39:56,496 INFO o.a.j.e.StandardJMeterEngine: Test will stop on error
+2026-07-03 01:39:56,497 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=1 ramp-up=1 delayedStart=false
+2026-07-03 01:39:56,506 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-07-03 01:39:56,509 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-07-03 01:39:56,514 INFO o.a.j.t.JMeterThread: Thread started: Idle-fee driver journeys 1-1
+2026-07-03 01:39:56,523 INFO o.a.j.s.FileServer: Stored: scripts/jmeter/data/connectors-100.csv
+2026-07-03 01:39:56,547 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-07-03 01:39:56,548 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
+2026-07-03 01:39:56,549 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-07-03 01:39:56,550 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-07-03 01:39:57,976 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=register
+2026-07-03 01:39:58,125 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/auth/register status=200 elapsedMs=108
+2026-07-03 01:39:58,144 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] registered uid=4251346a-1da6-439e-97a7-3699a197d0f6
+2026-07-03 01:39:58,165 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state before setup
+2026-07-03 01:39:58,183 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=451 elapsedMs=16
+2026-07-03 01:39:58,185 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=accept terms
+2026-07-03 01:39:58,203 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/terms/accept status=201 elapsedMs=16
+2026-07-03 01:39:58,212 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] accepted terms; refreshing token through login
+2026-07-03 01:39:58,214 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=login
+2026-07-03 01:39:58,293 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /auth/api/auth/login status=200 elapsedMs=78
+2026-07-03 01:39:58,296 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] logged in uid=4251346a-1da6-439e-97a7-3699a197d0f6
+2026-07-03 01:39:58,297 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state after terms
+2026-07-03 01:39:58,319 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=21
+2026-07-03 01:39:58,321 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=add card
+2026-07-03 01:39:58,338 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /payment/api/v1/payment/cards status=201 elapsedMs=15
+2026-07-03 01:39:58,342 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=wallet topup
+2026-07-03 01:39:58,362 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=18
+2026-07-03 01:39:58,364 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state after setup
+2026-07-03 01:39:58,378 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=13
+2026-07-03 01:39:58,379 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] payment ready wallet=120.00
+2026-07-03 01:39:58,381 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=charger graphql list
+2026-07-03 01:39:59,322 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /charger/graphql status=200 elapsedMs=940
+2026-07-03 01:39:59,343 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] selected available connector EH-US-CHG-0002/CON-US-0002 location=US*EHB*LOC*USA001 candidate=1/67
+2026-07-03 01:39:59,344 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=charger graphql view
+2026-07-03 01:39:59,508 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /charger/graphql status=200 elapsedMs=163
+2026-07-03 01:39:59,509 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] idle fee discovery ok charger=EH-US-CHG-0002/CON-US-0002 rate=2.0 USD
+2026-07-03 01:39:59,511 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=payment state before start
+2026-07-03 01:39:59,524 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=12
+2026-07-03 01:39:59,529 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=start charging attempt 1
+2026-07-03 01:40:01,060 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /session/api/v1/sessions/start status=201 elapsedMs=1529
+2026-07-03 01:40:01,061 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] started session=54191e39-9c33-4391-879b-0beade71852b charger=EH-US-CHG-0002/CON-US-0002 status=PREPARING remote=Accepted attempt=1/67
+2026-07-03 01:40:01,062 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 01:40:01,643 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=579
+2026-07-03 01:40:24,286 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] sse ok connected=1 snapshot=2 updates=13 receipts=0 heartbeats=0
+2026-07-03 01:40:24,289 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 01:40:25,294 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1004
+2026-07-03 01:40:25,296 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] active session predicate ok idle fee policy snapshot session=54191e39-9c33-4391-879b-0beade71852b
+2026-07-03 01:40:25,300 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=simulator meter value
+2026-07-03 01:40:25,315 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] simulator POST /api/v1/chargers/EH-US-CHG-0002/connectors/1/meter-values/send status=202 elapsedMs=8
+2026-07-03 01:40:25,318 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=simulator status SuspendedEV
+2026-07-03 01:40:25,324 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] simulator POST /api/v1/chargers/EH-US-CHG-0002/connectors/1/status status=200 elapsedMs=5
+2026-07-03 01:40:25,326 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 01:40:26,307 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=981
+2026-07-03 01:40:29,309 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 01:40:30,434 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1123
+2026-07-03 01:40:30,435 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] active session predicate ok idle started session=54191e39-9c33-4391-879b-0beade71852b
+2026-07-03 01:40:30,436 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] idle started session=54191e39-9c33-4391-879b-0beade71852b idleSeconds=5 idleStartedAt=2026-07-03T01:40:25Z
+2026-07-03 01:40:30,437 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=stop charging session
+2026-07-03 01:40:31,375 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http POST /session/api/v1/sessions/54191e39-9c33-4391-879b-0beade71852b/stop status=204 elapsedMs=936
+2026-07-03 01:40:31,377 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] stop requested session=54191e39-9c33-4391-879b-0beade71852b
+2026-07-03 01:40:33,881 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 01:40:34,391 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=509
+2026-07-03 01:40:34,394 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] active session predicate ok remote stop requires unplug session=54191e39-9c33-4391-879b-0beade71852b
+2026-07-03 01:40:34,395 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] remote stop kept idle-fee session active session=54191e39-9c33-4391-879b-0beade71852b status=SUSPENDED idleSeconds=6 idleFeeAmount=0.3 estimatedCost=1.8614
+2026-07-03 01:40:34,396 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=simulator status Available
+2026-07-03 01:40:34,411 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] simulator POST /api/v1/chargers/EH-US-CHG-0002/connectors/1/status status=200 elapsedMs=10
+2026-07-03 01:40:34,412 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 01:40:35,403 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=990
+2026-07-03 01:40:40,405 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=active sessions
+2026-07-03 01:40:40,427 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=20
+2026-07-03 01:40:40,429 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=receipt
+2026-07-03 01:40:40,447 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/54191e39-9c33-4391-879b-0beade71852b/receipt status=200 elapsedMs=17
+2026-07-03 01:40:40,449 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=session history
+2026-07-03 01:40:40,477 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/history?page=0&size=10 status=200 elapsedMs=27
+2026-07-03 01:40:40,478 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] step=dashboard stats
+2026-07-03 01:40:40,537 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] http GET /session/api/v1/sessions/dashboard-stats status=200 elapsedMs=57
+2026-07-03 01:40:40,538 INFO o.a.j.p.j.s.J.Idle fee charging journey: [electrahub-jmeter][idle-fee][001] receipt ok session=54191e39-9c33-4391-879b-0beade71852b status=Completed total=1.6838
+2026-07-03 01:40:40,552 INFO o.a.j.t.JMeterThread: Thread is done: Idle-fee driver journeys 1-1
+2026-07-03 01:40:40,553 INFO o.a.j.t.JMeterThread: Thread finished: Idle-fee driver journeys 1-1
+2026-07-03 01:40:40,554 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2026-07-03 01:40:40,555 INFO o.a.j.s.FileServer: Close: scripts/jmeter/data/connectors-100.csv
+2026-07-03 01:40:40,562 INFO o.a.j.r.Summariser: summary =      1 in 00:00:44 =    0.0/s Avg: 41504 Min: 41504 Max: 41504 Err:     0 (0.00%)

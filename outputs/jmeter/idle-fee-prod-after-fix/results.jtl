@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783042383028,89861,Idle fee charging journey,500,javax.script.ScriptException: java.lang.IllegalStateException: session e31fc3e5-d972-41f2-bb1f-3b55f8cac7fb did not satisfy remote stop requires unplug; last=null,Idle-fee driver journeys 1-1,text,false,,99,0,1,1,null,0,0,0

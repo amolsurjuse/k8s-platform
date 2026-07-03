@@ -1,0 +1,397 @@
+2026-07-02 00:52:38,508 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-07-02 00:52:38,555 INFO o.a.j.JMeter: Loading user properties from: /opt/apache-jmeter-5.6.3/bin/user.properties
+2026-07-02 00:52:38,558 INFO o.a.j.JMeter: Loading system properties from: /opt/apache-jmeter-5.6.3/bin/system.properties
+2026-07-02 00:52:38,560 INFO o.a.j.JMeter: Setting JMeter property: base_url=https://api.electrahub.net
+2026-07-02 00:52:38,561 INFO o.a.j.JMeter: Setting JMeter property: users=5
+2026-07-02 00:52:38,562 INFO o.a.j.JMeter: Setting JMeter property: ramp_seconds=60
+2026-07-02 00:52:38,562 INFO o.a.j.JMeter: Setting JMeter property: hold_seconds=60
+2026-07-02 00:52:38,563 INFO o.a.j.JMeter: Setting JMeter property: sse_seconds=30
+2026-07-02 00:52:38,571 INFO o.a.j.JMeter: Setting JMeter property: dynamic_connector_selection=true
+2026-07-02 00:52:38,572 INFO o.a.j.JMeter: Setting JMeter property: run_id=redis-smoke-5
+2026-07-02 00:52:38,580 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
+2026-07-02 00:52:38,581 INFO o.a.j.JMeter: Version 5.6.3
+2026-07-02 00:52:38,581 INFO o.a.j.JMeter: java.version=17.0.19
+2026-07-02 00:52:38,582 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-07-02 00:52:38,583 INFO o.a.j.JMeter: os.name=Linux
+2026-07-02 00:52:38,584 INFO o.a.j.JMeter: os.arch=amd64
+2026-07-02 00:52:38,585 INFO o.a.j.JMeter: os.version=6.18.33.1-microsoft-standard-WSL2
+2026-07-02 00:52:38,585 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-07-02 00:52:38,586 INFO o.a.j.JMeter: java.awt.headless=true
+2026-07-02 00:52:38,586 INFO o.a.j.JMeter: Max memory     =1073741824
+2026-07-02 00:52:38,587 INFO o.a.j.JMeter: Available Processors =16
+2026-07-02 00:52:38,604 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-07-02 00:52:38,605 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-07-02 00:52:38,606 INFO o.a.j.JMeter: JMeterHome=/opt/apache-jmeter-5.6.3
+2026-07-02 00:52:38,607 INFO o.a.j.JMeter: user.dir  =/work
+2026-07-02 00:52:38,607 INFO o.a.j.JMeter: PWD       =/work
+2026-07-02 00:52:38,609 INFO o.a.j.JMeter: IP: 172.17.0.35 Name: 743225b061e5 FullName: 743225b061e5
+2026-07-02 00:52:38,636 INFO o.a.j.JMeter: Setting property 'jmeter.reportgenerator.outputdir' to:'/work/outputs/jmeter/prod-redis-smoke-5/report'
+2026-07-02 00:52:38,651 INFO o.a.j.s.FileServer: Default base='/work'
+2026-07-02 00:52:38,656 INFO o.a.j.s.FileServer: Set new base='/work/scripts/jmeter'
+2026-07-02 00:52:38,848 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-07-02 00:52:38,877 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-07-02 00:52:38,885 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-07-02 00:52:38,889 INFO o.a.j.s.SaveService: Loading file: scripts/jmeter/03-full-e2e-charging-100-users.jmx
+2026-07-02 00:52:39,024 INFO o.a.j.JMeter: Creating summariser <summary>
+2026-07-02 00:52:39,042 INFO o.a.j.r.d.ReportGenerator: ReportGenerator will use for Parsing the separator: ','
+2026-07-02 00:52:39,044 INFO o.a.j.r.d.ReportGenerator: Will generate report at end of test from  results file: outputs/jmeter/prod-redis-smoke-5/results.jtl
+2026-07-02 00:52:39,044 INFO o.a.j.r.d.ReportGenerator: Reading report generator properties from: /opt/apache-jmeter-5.6.3/bin/reportgenerator.properties
+2026-07-02 00:52:39,046 INFO o.a.j.r.d.ReportGenerator: Merging with JMeter properties
+2026-07-02 00:52:39,050 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.temp_dir' not found, using default value 'temp' instead.
+2026-07-02 00:52:39,053 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.apdex_per_transaction' not found, using default value 'null' instead.
+2026-07-02 00:52:39,059 INFO o.a.j.r.c.ReportGeneratorConfiguration: apdex_per_transaction is empty, not APDEX per transaction customization
+2026-07-02 00:52:39,060 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.sample_filter' not found, using default value 'null' instead.
+2026-07-02 00:52:39,061 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.report_title' not found, using default value 'null' instead.
+2026-07-02 00:52:39,062 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.start_date' not found, using default value 'null' instead.
+2026-07-02 00:52:39,067 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.end_date' not found, using default value 'null' instead.
+2026-07-02 00:52:39,068 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.date_format' not found, using default value 'null' instead.
+2026-07-02 00:52:39,070 INFO o.a.j.r.c.ReportGeneratorConfiguration: Will use date range start date: null, end date: null
+2026-07-02 00:52:39,077 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.totalTPS.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,078 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.activeThreadsOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,079 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.timeVsThreads.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,079 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimeDistribution.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,080 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.transactionsPerSecond.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,081 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimePercentiles.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,082 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimePercentilesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,083 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,083 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.connectTimeOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,084 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.latenciesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-07-02 00:52:39,085 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.filters_only_sample_series' not found, using default value 'true' instead.
+2026-07-02 00:52:39,086 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.series_filter' not found, using default value '' instead.
+2026-07-02 00:52:39,092 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.show_controllers_only' not found, using default value 'false' instead.
+2026-07-02 00:52:39,094 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.filters_only_sample_series' not found, using default value 'true' instead.
+2026-07-02 00:52:39,095 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.series_filter' not found, using default value '' instead.
+2026-07-02 00:52:39,096 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.show_controllers_only' not found, using default value 'false' instead.
+2026-07-02 00:52:39,113 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-07-02 00:52:39,114 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-02 00:52:39,115 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-02 00:52:39,120 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-07-02 00:52:39,121 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-07-02 00:52:39,408 INFO o.a.j.JMeter: Running test (1782953559408)
+2026-07-02 00:52:39,426 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : 100 driver charging journeys
+2026-07-02 00:52:39,427 INFO o.a.j.e.StandardJMeterEngine: Starting 5 threads for group 100 driver charging journeys.
+2026-07-02 00:52:39,427 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error
+2026-07-02 00:52:39,428 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=5 ramp-up=60 delayedStart=false
+2026-07-02 00:52:39,434 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-07-02 00:52:39,435 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-07-02 00:52:39,442 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-1
+2026-07-02 00:52:39,446 INFO o.a.j.s.FileServer: Stored: scripts/jmeter/data/connectors-100.csv
+2026-07-02 00:52:39,481 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-07-02 00:52:39,482 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
+2026-07-02 00:52:39,483 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-07-02 00:52:39,483 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-07-02 00:52:41,129 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=register
+2026-07-02 00:52:43,101 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /auth/api/auth/register status=200 elapsedMs=1609
+2026-07-02 00:52:43,143 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] registered uid=a7113674-3a22-4d6d-92e5-0cb34508c2bb
+2026-07-02 00:52:43,188 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=payment state before setup
+2026-07-02 00:52:43,487 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /payment/api/v1/payment/state status=451 elapsedMs=295
+2026-07-02 00:52:43,488 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=accept terms
+2026-07-02 00:52:43,583 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /auth/api/terms/accept status=201 elapsedMs=93
+2026-07-02 00:52:43,591 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] accepted terms; refreshing token through login
+2026-07-02 00:52:43,592 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=login
+2026-07-02 00:52:43,861 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /auth/api/auth/login status=200 elapsedMs=266
+2026-07-02 00:52:43,862 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] logged in uid=a7113674-3a22-4d6d-92e5-0cb34508c2bb
+2026-07-02 00:52:43,865 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=payment state after terms
+2026-07-02 00:52:44,068 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=202
+2026-07-02 00:52:44,070 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=add card
+2026-07-02 00:52:44,164 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /payment/api/v1/payment/cards status=201 elapsedMs=92
+2026-07-02 00:52:44,167 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=wallet topup
+2026-07-02 00:52:44,351 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=181
+2026-07-02 00:52:44,353 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=payment state after setup
+2026-07-02 00:52:44,428 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=74
+2026-07-02 00:52:44,429 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] payment ready wallet=120.00
+2026-07-02 00:52:44,431 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=charger graphql list
+2026-07-02 00:52:44,626 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /charger/graphql status=200 elapsedMs=194
+2026-07-02 00:52:44,639 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] dynamic connector selection found no available connector; using CSV connector
+2026-07-02 00:52:44,641 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=charger graphql view
+2026-07-02 00:52:44,724 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /charger/graphql status=200 elapsedMs=82
+2026-07-02 00:52:44,726 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=payment state before start
+2026-07-02 00:52:44,794 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=67
+2026-07-02 00:52:44,819 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] using connector csv fallback attempts=10 startIndex=1/100
+2026-07-02 00:52:44,822 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=start charging attempt 1
+2026-07-02 00:52:46,843 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /session/api/v1/sessions/start status=201 elapsedMs=2020
+2026-07-02 00:52:46,844 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] started session=01a6bc00-e3ff-4ca1-b33b-20a6510cad42 charger=EH-US-CHG-0001/CON-US-0001 status=PREPARING remote=Accepted attempt=1/10
+2026-07-02 00:52:46,846 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=active sessions
+2026-07-02 00:52:47,620 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=773
+2026-07-02 00:52:51,438 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-2
+2026-07-02 00:52:51,446 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=register
+2026-07-02 00:52:51,705 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /auth/api/auth/register status=200 elapsedMs=219
+2026-07-02 00:52:51,707 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] registered uid=7f5b9b4a-f69b-4c76-900e-880d36560fca
+2026-07-02 00:52:51,717 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=payment state before setup
+2026-07-02 00:52:51,788 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /payment/api/v1/payment/state status=451 elapsedMs=70
+2026-07-02 00:52:51,789 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=accept terms
+2026-07-02 00:52:51,861 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /auth/api/terms/accept status=201 elapsedMs=70
+2026-07-02 00:52:51,862 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] accepted terms; refreshing token through login
+2026-07-02 00:52:51,863 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=login
+2026-07-02 00:52:52,051 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /auth/api/auth/login status=200 elapsedMs=186
+2026-07-02 00:52:52,052 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] logged in uid=7f5b9b4a-f69b-4c76-900e-880d36560fca
+2026-07-02 00:52:52,053 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=payment state after terms
+2026-07-02 00:52:52,140 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /payment/api/v1/payment/state status=200 elapsedMs=86
+2026-07-02 00:52:52,141 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=add card
+2026-07-02 00:52:52,241 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /payment/api/v1/payment/cards status=201 elapsedMs=98
+2026-07-02 00:52:52,243 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=wallet topup
+2026-07-02 00:52:52,323 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=79
+2026-07-02 00:52:52,324 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=payment state after setup
+2026-07-02 00:52:52,392 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /payment/api/v1/payment/state status=200 elapsedMs=67
+2026-07-02 00:52:52,394 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] payment ready wallet=120.00
+2026-07-02 00:52:52,395 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=charger graphql list
+2026-07-02 00:52:52,507 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /charger/graphql status=200 elapsedMs=110
+2026-07-02 00:52:52,509 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] dynamic connector selection found no available connector; using CSV connector
+2026-07-02 00:52:52,511 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=charger graphql view
+2026-07-02 00:52:52,601 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /charger/graphql status=200 elapsedMs=89
+2026-07-02 00:52:52,603 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=payment state before start
+2026-07-02 00:52:52,686 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /payment/api/v1/payment/state status=200 elapsedMs=82
+2026-07-02 00:52:52,695 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] using connector csv fallback attempts=10 startIndex=2/100
+2026-07-02 00:52:52,697 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=start charging attempt 1
+2026-07-02 00:52:53,662 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /session/api/v1/sessions/start status=201 elapsedMs=963
+2026-07-02 00:52:53,663 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] started session=435c1310-c301-4612-b8ad-4be493b6fa1a charger=EH-US-CHG-0002/CON-US-0002 status=PREPARING remote=Accepted attempt=1/10
+2026-07-02 00:52:53,664 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=active sessions
+2026-07-02 00:52:54,674 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /session/api/v1/sessions/active status=200 elapsedMs=1009
+2026-07-02 00:53:03,438 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-3
+2026-07-02 00:53:03,444 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=register
+2026-07-02 00:53:03,793 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /auth/api/auth/register status=200 elapsedMs=269
+2026-07-02 00:53:03,794 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] registered uid=487201ad-6136-478f-bfd8-b092020d9d17
+2026-07-02 00:53:03,803 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=payment state before setup
+2026-07-02 00:53:03,932 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /payment/api/v1/payment/state status=451 elapsedMs=128
+2026-07-02 00:53:03,933 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=accept terms
+2026-07-02 00:53:04,223 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /auth/api/terms/accept status=201 elapsedMs=288
+2026-07-02 00:53:04,223 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] accepted terms; refreshing token through login
+2026-07-02 00:53:04,224 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=login
+2026-07-02 00:53:05,213 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /auth/api/auth/login status=200 elapsedMs=987
+2026-07-02 00:53:05,215 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] logged in uid=487201ad-6136-478f-bfd8-b092020d9d17
+2026-07-02 00:53:05,216 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=payment state after terms
+2026-07-02 00:53:05,302 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /payment/api/v1/payment/state status=200 elapsedMs=85
+2026-07-02 00:53:05,303 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=add card
+2026-07-02 00:53:05,391 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /payment/api/v1/payment/cards status=201 elapsedMs=87
+2026-07-02 00:53:05,392 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=wallet topup
+2026-07-02 00:53:05,488 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=94
+2026-07-02 00:53:05,488 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=payment state after setup
+2026-07-02 00:53:05,572 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /payment/api/v1/payment/state status=200 elapsedMs=82
+2026-07-02 00:53:05,572 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] payment ready wallet=120.00
+2026-07-02 00:53:05,573 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=charger graphql list
+2026-07-02 00:53:05,723 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /charger/graphql status=200 elapsedMs=148
+2026-07-02 00:53:05,724 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] dynamic connector selection found no available connector; using CSV connector
+2026-07-02 00:53:05,731 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=charger graphql view
+2026-07-02 00:53:05,836 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /charger/graphql status=200 elapsedMs=103
+2026-07-02 00:53:05,837 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=payment state before start
+2026-07-02 00:53:05,938 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /payment/api/v1/payment/state status=200 elapsedMs=100
+2026-07-02 00:53:05,942 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] using connector csv fallback attempts=10 startIndex=3/100
+2026-07-02 00:53:05,943 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=start charging attempt 1
+2026-07-02 00:53:06,704 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /session/api/v1/sessions/start status=201 elapsedMs=760
+2026-07-02 00:53:06,705 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] started session=8fa3b10c-7e46-4ea5-96be-7332f068c914 charger=EH-US-CHG-0003/CON-US-0003 status=PREPARING remote=Accepted attempt=1/10
+2026-07-02 00:53:06,706 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=active sessions
+2026-07-02 00:53:07,697 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /session/api/v1/sessions/active status=200 elapsedMs=991
+2026-07-02 00:53:15,438 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-4
+2026-07-02 00:53:15,444 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=register
+2026-07-02 00:53:15,861 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /auth/api/auth/register status=200 elapsedMs=291
+2026-07-02 00:53:15,862 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] registered uid=1b6ad153-ccb1-4fde-af4d-4883b5385d71
+2026-07-02 00:53:15,869 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=payment state before setup
+2026-07-02 00:53:16,065 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /payment/api/v1/payment/state status=451 elapsedMs=195
+2026-07-02 00:53:16,066 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=accept terms
+2026-07-02 00:53:16,219 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /auth/api/terms/accept status=201 elapsedMs=152
+2026-07-02 00:53:16,220 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] accepted terms; refreshing token through login
+2026-07-02 00:53:16,221 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=login
+2026-07-02 00:53:16,499 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /auth/api/auth/login status=200 elapsedMs=276
+2026-07-02 00:53:16,500 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] logged in uid=1b6ad153-ccb1-4fde-af4d-4883b5385d71
+2026-07-02 00:53:16,501 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=payment state after terms
+2026-07-02 00:53:16,647 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /payment/api/v1/payment/state status=200 elapsedMs=146
+2026-07-02 00:53:16,648 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=add card
+2026-07-02 00:53:16,770 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /payment/api/v1/payment/cards status=201 elapsedMs=121
+2026-07-02 00:53:16,771 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=wallet topup
+2026-07-02 00:53:16,901 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=129
+2026-07-02 00:53:16,902 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=payment state after setup
+2026-07-02 00:53:17,022 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /payment/api/v1/payment/state status=200 elapsedMs=119
+2026-07-02 00:53:17,024 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] payment ready wallet=120.00
+2026-07-02 00:53:17,025 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=charger graphql list
+2026-07-02 00:53:17,210 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /charger/graphql status=200 elapsedMs=184
+2026-07-02 00:53:17,212 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] dynamic connector selection found no available connector; using CSV connector
+2026-07-02 00:53:17,213 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=charger graphql view
+2026-07-02 00:53:17,353 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /charger/graphql status=200 elapsedMs=139
+2026-07-02 00:53:17,354 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=payment state before start
+2026-07-02 00:53:17,423 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /payment/api/v1/payment/state status=200 elapsedMs=68
+2026-07-02 00:53:17,428 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] using connector csv fallback attempts=10 startIndex=4/100
+2026-07-02 00:53:17,429 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=start charging attempt 1
+2026-07-02 00:53:17,722 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /session/api/v1/sessions/start status=201 elapsedMs=292
+2026-07-02 00:53:17,724 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] started session=73014ae9-8b62-4c3e-a206-cb1e542fa020 charger=EH-US-CHG-0004/CON-US-0004 status=PREPARING remote=Accepted attempt=1/10
+2026-07-02 00:53:17,725 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=active sessions
+2026-07-02 00:53:18,742 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /session/api/v1/sessions/active status=200 elapsedMs=1017
+2026-07-02 00:53:18,746 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] sse ok connected=1 snapshot=2 updates=11 receipts=0 heartbeats=0
+2026-07-02 00:53:18,748 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] holding session for 23s before stop
+2026-07-02 00:53:25,794 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] sse ok connected=1 snapshot=2 updates=11 receipts=0 heartbeats=0
+2026-07-02 00:53:25,795 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] holding session for 26s before stop
+2026-07-02 00:53:27,436 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-5
+2026-07-02 00:53:27,441 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=register
+2026-07-02 00:53:27,887 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /auth/api/auth/register status=200 elapsedMs=343
+2026-07-02 00:53:27,888 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] registered uid=e99ba12d-6fd0-4dcd-875b-0ad1d30663c1
+2026-07-02 00:53:27,898 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=payment state before setup
+2026-07-02 00:53:28,048 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /payment/api/v1/payment/state status=451 elapsedMs=149
+2026-07-02 00:53:28,049 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=accept terms
+2026-07-02 00:53:28,197 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /auth/api/terms/accept status=201 elapsedMs=147
+2026-07-02 00:53:28,198 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] accepted terms; refreshing token through login
+2026-07-02 00:53:28,199 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=login
+2026-07-02 00:53:28,460 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /auth/api/auth/login status=200 elapsedMs=259
+2026-07-02 00:53:28,461 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] logged in uid=e99ba12d-6fd0-4dcd-875b-0ad1d30663c1
+2026-07-02 00:53:28,461 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=payment state after terms
+2026-07-02 00:53:28,605 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /payment/api/v1/payment/state status=200 elapsedMs=143
+2026-07-02 00:53:28,607 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=add card
+2026-07-02 00:53:28,750 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /payment/api/v1/payment/cards status=201 elapsedMs=142
+2026-07-02 00:53:28,751 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=wallet topup
+2026-07-02 00:53:28,909 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=156
+2026-07-02 00:53:28,910 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=payment state after setup
+2026-07-02 00:53:29,063 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /payment/api/v1/payment/state status=200 elapsedMs=153
+2026-07-02 00:53:29,064 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] payment ready wallet=120.00
+2026-07-02 00:53:29,064 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=charger graphql list
+2026-07-02 00:53:29,243 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /charger/graphql status=200 elapsedMs=178
+2026-07-02 00:53:29,245 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] dynamic connector selection found no available connector; using CSV connector
+2026-07-02 00:53:29,246 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=charger graphql view
+2026-07-02 00:53:29,361 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /charger/graphql status=200 elapsedMs=114
+2026-07-02 00:53:29,362 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=payment state before start
+2026-07-02 00:53:29,478 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /payment/api/v1/payment/state status=200 elapsedMs=115
+2026-07-02 00:53:29,483 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] using connector csv fallback attempts=10 startIndex=5/100
+2026-07-02 00:53:29,484 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=start charging attempt 1
+2026-07-02 00:53:29,616 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /session/api/v1/sessions/start status=409 elapsedMs=130
+2026-07-02 00:53:29,618 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] start skipped EH-US-CHG-0005/CON-US-0005 HTTP 409; trying next connector
+2026-07-02 00:53:30,619 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=start charging attempt 2
+2026-07-02 00:53:30,760 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /session/api/v1/sessions/start status=409 elapsedMs=140
+2026-07-02 00:53:30,761 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] start skipped EH-US-CHG-0006/CON-US-0006 HTTP 409; trying next connector
+2026-07-02 00:53:31,762 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=start charging attempt 3
+2026-07-02 00:53:31,927 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /session/api/v1/sessions/start status=409 elapsedMs=164
+2026-07-02 00:53:31,928 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] start skipped EH-US-CHG-0007/CON-US-0007 HTTP 409; trying next connector
+2026-07-02 00:53:32,929 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=start charging attempt 4
+2026-07-02 00:53:33,868 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /session/api/v1/sessions/start status=201 elapsedMs=937
+2026-07-02 00:53:33,868 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] started session=c6330233-73fe-4231-b6fe-d486020eb694 charger=EH-US-CHG-0008/CON-US-0008 status=PREPARING remote=Accepted attempt=4/10
+2026-07-02 00:53:33,869 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=active sessions
+2026-07-02 00:53:34,858 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /session/api/v1/sessions/active status=200 elapsedMs=988
+2026-07-02 00:53:39,663 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] sse ok connected=1 snapshot=2 updates=11 receipts=0 heartbeats=0
+2026-07-02 00:53:39,664 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] holding session for 24s before stop
+2026-07-02 00:53:43,519 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=stop charging session
+2026-07-02 00:53:47,712 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http POST /session/api/v1/sessions/01a6bc00-e3ff-4ca1-b33b-20a6510cad42/stop status=204 elapsedMs=4079
+2026-07-02 00:53:47,713 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] stop requested session=01a6bc00-e3ff-4ca1-b33b-20a6510cad42
+2026-07-02 00:53:47,714 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=active sessions
+2026-07-02 00:53:48,733 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1018
+2026-07-02 00:53:50,707 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] sse ok connected=1 snapshot=2 updates=13 receipts=0 heartbeats=0
+2026-07-02 00:53:50,709 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] holding session for 25s before stop
+2026-07-02 00:53:53,565 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=stop charging session
+2026-07-02 00:53:53,734 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=active sessions
+2026-07-02 00:53:53,871 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=136
+2026-07-02 00:53:53,873 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=receipt
+2026-07-02 00:53:53,964 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /session/api/v1/sessions/01a6bc00-e3ff-4ca1-b33b-20a6510cad42/receipt status=200 elapsedMs=90
+2026-07-02 00:53:53,966 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=session history
+2026-07-02 00:53:54,047 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /session/api/v1/sessions/history?page=0&size=10 status=200 elapsedMs=80
+2026-07-02 00:53:54,050 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] step=dashboard stats
+2026-07-02 00:53:54,156 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] http GET /session/api/v1/sessions/dashboard-stats status=200 elapsedMs=105
+2026-07-02 00:53:54,157 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] receipt ok session=01a6bc00-e3ff-4ca1-b33b-20a6510cad42 status=Completed total=1.4365
+2026-07-02 00:53:54,176 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-1
+2026-07-02 00:53:54,177 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-1
+2026-07-02 00:53:56,740 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http POST /session/api/v1/sessions/435c1310-c301-4612-b8ad-4be493b6fa1a/stop status=204 elapsedMs=3174
+2026-07-02 00:53:56,741 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] stop requested session=435c1310-c301-4612-b8ad-4be493b6fa1a
+2026-07-02 00:53:56,742 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=active sessions
+2026-07-02 00:53:57,747 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /session/api/v1/sessions/active status=200 elapsedMs=1004
+2026-07-02 00:54:02,748 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=active sessions
+2026-07-02 00:54:02,891 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /session/api/v1/sessions/active status=200 elapsedMs=142
+2026-07-02 00:54:02,892 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=receipt
+2026-07-02 00:54:02,985 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /session/api/v1/sessions/435c1310-c301-4612-b8ad-4be493b6fa1a/receipt status=200 elapsedMs=93
+2026-07-02 00:54:02,986 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=session history
+2026-07-02 00:54:03,065 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /session/api/v1/sessions/history?page=0&size=10 status=200 elapsedMs=77
+2026-07-02 00:54:03,066 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] step=dashboard stats
+2026-07-02 00:54:03,146 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] http GET /session/api/v1/sessions/dashboard-stats status=200 elapsedMs=79
+2026-07-02 00:54:03,147 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] receipt ok session=435c1310-c301-4612-b8ad-4be493b6fa1a status=Completed total=1.4373
+2026-07-02 00:54:03,151 INFO o.a.j.r.Summariser: summary +      2 in 00:01:24 =    0.0/s Avg: 70498 Min: 69008 Max: 71989 Err:     0 (0.00%) Active: 4 Started: 5 Finished: 1
+2026-07-02 00:54:03,151 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-2
+2026-07-02 00:54:03,152 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-2
+2026-07-02 00:54:03,665 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=stop charging session
+2026-07-02 00:54:08,577 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http POST /session/api/v1/sessions/8fa3b10c-7e46-4ea5-96be-7332f068c914/stop status=204 elapsedMs=4910
+2026-07-02 00:54:08,577 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] stop requested session=8fa3b10c-7e46-4ea5-96be-7332f068c914
+2026-07-02 00:54:08,578 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] sse ok connected=1 snapshot=2 updates=11 receipts=0 heartbeats=0
+2026-07-02 00:54:08,578 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=active sessions
+2026-07-02 00:54:08,579 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] holding session for 19s before stop
+2026-07-02 00:54:09,589 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /session/api/v1/sessions/active status=200 elapsedMs=1010
+2026-07-02 00:54:14,590 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=active sessions
+2026-07-02 00:54:14,714 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /session/api/v1/sessions/active status=200 elapsedMs=122
+2026-07-02 00:54:14,714 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=receipt
+2026-07-02 00:54:14,781 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /session/api/v1/sessions/8fa3b10c-7e46-4ea5-96be-7332f068c914/receipt status=200 elapsedMs=65
+2026-07-02 00:54:14,782 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=session history
+2026-07-02 00:54:14,847 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /session/api/v1/sessions/history?page=0&size=10 status=200 elapsedMs=64
+2026-07-02 00:54:14,848 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] step=dashboard stats
+2026-07-02 00:54:14,916 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] http GET /session/api/v1/sessions/dashboard-stats status=200 elapsedMs=67
+2026-07-02 00:54:14,917 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] receipt ok session=8fa3b10c-7e46-4ea5-96be-7332f068c914 status=Completed total=1.4365
+2026-07-02 00:54:14,919 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-3
+2026-07-02 00:54:14,920 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-3
+2026-07-02 00:54:17,459 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=stop charging session
+2026-07-02 00:54:20,638 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http POST /session/api/v1/sessions/73014ae9-8b62-4c3e-a206-cb1e542fa020/stop status=204 elapsedMs=3178
+2026-07-02 00:54:20,639 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] stop requested session=73014ae9-8b62-4c3e-a206-cb1e542fa020
+2026-07-02 00:54:20,640 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=active sessions
+2026-07-02 00:54:21,644 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /session/api/v1/sessions/active status=200 elapsedMs=1003
+2026-07-02 00:54:26,645 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=active sessions
+2026-07-02 00:54:26,762 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /session/api/v1/sessions/active status=200 elapsedMs=115
+2026-07-02 00:54:26,763 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=receipt
+2026-07-02 00:54:26,826 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /session/api/v1/sessions/73014ae9-8b62-4c3e-a206-cb1e542fa020/receipt status=200 elapsedMs=62
+2026-07-02 00:54:26,827 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=session history
+2026-07-02 00:54:26,895 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /session/api/v1/sessions/history?page=0&size=10 status=200 elapsedMs=67
+2026-07-02 00:54:26,896 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] step=dashboard stats
+2026-07-02 00:54:26,966 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] http GET /session/api/v1/sessions/dashboard-stats status=200 elapsedMs=68
+2026-07-02 00:54:26,967 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] receipt ok session=73014ae9-8b62-4c3e-a206-cb1e542fa020 status=Completed total=1.4373
+2026-07-02 00:54:26,968 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-4
+2026-07-02 00:54:26,968 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-4
+2026-07-02 00:54:27,580 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=stop charging session
+2026-07-02 00:54:30,681 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http POST /session/api/v1/sessions/c6330233-73fe-4231-b6fe-d486020eb694/stop status=204 elapsedMs=3099
+2026-07-02 00:54:30,682 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] stop requested session=c6330233-73fe-4231-b6fe-d486020eb694
+2026-07-02 00:54:30,683 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=active sessions
+2026-07-02 00:54:31,696 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /session/api/v1/sessions/active status=200 elapsedMs=1013
+2026-07-02 00:54:36,697 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=active sessions
+2026-07-02 00:54:36,839 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /session/api/v1/sessions/active status=200 elapsedMs=141
+2026-07-02 00:54:36,841 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=receipt
+2026-07-02 00:54:36,912 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /session/api/v1/sessions/c6330233-73fe-4231-b6fe-d486020eb694/receipt status=200 elapsedMs=70
+2026-07-02 00:54:36,912 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=session history
+2026-07-02 00:54:36,977 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /session/api/v1/sessions/history?page=0&size=10 status=200 elapsedMs=64
+2026-07-02 00:54:36,978 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] step=dashboard stats
+2026-07-02 00:54:37,039 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] http GET /session/api/v1/sessions/dashboard-stats status=200 elapsedMs=60
+2026-07-02 00:54:37,040 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] receipt ok session=c6330233-73fe-4231-b6fe-d486020eb694 status=Completed total=1.4328
+2026-07-02 00:54:37,041 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-5
+2026-07-02 00:54:37,041 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-5
+2026-07-02 00:54:37,042 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2026-07-02 00:54:37,043 INFO o.a.j.s.FileServer: Close: scripts/jmeter/data/connectors-100.csv
+2026-07-02 00:54:37,052 INFO o.a.j.r.Summariser: summary +      3 in 00:00:34 =    0.1/s Avg: 67042 Min: 66085 Max: 68010 Err:     0 (0.00%) Active: 0 Started: 5 Finished: 5
+2026-07-02 00:54:37,053 INFO o.a.j.r.Summariser: summary =      5 in 00:01:58 =    0.0/s Avg: 68424 Min: 66085 Max: 71989 Err:     0 (0.00%)
+2026-07-02 00:54:37,055 INFO o.a.j.JMeter: Generating Dashboard
+2026-07-02 00:54:37,056 INFO o.a.j.r.d.ReportGenerator: Flushing result collector before report Generation
+2026-07-02 00:54:37,074 INFO o.a.j.r.p.NormalizerSampleConsumer: Using format, 'ms', to parse timeStamp field
+2026-07-02 00:54:37,137 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.AggregateConsumer#stopProducing(): beginDate produced 0 samples
+2026-07-02 00:54:37,138 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.AggregateConsumer#stopProducing(): endDate produced 0 samples
+2026-07-02 00:54:37,140 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.ApdexSummaryConsumer#stopProducing(): apdexSummary produced 0 samples
+2026-07-02 00:54:37,140 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.RequestsSummaryConsumer#stopProducing(): requestsSummary produced 0 samples
+2026-07-02 00:54:37,146 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.StatisticsSummaryConsumer#stopProducing(): statisticsSummary produced 0 samples
+2026-07-02 00:54:37,150 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.Top5ErrorsBySamplerConsumer#stopProducing(): top5ErrorsBySampler produced 0 samples
+2026-07-02 00:54:37,151 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.ErrorsSummaryConsumer#stopProducing(): errorsSummary produced 0 samples
+2026-07-02 00:54:37,152 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.HitsPerSecondGraphConsumer#stopProducing(): hitsPerSecond produced 0 samples
+2026-07-02 00:54:37,184 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.LatencyVSRequestGraphConsumer#stopProducing(): latencyVsRequest produced 0 samples
+2026-07-02 00:54:37,185 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.SyntheticResponseTimeDistributionGraphConsumer#stopProducing(): syntheticResponseTimeDistribution produced 0 samples
+2026-07-02 00:54:37,186 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.BytesThroughputGraphConsumer#stopProducing(): bytesThroughputOverTime produced 0 samples
+2026-07-02 00:54:37,187 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.CodesPerSecondGraphConsumer#stopProducing(): codesPerSecond produced 0 samples
+2026-07-02 00:54:37,208 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeVSRequestGraphConsumer#stopProducing(): responseTimeVsRequest produced 0 samples
+2026-07-02 00:54:37,209 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): startIntervalControlerFilter produced 35 samples
+2026-07-02 00:54:37,210 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TotalTPSGraphConsumer#stopProducing(): totalTPS produced 0 samples
+2026-07-02 00:54:37,210 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ActiveThreadsGraphConsumer#stopProducing(): activeThreadsOverTime produced 0 samples
+2026-07-02 00:54:37,211 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TimeVSThreadGraphConsumer#stopProducing(): timeVsThreads produced 0 samples
+2026-07-02 00:54:37,211 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeDistributionGraphConsumer#stopProducing(): responseTimeDistribution produced 0 samples
+2026-07-02 00:54:37,212 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TransactionsPerSecondGraphConsumer#stopProducing(): transactionsPerSecond produced 0 samples
+2026-07-02 00:54:37,213 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimePercentilesGraphConsumer#stopProducing(): responseTimePercentiles produced 0 samples
+2026-07-02 00:54:37,214 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimePercentilesOverTimeGraphConsumer#stopProducing(): responseTimePercentilesOverTime produced 0 samples
+2026-07-02 00:54:37,214 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeOverTimeGraphConsumer#stopProducing(): responseTimesOverTime produced 0 samples
+2026-07-02 00:54:37,215 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ConnectTimeOverTimeGraphConsumer#stopProducing(): connectTimeOverTime produced 0 samples
+2026-07-02 00:54:37,215 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.LatencyOverTimeGraphConsumer#stopProducing(): latenciesOverTime produced 0 samples
+2026-07-02 00:54:37,216 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): nameFilter produced 75 samples
+2026-07-02 00:54:37,216 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): dateRangeFilter produced 15 samples
+2026-07-02 00:54:37,217 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.NormalizerSampleConsumer#stopProducing(): normalizer produced 5 samples
+2026-07-02 00:54:37,219 INFO o.a.j.r.p.CsvFileSampleSource: produce(): 5 samples produced in 127ms on channel 0
+2026-07-02 00:54:37,219 INFO o.a.j.r.d.ReportGenerator: Exporting data using exporter:'json' of className:'org.apache.jmeter.report.dashboard.JsonExporter'
+2026-07-02 00:54:37,285 INFO o.a.j.r.d.JsonExporter: Found data for consumer statisticsSummary in context
+2026-07-02 00:54:37,286 INFO o.a.j.r.d.JsonExporter: Creating statistics for overall
+2026-07-02 00:54:37,287 INFO o.a.j.r.d.JsonExporter: Creating statistics for other transactions
+2026-07-02 00:54:37,287 INFO o.a.j.r.d.JsonExporter: Checking output folder
+2026-07-02 00:54:37,290 INFO o.a.j.r.d.JsonExporter: Writing statistics JSON to /work/outputs/jmeter/prod-redis-smoke-5/report/statistics.json
+2026-07-02 00:54:37,319 INFO o.a.j.r.d.ReportGenerator: Exporting data using exporter:'html' of className:'org.apache.jmeter.report.dashboard.HtmlTemplateExporter'
+2026-07-02 00:54:37,327 INFO o.a.j.r.d.HtmlTemplateExporter: Will generate dashboard in folder: /work/outputs/jmeter/prod-redis-smoke-5/report
+2026-07-02 00:54:37,405 INFO o.a.j.r.d.HtmlTemplateExporter: Report will be generated in: /work/outputs/jmeter/prod-redis-smoke-5/report, creating folder structure
+2026-07-02 00:54:37,419 INFO o.a.j.r.d.TemplateVisitor: Copying folder from '/opt/apache-jmeter-5.6.3/bin/report-template' to '/work/outputs/jmeter/prod-redis-smoke-5/report', got message: /work/outputs/jmeter/prod-redis-smoke-5/report, found non empty folder with following content [/work/outputs/jmeter/prod-redis-smoke-5/report/statistics.json], will be ignored
+2026-07-02 00:54:40,606 INFO o.a.j.JMeter: Dashboard generated

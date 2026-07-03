@@ -1,0 +1,197 @@
+2026-06-25 03:21:19,192 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-06-25 03:21:19,211 INFO o.a.j.JMeter: Loading user properties from: /opt/apache-jmeter-5.5/bin/user.properties
+2026-06-25 03:21:19,213 INFO o.a.j.JMeter: Loading system properties from: /opt/apache-jmeter-5.5/bin/system.properties
+2026-06-25 03:21:19,214 INFO o.a.j.JMeter: Setting System property: log4j2.formatMsgNoLookups=true
+2026-06-25 03:21:19,215 INFO o.a.j.JMeter: Setting JMeter property: base_url=https://api.electrahub.net
+2026-06-25 03:21:19,215 INFO o.a.j.JMeter: Setting JMeter property: users=5
+2026-06-25 03:21:19,216 INFO o.a.j.JMeter: Setting JMeter property: ramp_seconds=30
+2026-06-25 03:21:19,218 INFO o.a.j.JMeter: Setting JMeter property: hold_seconds=120
+2026-06-25 03:21:19,219 INFO o.a.j.JMeter: Setting JMeter property: sse_seconds=60
+2026-06-25 03:21:19,219 INFO o.a.j.JMeter: Setting JMeter property: dynamic_connector_selection=true
+2026-06-25 03:21:19,220 INFO o.a.j.JMeter: Setting JMeter property: run_id=prod-auth9-smoke
+2026-06-25 03:21:19,221 INFO o.a.j.JMeter: Setting JMeter property: jmeter=.save.saveservice.output_format=csv
+2026-06-25 03:21:19,222 INFO o.a.j.JMeter: Setting JMeter property: jmeter=.save.saveservice.print_field_names=true
+2026-06-25 03:21:19,223 INFO o.a.j.JMeter: Setting JMeter property: jmeter=.save.saveservice.response_data.on_error=true
+2026-06-25 03:21:19,230 INFO o.a.j.JMeter: Copyright (c) 1998-2022 The Apache Software Foundation
+2026-06-25 03:21:19,230 INFO o.a.j.JMeter: Version 5.5
+2026-06-25 03:21:19,231 INFO o.a.j.JMeter: java.version=1.8.0_275
+2026-06-25 03:21:19,231 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-06-25 03:21:19,232 INFO o.a.j.JMeter: os.name=Linux
+2026-06-25 03:21:19,233 INFO o.a.j.JMeter: os.arch=amd64
+2026-06-25 03:21:19,234 INFO o.a.j.JMeter: os.version=6.18.33.1-microsoft-standard-WSL2
+2026-06-25 03:21:19,235 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-06-25 03:21:19,235 INFO o.a.j.JMeter: java.awt.headless=true
+2026-06-25 03:21:19,236 INFO o.a.j.JMeter: Max memory     =8204058624
+2026-06-25 03:21:19,237 INFO o.a.j.JMeter: Available Processors =16
+2026-06-25 03:21:19,243 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-06-25 03:21:19,244 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-06-25 03:21:19,245 INFO o.a.j.JMeter: JMeterHome=/opt/apache-jmeter-5.5
+2026-06-25 03:21:19,246 INFO o.a.j.JMeter: user.dir  =/work
+2026-06-25 03:21:19,247 INFO o.a.j.JMeter: PWD       =/work
+2026-06-25 03:21:19,248 INFO o.a.j.JMeter: IP: 172.17.0.32 Name: 08b146d596db FullName: 08b146d596db
+2026-06-25 03:21:19,273 INFO o.a.j.JMeter: Setting property 'jmeter.reportgenerator.outputdir' to:'/work/outputs/jmeter/prod-smoke-auth9/report'
+2026-06-25 03:21:19,281 INFO o.a.j.s.FileServer: Default base='/work'
+2026-06-25 03:21:19,283 INFO o.a.j.s.FileServer: Set new base='/work/scripts/jmeter'
+2026-06-25 03:21:19,405 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-06-25 03:21:19,420 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-06-25 03:21:19,425 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-06-25 03:21:19,431 INFO o.a.j.s.SaveService: Loading file: scripts/jmeter/03-full-e2e-charging-100-users.jmx
+2026-06-25 03:21:19,494 INFO o.a.j.JMeter: Creating summariser <summary>
+2026-06-25 03:21:19,503 INFO o.a.j.r.d.ReportGenerator: ReportGenerator will use for Parsing the separator: ','
+2026-06-25 03:21:19,505 INFO o.a.j.r.d.ReportGenerator: Will generate report at end of test from  results file: outputs/jmeter/prod-smoke-auth9/results.jtl
+2026-06-25 03:21:19,505 INFO o.a.j.r.d.ReportGenerator: Reading report generator properties from: /opt/apache-jmeter-5.5/bin/reportgenerator.properties
+2026-06-25 03:21:19,506 INFO o.a.j.r.d.ReportGenerator: Merging with JMeter properties
+2026-06-25 03:21:19,513 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.temp_dir' not found, using default value 'temp' instead.
+2026-06-25 03:21:19,516 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.apdex_per_transaction' not found, using default value 'null' instead.
+2026-06-25 03:21:19,522 INFO o.a.j.r.c.ReportGeneratorConfiguration: apdex_per_transaction is empty, not APDEX per transaction customization
+2026-06-25 03:21:19,523 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.sample_filter' not found, using default value 'null' instead.
+2026-06-25 03:21:19,524 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.report_title' not found, using default value 'null' instead.
+2026-06-25 03:21:19,524 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.start_date' not found, using default value 'null' instead.
+2026-06-25 03:21:19,525 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.end_date' not found, using default value 'null' instead.
+2026-06-25 03:21:19,526 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.date_format' not found, using default value 'null' instead.
+2026-06-25 03:21:19,527 INFO o.a.j.r.c.ReportGeneratorConfiguration: Will use date range start date: null, end date: null
+2026-06-25 03:21:19,531 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.totalTPS.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,532 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.activeThreadsOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,533 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.timeVsThreads.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,533 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimeDistribution.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,534 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.transactionsPerSecond.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,535 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimePercentiles.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,535 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimePercentilesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,536 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,537 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.connectTimeOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,538 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.latenciesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-06-25 03:21:19,540 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.filters_only_sample_series' not found, using default value 'true' instead.
+2026-06-25 03:21:19,540 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.series_filter' not found, using default value '' instead.
+2026-06-25 03:21:19,541 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.show_controllers_only' not found, using default value 'false' instead.
+2026-06-25 03:21:19,542 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.filters_only_sample_series' not found, using default value 'true' instead.
+2026-06-25 03:21:19,543 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.series_filter' not found, using default value '' instead.
+2026-06-25 03:21:19,543 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.show_controllers_only' not found, using default value 'false' instead.
+2026-06-25 03:21:19,550 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-06-25 03:21:19,552 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-06-25 03:21:19,553 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-06-25 03:21:19,558 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-06-25 03:21:19,559 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-06-25 03:21:19,978 INFO o.a.j.JMeter: Running test (1782350479978)
+2026-06-25 03:21:20,049 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : 100 driver charging journeys
+2026-06-25 03:21:20,050 INFO o.a.j.e.StandardJMeterEngine: Starting 5 threads for group 100 driver charging journeys.
+2026-06-25 03:21:20,051 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error
+2026-06-25 03:21:20,052 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=5 ramp-up=30 delayedStart=false
+2026-06-25 03:21:20,057 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-06-25 03:21:20,058 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-06-25 03:21:20,066 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-1
+2026-06-25 03:21:20,070 INFO o.a.j.s.FileServer: Stored: scripts/jmeter/data/connectors-100.csv
+2026-06-25 03:21:20,099 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-06-25 03:21:20,100 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to ISO-8859-1
+2026-06-25 03:21:20,101 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-06-25 03:21:20,102 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-06-25 03:21:23,358 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] registered uid=ee52f189-fe9f-4b18-a364-a4189396c699
+2026-06-25 03:21:23,932 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] accepted terms; refreshing token through login
+2026-06-25 03:21:24,127 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] logged in uid=ee52f189-fe9f-4b18-a364-a4189396c699
+2026-06-25 03:21:24,590 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] payment ready wallet=120.00
+2026-06-25 03:21:26,063 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-2
+2026-06-25 03:21:26,443 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] registered uid=d7174dc4-d3ba-40a7-9ef8-701ebe2c5c69
+2026-06-25 03:21:26,656 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] accepted terms; refreshing token through login
+2026-06-25 03:21:26,899 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] logged in uid=d7174dc4-d3ba-40a7-9ef8-701ebe2c5c69
+2026-06-25 03:21:27,218 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] payment ready wallet=120.00
+2026-06-25 03:21:27,821 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] dynamic connector selection found no available connector; using CSV connector
+2026-06-25 03:21:27,886 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] dynamic connector selection found no available connector; using CSV connector
+2026-06-25 03:21:32,064 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-3
+2026-06-25 03:21:32,183 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] started session=ab8505c8-82bd-4fc9-88ec-3c8459e32da4 charger=EH-US-CHG-0001/CON-US-0001 status=PREPARING remote=Accepted attempt=1/1
+2026-06-25 03:21:32,202 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] started session=c297c54c-7bde-43da-bdbf-22eefbe10685 charger=EH-US-CHG-0002/CON-US-0002 status=PREPARING remote=Accepted attempt=1/1
+2026-06-25 03:21:32,421 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] registered uid=394a797d-a0d4-4520-82fa-c1c13ef7084d
+2026-06-25 03:21:32,642 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] accepted terms; refreshing token through login
+2026-06-25 03:21:32,827 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] logged in uid=394a797d-a0d4-4520-82fa-c1c13ef7084d
+2026-06-25 03:21:33,103 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] payment ready wallet=120.00
+2026-06-25 03:21:33,390 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] dynamic connector selection found no available connector; using CSV connector
+2026-06-25 03:21:34,520 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] started session=75d696d7-2b9e-45b5-b221-79750d3a21e3 charger=EH-US-CHG-0003/CON-US-0003 status=PREPARING remote=Accepted attempt=1/1
+2026-06-25 03:21:38,063 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-4
+2026-06-25 03:21:38,398 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] registered uid=8dcdd075-76fc-48f0-a6c7-c6cac3ec3fda
+2026-06-25 03:21:38,540 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] accepted terms; refreshing token through login
+2026-06-25 03:21:38,728 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] logged in uid=8dcdd075-76fc-48f0-a6c7-c6cac3ec3fda
+2026-06-25 03:21:39,038 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] payment ready wallet=120.00
+2026-06-25 03:21:39,311 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] dynamic connector selection found no available connector; using CSV connector
+2026-06-25 03:21:40,691 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] started session=a4102f25-c427-403e-b6f2-b90414bb679e charger=EH-US-CHG-0004/CON-US-0004 status=PREPARING remote=Accepted attempt=1/1
+2026-06-25 03:21:44,064 INFO o.a.j.t.JMeterThread: Thread started: 100 driver charging journeys 1-5
+2026-06-25 03:21:44,438 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] registered uid=4ae9fc2e-f7db-4acb-9d97-e25af0a99d8c
+2026-06-25 03:21:44,578 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] accepted terms; refreshing token through login
+2026-06-25 03:21:44,787 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] logged in uid=4ae9fc2e-f7db-4acb-9d97-e25af0a99d8c
+2026-06-25 03:21:45,065 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] payment ready wallet=120.00
+2026-06-25 03:21:45,260 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] dynamic connector selection found no available connector; using CSV connector
+2026-06-25 03:21:45,723 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] started session=f014e770-8520-455d-a436-7848c01d92aa charger=EH-US-CHG-0005/CON-US-0005 status=PREPARING remote=Accepted attempt=1/1
+2026-06-25 03:22:37,079 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] sse ok connected=1 snapshot=2 updates=25 receipts=0 heartbeats=0
+2026-06-25 03:22:37,079 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] sse ok connected=1 snapshot=2 updates=27 receipts=0 heartbeats=0
+2026-06-25 03:22:37,082 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] holding session for 45s before stop
+2026-06-25 03:22:37,082 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] holding session for 49s before stop
+2026-06-25 03:22:40,236 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] sse ok connected=1 snapshot=2 updates=25 receipts=0 heartbeats=0
+2026-06-25 03:22:40,238 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] holding session for 52s before stop
+2026-06-25 03:22:46,266 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] sse ok connected=1 snapshot=2 updates=25 receipts=0 heartbeats=0
+2026-06-25 03:22:46,267 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] holding session for 52s before stop
+2026-06-25 03:22:52,296 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] sse ok connected=1 snapshot=2 updates=27 receipts=0 heartbeats=0
+2026-06-25 03:22:52,298 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] holding session for 52s before stop
+2026-06-25 03:23:25,661 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] stop requested session=ab8505c8-82bd-4fc9-88ec-3c8459e32da4
+2026-06-25 03:23:29,691 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] stop requested session=c297c54c-7bde-43da-bdbf-22eefbe10685
+2026-06-25 03:23:31,968 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][001] receipt ok session=ab8505c8-82bd-4fc9-88ec-3c8459e32da4 status=Completed total=1.8663
+2026-06-25 03:23:31,983 INFO o.a.j.r.Summariser: summary +      1 in 00:02:12 =    0.0/s Avg: 131297 Min: 131297 Max: 131297 Err:     0 (0.00%) Active: 5 Started: 5 Finished: 0
+2026-06-25 03:23:31,986 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-1
+2026-06-25 03:23:31,986 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-1
+2026-06-25 03:23:35,731 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] stop requested session=75d696d7-2b9e-45b5-b221-79750d3a21e3
+2026-06-25 03:23:36,130 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][002] receipt ok session=c297c54c-7bde-43da-bdbf-22eefbe10685 status=Completed total=1.8692
+2026-06-25 03:23:36,132 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-2
+2026-06-25 03:23:36,133 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-2
+2026-06-25 03:23:41,886 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] stop requested session=a4102f25-c427-403e-b6f2-b90414bb679e
+2026-06-25 03:23:42,205 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][003] receipt ok session=75d696d7-2b9e-45b5-b221-79750d3a21e3 status=Completed total=1.8715
+2026-06-25 03:23:42,208 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-3
+2026-06-25 03:23:42,209 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-3
+2026-06-25 03:23:47,925 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] stop requested session=f014e770-8520-455d-a436-7848c01d92aa
+2026-06-25 03:23:48,329 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][004] receipt ok session=a4102f25-c427-403e-b6f2-b90414bb679e status=Completed total=1.8715
+2026-06-25 03:23:48,330 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-4
+2026-06-25 03:23:48,331 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-4
+2026-06-25 03:23:54,302 INFO o.a.j.p.j.s.J.Full charging journey with SSE: [electrahub-jmeter][full][005] receipt ok session=f014e770-8520-455d-a436-7848c01d92aa status=Completed total=1.8715
+2026-06-25 03:23:54,304 INFO o.a.j.t.JMeterThread: Thread is done: 100 driver charging journeys 1-5
+2026-06-25 03:23:54,305 INFO o.a.j.t.JMeterThread: Thread finished: 100 driver charging journeys 1-5
+2026-06-25 03:23:54,306 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2026-06-25 03:23:54,307 INFO o.a.j.s.FileServer: Close: scripts/jmeter/data/connectors-100.csv
+2026-06-25 03:23:54,310 INFO o.a.j.r.Summariser: summary +      4 in 00:00:22 =    0.2/s Avg: 129548 Min: 129448 Max: 129686 Err:     0 (0.00%) Active: 0 Started: 5 Finished: 5
+2026-06-25 03:23:54,311 INFO o.a.j.r.Summariser: summary =      5 in 00:02:34 =    0.0/s Avg: 129898 Min: 129448 Max: 131297 Err:     0 (0.00%)
+2026-06-25 03:23:54,312 INFO o.a.j.JMeter: Generating Dashboard
+2026-06-25 03:23:54,312 INFO o.a.j.r.d.ReportGenerator: Flushing result collector before report Generation
+2026-06-25 03:23:54,332 INFO o.a.j.r.p.NormalizerSampleConsumer: Using format, 'ms', to parse timeStamp field
+2026-06-25 03:23:54,396 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.AggregateConsumer#stopProducing(): beginDate produced 0 samples
+2026-06-25 03:23:54,397 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.AggregateConsumer#stopProducing(): endDate produced 0 samples
+2026-06-25 03:23:54,400 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.ApdexSummaryConsumer#stopProducing(): apdexSummary produced 0 samples
+2026-06-25 03:23:54,401 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.RequestsSummaryConsumer#stopProducing(): requestsSummary produced 0 samples
+2026-06-25 03:23:54,407 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.StatisticsSummaryConsumer#stopProducing(): statisticsSummary produced 0 samples
+2026-06-25 03:23:54,411 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.Top5ErrorsBySamplerConsumer#stopProducing(): top5ErrorsBySampler produced 0 samples
+2026-06-25 03:23:54,413 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.ErrorsSummaryConsumer#stopProducing(): errorsSummary produced 0 samples
+2026-06-25 03:23:54,414 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.HitsPerSecondGraphConsumer#stopProducing(): hitsPerSecond produced 0 samples
+2026-06-25 03:23:54,451 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.LatencyVSRequestGraphConsumer#stopProducing(): latencyVsRequest produced 0 samples
+2026-06-25 03:23:54,453 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.SyntheticResponseTimeDistributionGraphConsumer#stopProducing(): syntheticResponseTimeDistribution produced 0 samples
+2026-06-25 03:23:54,454 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.BytesThroughputGraphConsumer#stopProducing(): bytesThroughputOverTime produced 0 samples
+2026-06-25 03:23:54,455 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.CodesPerSecondGraphConsumer#stopProducing(): codesPerSecond produced 0 samples
+2026-06-25 03:23:54,477 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeVSRequestGraphConsumer#stopProducing(): responseTimeVsRequest produced 0 samples
+2026-06-25 03:23:54,478 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): startIntervalControlerFilter produced 35 samples
+2026-06-25 03:23:54,479 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TotalTPSGraphConsumer#stopProducing(): totalTPS produced 0 samples
+2026-06-25 03:23:54,480 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ActiveThreadsGraphConsumer#stopProducing(): activeThreadsOverTime produced 0 samples
+2026-06-25 03:23:54,481 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TimeVSThreadGraphConsumer#stopProducing(): timeVsThreads produced 0 samples
+2026-06-25 03:23:54,481 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeDistributionGraphConsumer#stopProducing(): responseTimeDistribution produced 0 samples
+2026-06-25 03:23:54,482 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TransactionsPerSecondGraphConsumer#stopProducing(): transactionsPerSecond produced 0 samples
+2026-06-25 03:23:54,483 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimePercentilesGraphConsumer#stopProducing(): responseTimePercentiles produced 0 samples
+2026-06-25 03:23:54,484 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimePercentilesOverTimeGraphConsumer#stopProducing(): responseTimePercentilesOverTime produced 0 samples
+2026-06-25 03:23:54,484 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeOverTimeGraphConsumer#stopProducing(): responseTimesOverTime produced 0 samples
+2026-06-25 03:23:54,485 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ConnectTimeOverTimeGraphConsumer#stopProducing(): connectTimeOverTime produced 0 samples
+2026-06-25 03:23:54,485 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.LatencyOverTimeGraphConsumer#stopProducing(): latenciesOverTime produced 0 samples
+2026-06-25 03:23:54,486 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): nameFilter produced 75 samples
+2026-06-25 03:23:54,486 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): dateRangeFilter produced 15 samples
+2026-06-25 03:23:54,487 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.NormalizerSampleConsumer#stopProducing(): normalizer produced 5 samples
+2026-06-25 03:23:54,489 INFO o.a.j.r.p.CsvFileSampleSource: produce(): 5 samples produced in 136ms on channel 0
+2026-06-25 03:23:54,489 INFO o.a.j.r.d.ReportGenerator: Exporting data using exporter:'json' of className:'org.apache.jmeter.report.dashboard.JsonExporter'
+2026-06-25 03:23:54,602 INFO o.a.j.r.d.JsonExporter: Found data for consumer statisticsSummary in context
+2026-06-25 03:23:54,603 INFO o.a.j.r.d.JsonExporter: Creating statistics for overall
+2026-06-25 03:23:54,604 INFO o.a.j.r.d.JsonExporter: Creating statistics for other transactions
+2026-06-25 03:23:54,605 INFO o.a.j.r.d.JsonExporter: Checking output folder
+2026-06-25 03:23:54,608 INFO o.a.j.r.d.JsonExporter: Writing statistics JSON to /work/outputs/jmeter/prod-smoke-auth9/report/statistics.json
+2026-06-25 03:23:54,649 INFO o.a.j.r.d.ReportGenerator: Exporting data using exporter:'html' of className:'org.apache.jmeter.report.dashboard.HtmlTemplateExporter'
+2026-06-25 03:23:54,657 INFO o.a.j.r.d.HtmlTemplateExporter: Will generate dashboard in folder: /work/outputs/jmeter/prod-smoke-auth9/report
+2026-06-25 03:23:54,730 INFO o.a.j.r.d.HtmlTemplateExporter: Report will be generated in: /work/outputs/jmeter/prod-smoke-auth9/report, creating folder structure
+2026-06-25 03:23:54,740 INFO o.a.j.r.d.TemplateVisitor: Copying folder from '/opt/apache-jmeter-5.5/bin/report-template' to '/work/outputs/jmeter/prod-smoke-auth9/report', got message: /work/outputs/jmeter/prod-smoke-auth9/report, found non empty folder with following content [/work/outputs/jmeter/prod-smoke-auth9/report/statistics.json], will be ignored
+2026-06-25 03:23:56,173 INFO o.a.j.JMeter: Dashboard generated

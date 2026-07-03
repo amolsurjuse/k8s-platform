@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783031871269,1989,Idle fee charging journey,500,javax.script.ScriptException: javax.net.ssl.SSLHandshakeException: (handshake_failure) Received fatal alert: handshake_failure,Idle-fee driver journeys 1-1,text,false,,59,0,1,1,null,0,0,0

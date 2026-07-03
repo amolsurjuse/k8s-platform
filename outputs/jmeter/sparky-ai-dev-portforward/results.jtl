@@ -1,0 +1,19 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1782410852705,18537,Sparky AI prompt regression,500,"javax.script.ScriptException: java.lang.IllegalStateException: prompt 'already active connector' answer missing 'charger EH-SFO-CHG-001'. Answer=I checked charger: EH-SFO-CHG-001 | connector: CON-SFO-001 | location: US*EHB*LOC*SFO001.
+
+That response means ElectraHub sees a session already in progress for this connector.
+
+If this is your session, stay on the charging screen and wait for live updates. If the charger is not physically charging after about 30 seconds, stop and retry from a different available connector.
+
+Live backend checks:
+- wallet balance is USD 0
+- wallet budget is USD 120
+- saved payment cards: 0
+- auto top-up: disabled
+- OCPP connection active=true, localConnected=true, databaseActive=true
+- last OCPP heartbeat was 1m ago at 2026-06-25T18:06:46.374180Z
+- no recent OCPP messages were found for EH-SFO-CHG-001
+
+Checks I could not complete:
+- active session lookup was not reachable
+- charger status lookup was not reachable",Sparky prompt matrix 1-1,text,false,,0,0,1,1,null,0,0,0

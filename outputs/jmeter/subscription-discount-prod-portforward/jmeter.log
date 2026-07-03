@@ -1,0 +1,244 @@
+2026-07-03 00:57:03,557 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-07-03 00:57:03,581 INFO o.a.j.JMeter: Loading user properties from: /opt/apache-jmeter-5.6.3/bin/user.properties
+2026-07-03 00:57:03,583 INFO o.a.j.JMeter: Loading system properties from: /opt/apache-jmeter-5.6.3/bin/system.properties
+2026-07-03 00:57:03,584 INFO o.a.j.JMeter: Setting JMeter property: base_url=http://host.docker.internal:19093
+2026-07-03 00:57:03,584 INFO o.a.j.JMeter: Setting JMeter property: charger_country_code=US
+2026-07-03 00:57:03,585 INFO o.a.j.JMeter: Setting JMeter property: dynamic_connector_selection=true
+2026-07-03 00:57:03,586 INFO o.a.j.JMeter: Setting JMeter property: users=1
+2026-07-03 00:57:03,586 INFO o.a.j.JMeter: Setting JMeter property: ramp_seconds=1
+2026-07-03 00:57:03,587 INFO o.a.j.JMeter: Setting JMeter property: hold_seconds=15
+2026-07-03 00:57:03,588 INFO o.a.j.JMeter: Setting JMeter property: sse_seconds=15
+2026-07-03 00:57:03,588 INFO o.a.j.JMeter: Setting JMeter property: run_id=subscription-discount-prod-portforward
+2026-07-03 00:57:03,593 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
+2026-07-03 00:57:03,594 INFO o.a.j.JMeter: Version 5.6.3
+2026-07-03 00:57:03,594 INFO o.a.j.JMeter: java.version=17.0.19
+2026-07-03 00:57:03,595 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-07-03 00:57:03,596 INFO o.a.j.JMeter: os.name=Linux
+2026-07-03 00:57:03,596 INFO o.a.j.JMeter: os.arch=amd64
+2026-07-03 00:57:03,597 INFO o.a.j.JMeter: os.version=6.18.33.1-microsoft-standard-WSL2
+2026-07-03 00:57:03,597 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-07-03 00:57:03,598 INFO o.a.j.JMeter: java.awt.headless=true
+2026-07-03 00:57:03,598 INFO o.a.j.JMeter: Max memory     =1073741824
+2026-07-03 00:57:03,599 INFO o.a.j.JMeter: Available Processors =16
+2026-07-03 00:57:03,608 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-07-03 00:57:03,609 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-07-03 00:57:03,610 INFO o.a.j.JMeter: JMeterHome=/opt/apache-jmeter-5.6.3
+2026-07-03 00:57:03,611 INFO o.a.j.JMeter: user.dir  =/work
+2026-07-03 00:57:03,611 INFO o.a.j.JMeter: PWD       =/work
+2026-07-03 00:57:03,612 INFO o.a.j.JMeter: IP: 172.17.0.37 Name: 13648de40a70 FullName: 13648de40a70
+2026-07-03 00:57:03,639 INFO o.a.j.s.FileServer: Default base='/work'
+2026-07-03 00:57:03,642 INFO o.a.j.s.FileServer: Set new base='/work/scripts/jmeter'
+2026-07-03 00:57:03,824 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-07-03 00:57:03,849 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-07-03 00:57:03,852 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-07-03 00:57:03,856 INFO o.a.j.s.SaveService: Loading file: scripts/jmeter/07-subscription-discount-charging-flow.jmx
+2026-07-03 00:57:03,941 INFO o.a.j.JMeter: Creating summariser <summary>
+2026-07-03 00:57:03,959 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-07-03 00:57:03,960 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-03 00:57:03,961 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-07-03 00:57:03,965 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-07-03 00:57:03,965 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-07-03 00:57:04,235 INFO o.a.j.JMeter: Running test (1783040224235)
+2026-07-03 00:57:04,253 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Subscription-discount driver journeys
+2026-07-03 00:57:04,254 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Subscription-discount driver journeys.
+2026-07-03 00:57:04,255 INFO o.a.j.e.StandardJMeterEngine: Test will stop on error
+2026-07-03 00:57:04,256 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=1 ramp-up=1 delayedStart=false
+2026-07-03 00:57:04,260 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-07-03 00:57:04,260 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-07-03 00:57:04,265 INFO o.a.j.t.JMeterThread: Thread started: Subscription-discount driver journeys 1-1
+2026-07-03 00:57:04,273 INFO o.a.j.s.FileServer: Stored: scripts/jmeter/data/connectors-100.csv
+2026-07-03 00:57:04,307 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-07-03 00:57:04,308 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
+2026-07-03 00:57:04,308 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-07-03 00:57:04,309 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-07-03 00:57:05,606 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=register
+2026-07-03 00:57:05,840 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /auth/api/auth/register status=200 elapsedMs=191
+2026-07-03 00:57:05,856 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] registered uid=01b702a1-26ce-4ab9-9f3c-afe64e72f99f
+2026-07-03 00:57:05,885 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=payment state before setup
+2026-07-03 00:57:05,899 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /payment/api/v1/payment/state status=451 elapsedMs=12
+2026-07-03 00:57:05,901 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=accept terms
+2026-07-03 00:57:05,926 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /auth/api/terms/accept status=201 elapsedMs=24
+2026-07-03 00:57:05,934 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] accepted terms; refreshing token through login
+2026-07-03 00:57:05,935 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=login
+2026-07-03 00:57:06,036 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /auth/api/auth/login status=200 elapsedMs=99
+2026-07-03 00:57:06,037 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] logged in uid=01b702a1-26ce-4ab9-9f3c-afe64e72f99f
+2026-07-03 00:57:06,039 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=payment state after terms
+2026-07-03 00:57:06,054 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=15
+2026-07-03 00:57:06,055 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=add card
+2026-07-03 00:57:06,070 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /payment/api/v1/payment/cards status=201 elapsedMs=13
+2026-07-03 00:57:06,072 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=wallet topup
+2026-07-03 00:57:06,090 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /payment/api/v1/payment/wallet/topups status=201 elapsedMs=16
+2026-07-03 00:57:06,091 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=payment state after setup
+2026-07-03 00:57:06,104 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=12
+2026-07-03 00:57:06,106 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] payment ready wallet=120.00
+2026-07-03 00:57:06,108 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=charger graphql list
+2026-07-03 00:57:06,221 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /charger/graphql status=200 elapsedMs=110
+2026-07-03 00:57:06,242 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] selected available connector EH-US-CHG-0001/CON-US-0001 location=US*EHB*LOC*USA001 candidate=1/90
+2026-07-03 00:57:06,244 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=charger graphql view
+2026-07-03 00:57:06,302 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /charger/graphql status=200 elapsedMs=57
+2026-07-03 00:57:06,304 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=payment state before start
+2026-07-03 00:57:06,316 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /payment/api/v1/payment/state status=200 elapsedMs=11
+2026-07-03 00:57:06,322 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=start charging attempt 1
+2026-07-03 00:57:07,600 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /session/api/v1/sessions/start status=201 elapsedMs=1275
+2026-07-03 00:57:07,601 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] started session=ef111ff8-d6f6-4978-8ca0-af34052a1d75 charger=EH-US-CHG-0001/CON-US-0001 status=PREPARING remote=Accepted attempt=1/90
+2026-07-03 00:57:07,602 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:57:08,303 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=700
+2026-07-03 00:57:25,258 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] sse ok connected=1 snapshot=2 updates=17 receipts=0 heartbeats=0
+2026-07-03 00:57:25,261 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:57:26,261 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=999
+2026-07-03 00:57:26,266 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] active session predicate ok subscription discount active price session=ef111ff8-d6f6-4978-8ca0-af34052a1d75
+2026-07-03 00:57:26,267 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] subscription discount active session=ef111ff8-d6f6-4978-8ca0-af34052a1d75 regular=1.4027 discounted=1.1222 discount=0.2805 plan=NEW_USER_20_OFF_500KWH_1Y
+2026-07-03 00:57:26,268 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=stop charging session
+2026-07-03 00:57:29,699 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http POST /session/api/v1/sessions/ef111ff8-d6f6-4978-8ca0-af34052a1d75/stop status=204 elapsedMs=3429
+2026-07-03 00:57:29,700 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] stop requested session=ef111ff8-d6f6-4978-8ca0-af34052a1d75
+2026-07-03 00:57:29,701 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:57:30,699 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=997
+2026-07-03 00:57:35,701 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:57:36,740 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1038
+2026-07-03 00:57:41,743 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:57:41,779 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=35
+2026-07-03 00:57:46,781 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:57:47,813 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1031
+2026-07-03 00:57:52,816 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:57:53,852 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1034
+2026-07-03 00:57:58,854 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:02,318 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=3461
+2026-07-03 00:58:07,319 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:08,361 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1041
+2026-07-03 00:58:13,363 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:14,392 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1028
+2026-07-03 00:58:19,394 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:20,428 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1032
+2026-07-03 00:58:25,430 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:26,456 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1023
+2026-07-03 00:58:31,457 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:34,875 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=3417
+2026-07-03 00:58:39,876 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:39,914 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=36
+2026-07-03 00:58:44,916 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:44,954 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=37
+2026-07-03 00:58:49,955 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:50,988 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1032
+2026-07-03 00:58:55,991 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:58:57,018 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1026
+2026-07-03 00:59:02,019 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:59:03,054 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1033
+2026-07-03 00:59:10,424 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:59:11,464 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1039
+2026-07-03 00:59:16,466 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:59:17,557 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1090
+2026-07-03 00:59:22,558 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:59:23,561 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=1001
+2026-07-03 00:59:28,563 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] step=active sessions
+2026-07-03 00:59:28,609 INFO o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] http GET /session/api/v1/sessions/active status=200 elapsedMs=45
+2026-07-03 00:59:33,614 ERROR o.a.j.p.j.s.J.Subscription discount charging journey: [electrahub-jmeter][subscription-discount][001] failed
+java.lang.IllegalStateException: session ef111ff8-d6f6-4978-8ca0-af34052a1d75 still appears in /sessions/active after stop
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:72) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.reflection.CachedConstructor.doConstructorInvoke(CachedConstructor.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrap.callConstructor(ConstructorSite.java:84) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:263) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:277) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure24.doCall(Script1.groovy:612) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:157) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure25.doCall(Script1.groovy:650) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) [groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) [groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:148) [groovy-3.0.20.jar:3.0.20]
+	at Script1.run(Script1.groovy:699) [script:?]
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:317) [groovy-jsr223-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.jsr223.GroovyCompiledScript.eval(GroovyCompiledScript.java:71) [groovy-jsr223-3.0.20.jar:3.0.20]
+	at java.scripting/javax.script.CompiledScript.eval(Unknown Source) [java.scripting:?]
+	at org.apache.jmeter.util.JSR223TestElement.processFileOrScript(JSR223TestElement.java:216) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.protocol.java.sampler.JSR223Sampler.sample(JSR223Sampler.java:72) [ApacheJMeter_java.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.doSampling(JMeterThread.java:651) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.executeSamplePackage(JMeterThread.java:570) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.processSampler(JMeterThread.java:501) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.run(JMeterThread.java:268) [ApacheJMeter_core.jar:5.6.3]
+	at java.base/java.lang.Thread.run(Unknown Source) [?:?]
+2026-07-03 00:59:33,618 ERROR o.a.j.p.j.s.JSR223Sampler: Problem in JSR223 script Subscription discount charging journey, message: javax.script.ScriptException: java.lang.IllegalStateException: session ef111ff8-d6f6-4978-8ca0-af34052a1d75 still appears in /sessions/active after stop
+javax.script.ScriptException: java.lang.IllegalStateException: session ef111ff8-d6f6-4978-8ca0-af34052a1d75 still appears in /sessions/active after stop
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:320) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.jsr223.GroovyCompiledScript.eval(GroovyCompiledScript.java:71) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	at java.scripting/javax.script.CompiledScript.eval(Unknown Source) ~[java.scripting:?]
+	at org.apache.jmeter.util.JSR223TestElement.processFileOrScript(JSR223TestElement.java:216) ~[ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.protocol.java.sampler.JSR223Sampler.sample(JSR223Sampler.java:72) [ApacheJMeter_java.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.doSampling(JMeterThread.java:651) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.executeSamplePackage(JMeterThread.java:570) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.processSampler(JMeterThread.java:501) [ApacheJMeter_core.jar:5.6.3]
+	at org.apache.jmeter.threads.JMeterThread.run(JMeterThread.java:268) [ApacheJMeter_core.jar:5.6.3]
+	at java.base/java.lang.Thread.run(Unknown Source) [?:?]
+Caused by: java.lang.IllegalStateException: session ef111ff8-d6f6-4978-8ca0-af34052a1d75 still appears in /sessions/active after stop
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:72) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.reflection.CachedConstructor.doConstructorInvoke(CachedConstructor.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrap.callConstructor(ConstructorSite.java:84) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:59) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:263) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:277) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure24.doCall(Script1.groovy:612) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:157) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1$_run_closure25.doCall(Script1.groovy:650) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[?:?]
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274) ~[groovy-3.0.20.jar:3.0.20]
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1030) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:38) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125) ~[groovy-3.0.20.jar:3.0.20]
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:148) ~[groovy-3.0.20.jar:3.0.20]
+	at Script1.run(Script1.groovy:699) ~[?:?]
+	at org.codehaus.groovy.jsr223.GroovyScriptEngineImpl.eval(GroovyScriptEngineImpl.java:317) ~[groovy-jsr223-3.0.20.jar:3.0.20]
+	... 9 more
+2026-07-03 00:59:33,622 INFO o.a.j.r.Summariser: summary +      1 in 00:02:29 =    0.0/s Avg: 139707 Min: 139707 Max: 139707 Err:     1 (100.00%) Active: 1 Started: 1 Finished: 0
+2026-07-03 00:59:33,623 INFO o.a.j.t.JMeterThread: Shutdown Test detected by thread: Subscription-discount driver journeys 1-1
+2026-07-03 00:59:33,625 INFO o.a.j.t.JMeterThread: Thread is done: Subscription-discount driver journeys 1-1
+2026-07-03 00:59:33,626 INFO o.a.j.t.JMeterThread: Thread finished: Subscription-discount driver journeys 1-1
+2026-07-03 00:59:33,625 INFO o.a.j.t.JMeterThread: Stopping: Subscription-discount driver journeys 1-1
+2026-07-03 00:59:33,627 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2026-07-03 00:59:33,628 INFO o.a.j.s.FileServer: Close: scripts/jmeter/data/connectors-100.csv
+2026-07-03 00:59:33,636 INFO o.a.j.r.Summariser: summary =      1 in 00:02:29 =    0.0/s Avg: 139707 Min: 139707 Max: 139707 Err:     1 (100.00%)

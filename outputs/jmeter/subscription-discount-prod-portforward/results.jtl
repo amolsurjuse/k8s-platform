@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783040224311,139707,Subscription discount charging journey,500,javax.script.ScriptException: java.lang.IllegalStateException: session ef111ff8-d6f6-4978-8ca0-af34052a1d75 still appears in /sessions/active after stop,Subscription-discount driver journeys 1-1,text,false,,89,0,1,1,null,0,0,0
