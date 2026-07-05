@@ -24,6 +24,7 @@ config:
     KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
     SESSION_ANALYTICS_KAFKA_ENABLED: "false"
     SESSION_ANALYTICS_RECEIPT_TOPIC: "eh.charging.receipt.generated.v1"
+    SIMULATOR_PUBLIC_URL: "https://ocpp-simulator.electrahub.net/ocpp-simulator-ui/"
     SERVER_TOMCAT_THREADS_MAX: "96"
     SERVER_TOMCAT_THREADS_MIN_SPARE: "16"
     SERVER_TOMCAT_ACCEPT_COUNT: "100"
