@@ -452,17 +452,16 @@ def create_source_build_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     elif cfg.build_kind == "go":
         create_script_step(tc, cfg, "Go Test", cfg.test_command or "go test ./...")
     elif cfg.build_kind == "node":
-        node_commands = sh_single_quote(f"""node --version
+        node_commands = sh_single_quote(f"""mkdir -p /workspace
+tar -xf - -C /workspace
+cd /workspace
+node --version
 npm --version
 {cfg.npm_install_command}
 {cfg.build_command}""")
         script = f"""set -eu
 cd "{cfg.app_dir}"
-docker run --rm \
-  -v "$PWD":/workspace \
-  -w /workspace \
-  "{cfg.node_image}" \
-  sh -lc {node_commands}
+tar --exclude=.git --exclude=node_modules --exclude=dist -cf - . | docker run --rm -i "{cfg.node_image}" sh -lc {node_commands}
 """
         create_script_step(tc, cfg, "Node Build", script)
     elif cfg.build_kind == "docker":
