@@ -367,14 +367,47 @@ def set_parameters(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     print("Set build parameters")
 
 
+def agent_requirement_properties(requirement: dict[str, Any]) -> dict[str, str]:
+    properties = requirement.get("properties", {}).get("property", [])
+    return {str(prop.get("name")): str(prop.get("value", "")) for prop in properties}
+
+
+def agent_requirement_matches_agent_name(requirement: dict[str, Any], agent_name: str) -> bool:
+    props = agent_requirement_properties(requirement)
+    return (
+        requirement.get("type") == "equals"
+        and props.get("property-name") == "system.agent.name"
+        and props.get("property-value") == agent_name
+    )
+
+
+def clear_agent_requirements(tc: TeamCityClient, cfg: PipelineConfig, requirements: dict[str, Any]) -> None:
+    agent_requirements = requirements.get("agent-requirement", [])
+    if not agent_requirements and int(requirements.get("count", 0)) > 0:
+        raise RuntimeError(
+            f"TeamCity reported {requirements.get('count')} agent requirement(s), but returned no ids to delete"
+        )
+    for requirement in agent_requirements:
+        requirement_id = requirement.get("id")
+        if requirement_id:
+            tc.request(
+                "DELETE",
+                f"/app/rest/buildTypes/id:{cfg.build_type_id}/agent-requirements/{urllib.parse.quote(requirement_id)}",
+            )
+            print(f"Deleted agent requirement: {requirement_id}")
+
+
 def ensure_agent_requirement(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     if not cfg.agent_name:
         print("Skipped agent requirement")
         return
     requirements = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}/agent-requirements")
-    if int(requirements.get("count", 0)) > 0:
+    agent_requirements = requirements.get("agent-requirement", [])
+    if len(agent_requirements) == 1 and agent_requirement_matches_agent_name(agent_requirements[0], cfg.agent_name):
         print("Agent requirement already configured")
         return
+    if int(requirements.get("count", 0)) > 0:
+        clear_agent_requirements(tc, cfg, requirements)
     tc.request("POST", f"/app/rest/buildTypes/id:{cfg.build_type_id}/agent-requirements", {
         "type": "equals",
         "properties": {"property": [
@@ -655,14 +688,19 @@ def clear_steps(tc: TeamCityClient, cfg: PipelineConfig) -> None:
 
 def create_steps_if_empty(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     build_type = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}")
+    replaced_existing_steps = False
     if int(build_type.get("steps", {}).get("count", 0)) > 0:
         if cfg.build_kind == "jmeter":
             clear_steps(tc, cfg)
             create_jmeter_regression_step(tc, cfg)
             print("Replaced JMeter regression step")
             return
-        print("Build steps already configured")
-        return
+        if cfg.build_kind == "node":
+            clear_steps(tc, cfg)
+            replaced_existing_steps = True
+        else:
+            print("Build steps already configured")
+            return
 
     if cfg.build_kind == "jmeter":
         create_jmeter_regression_step(tc, cfg)
@@ -720,7 +758,10 @@ docker buildx imagetools inspect "{cfg.docker_image}:%build.number%"
             ]},
         })
     create_script_step(tc, cfg, "Update build version", update_version_script(cfg))
-    print("Created build steps")
+    if replaced_existing_steps:
+        print("Replaced Node build steps")
+    else:
+        print("Created build steps")
 
 
 def ensure_trigger(tc: TeamCityClient, cfg: PipelineConfig) -> None:
