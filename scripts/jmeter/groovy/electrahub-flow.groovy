@@ -578,8 +578,8 @@ def sendSimulatorChargingStop = {
       forwardOcpp: true
     ])
   }
-  if ((response.status as int) == 404 && String.valueOf(response.body ?: '').toLowerCase(Locale.ROOT).contains('transaction not found')) {
-    logLine("simulator charging stop had no active transaction; falling back to OCPP Available unplug signal charger=${chargerId} connectorNumber=${number}")
+  if ((response.status as int) == 404) {
+    logLine("simulator charging stop returned 404; falling back to OCPP Available unplug signal charger=${chargerId} connectorNumber=${number} body=${response.body}")
     sendSimulatorStatus('Available')
     if ((props.getProperty('allow_backend_ocpp_status_fallback', 'false') as String).toBoolean()) {
       sendBackendOcppStatus('Available')

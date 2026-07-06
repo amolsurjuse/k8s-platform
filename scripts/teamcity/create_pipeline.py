@@ -526,6 +526,7 @@ CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -Jconnector_start_attempts="%regression.connector.start.attempts%" \
   -Jrequest_timeout_ms="%regression.request.timeout.ms%" \
   -Jsession_command_timeout_ms="%regression.session.command.timeout.ms%" \
+  -Jallow_backend_ocpp_status_fallback="true" \
   -Jrun_id="tc-%build.number%" \
   -Jjmeter.save.saveservice.output_format=csv \
   -Jjmeter.save.saveservice.print_field_names=true \
