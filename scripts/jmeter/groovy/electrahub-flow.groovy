@@ -639,11 +639,22 @@ def stopSession = { String token, String sessionId ->
 def validateStoppedAndReceipt = { String token, String sessionId, boolean expectSubscriptionDiscount = false ->
   long deadline = System.currentTimeMillis() + 120000L
   boolean goneFromActive = false
+  boolean unplugRequested = false
   while (System.currentTimeMillis() < deadline) {
     def active = activeSession(token)
-    if (!active.body.contains(sessionId)) {
+    def sessions = active.json instanceof List ? active.json : []
+    def activeMatch = sessions.find { String.valueOf(it.id ?: '') == sessionId }
+    if (activeMatch == null) {
       goneFromActive = true
       break
+    }
+    if (!unplugRequested &&
+      activeMatch.idleFeeEnabled == true &&
+      activeMatch.unplugRequiredToStop == true &&
+      String.valueOf(activeMatch.status ?: '').equalsIgnoreCase('SUSPENDED')) {
+      logLine("session ${sessionId} is idle-fee protected after remote stop; simulating physical unplug before receipt validation")
+      sendSimulatorChargingStop()
+      unplugRequested = true
     }
     sleep(5000)
   }
