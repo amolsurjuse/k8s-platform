@@ -711,7 +711,7 @@ def create_steps_if_empty(tc: TeamCityClient, cfg: PipelineConfig) -> None:
             create_jmeter_regression_step(tc, cfg)
             print("Replaced JMeter regression step")
             return
-        if cfg.build_kind == "node":
+        if cfg.build_kind in ("go", "node"):
             clear_steps(tc, cfg)
             replaced_existing_steps = True
         else:
@@ -775,7 +775,7 @@ docker buildx imagetools inspect "{cfg.docker_image}:%build.number%"
         })
     create_script_step(tc, cfg, "Update build version", update_version_script(cfg))
     if replaced_existing_steps:
-        print("Replaced Node build steps")
+        print(f"Replaced {cfg.build_kind} build steps")
     else:
         print("Created build steps")
 

@@ -15,7 +15,7 @@
       "dockerContext": ".",
       "dockerUseBuildx": true,
       "dockerPlatforms": "linux/amd64,linux/arm64",
-      "testCommand": "go test ./...",
+      "testCommand": "set -eu\ntar --exclude=.git -cf - . | docker run --rm -i golang:1.22-bookworm sh -lc 'mkdir -p /workspace && tar -xf - -C /workspace && cd /workspace && go version && go test ./...'",
       "agentName": "",
       "addVcsTrigger": false,
       "deployVersionFile": "charts/config/services/ocpp-simulator/us/version/dev-version.yaml"
