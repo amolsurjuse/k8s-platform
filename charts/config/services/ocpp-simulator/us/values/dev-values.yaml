@@ -34,7 +34,8 @@ metrics:
     enabled: false
 
 extraIngresses:
-  - fullname: ocpp-simulator-api
+  - name: api
+    fullname: ocpp-simulator-api
     className: "nginx"
     annotations:
       nginx.ingress.kubernetes.io/use-regex: "true"
