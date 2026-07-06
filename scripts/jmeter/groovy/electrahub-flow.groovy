@@ -112,73 +112,95 @@ def readCsvConnectorCandidates = {
 }
 
 def request = { String method, String path, Object body = null, String token = null, int timeoutMs = requestTimeoutMs ->
-  URL url = new URL("${baseUrl}${path}")
-  HttpURLConnection conn = (HttpURLConnection) url.openConnection()
-  conn.setRequestMethod(method)
-  conn.setConnectTimeout(timeoutMs)
-  conn.setReadTimeout(timeoutMs)
-  conn.setRequestProperty('Accept', 'application/json')
-  conn.setRequestProperty('User-Agent', 'ElectraHubRegression/1.0')
-  conn.setRequestProperty('X-ElectraHub-Test-Run', runId)
-  if (requestHostHeader) {
-    conn.setRequestProperty('Host', requestHostHeader)
-  }
-  if (token) {
-    conn.setRequestProperty('Authorization', "Bearer ${token}")
-  }
-  if (body != null) {
-    conn.setDoOutput(true)
-    conn.setRequestProperty('Content-Type', 'application/json')
-    byte[] bytes = json(body).getBytes(StandardCharsets.UTF_8)
-    conn.setRequestProperty('Content-Length', String.valueOf(bytes.length))
-    conn.outputStream.withCloseable { it.write(bytes) }
-  }
+  int attempts = (method == 'GET' || path == '/charger/graphql') ? 3 : 1
+  Throwable lastError = null
+  for (int attempt = 1; attempt <= attempts; attempt++) {
+    URL url = new URL("${baseUrl}${path}")
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection()
+    conn.setRequestMethod(method)
+    conn.setConnectTimeout(timeoutMs)
+    conn.setReadTimeout(timeoutMs)
+    conn.setRequestProperty('Accept', 'application/json')
+    conn.setRequestProperty('User-Agent', 'ElectraHubRegression/1.0')
+    conn.setRequestProperty('X-ElectraHub-Test-Run', runId)
+    if (requestHostHeader) {
+      conn.setRequestProperty('Host', requestHostHeader)
+    }
+    if (token) {
+      conn.setRequestProperty('Authorization', "Bearer ${token}")
+    }
+    if (body != null) {
+      conn.setDoOutput(true)
+      conn.setRequestProperty('Content-Type', 'application/json')
+      byte[] bytes = json(body).getBytes(StandardCharsets.UTF_8)
+      conn.setRequestProperty('Content-Length', String.valueOf(bytes.length))
+      conn.outputStream.withCloseable { it.write(bytes) }
+    }
 
-  try {
-    long started = System.currentTimeMillis()
-    int status = conn.responseCode
-    InputStream stream = status >= 400 ? conn.errorStream : conn.inputStream
-    String responseBody = stream == null ? '' : stream.getText('UTF-8')
-    long elapsed = System.currentTimeMillis() - started
-    logLine("http ${method} ${path} status=${status} elapsedMs=${elapsed}")
-    [status: status, body: responseBody, json: parseJson(responseBody)]
-  } catch (SocketTimeoutException timeout) {
-    throw new SocketTimeoutException("step=${currentStep} ${method} ${path} timed out after ${timeoutMs}ms")
-  } finally {
-    conn.disconnect()
+    try {
+      long started = System.currentTimeMillis()
+      int status = conn.responseCode
+      InputStream stream = status >= 400 ? conn.errorStream : conn.inputStream
+      String responseBody = stream == null ? '' : stream.getText('UTF-8')
+      long elapsed = System.currentTimeMillis() - started
+      logLine("http ${method} ${path} status=${status} elapsedMs=${elapsed}")
+      return [status: status, body: responseBody, json: parseJson(responseBody)]
+    } catch (SocketTimeoutException timeout) {
+      lastError = new SocketTimeoutException("step=${currentStep} ${method} ${path} timed out after ${timeoutMs}ms")
+    } catch (IOException ioe) {
+      lastError = ioe
+    } finally {
+      conn.disconnect()
+    }
+    if (attempt < attempts) {
+      logLine("http ${method} ${path} transient failure attempt=${attempt}/${attempts}: ${lastError.message ?: lastError.class.name}; retrying")
+      sleep(500L * attempt)
+    }
   }
+  throw lastError
 }
 
 def simulatorRequest = { String method, String path, Object body = null, int timeoutMs = requestTimeoutMs ->
-  URL url = new URL("${simulatorUrl}${path}")
-  HttpURLConnection conn = (HttpURLConnection) url.openConnection()
-  conn.setRequestMethod(method)
-  conn.setConnectTimeout(timeoutMs)
-  conn.setReadTimeout(timeoutMs)
-  conn.setRequestProperty('Accept', 'application/json')
-  conn.setRequestProperty('User-Agent', 'ElectraHubRegression/1.0')
-  conn.setRequestProperty('X-ElectraHub-Test-Run', runId)
-  if (body != null) {
-    conn.setDoOutput(true)
-    conn.setRequestProperty('Content-Type', 'application/json')
-    byte[] bytes = json(body).getBytes(StandardCharsets.UTF_8)
-    conn.setRequestProperty('Content-Length', String.valueOf(bytes.length))
-    conn.outputStream.withCloseable { it.write(bytes) }
-  }
+  int attempts = 3
+  Throwable lastError = null
+  for (int attempt = 1; attempt <= attempts; attempt++) {
+    URL url = new URL("${simulatorUrl}${path}")
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection()
+    conn.setRequestMethod(method)
+    conn.setConnectTimeout(timeoutMs)
+    conn.setReadTimeout(timeoutMs)
+    conn.setRequestProperty('Accept', 'application/json')
+    conn.setRequestProperty('User-Agent', 'ElectraHubRegression/1.0')
+    conn.setRequestProperty('X-ElectraHub-Test-Run', runId)
+    if (body != null) {
+      conn.setDoOutput(true)
+      conn.setRequestProperty('Content-Type', 'application/json')
+      byte[] bytes = json(body).getBytes(StandardCharsets.UTF_8)
+      conn.setRequestProperty('Content-Length', String.valueOf(bytes.length))
+      conn.outputStream.withCloseable { it.write(bytes) }
+    }
 
-  try {
-    long started = System.currentTimeMillis()
-    int status = conn.responseCode
-    InputStream stream = status >= 400 ? conn.errorStream : conn.inputStream
-    String responseBody = stream == null ? '' : stream.getText('UTF-8')
-    long elapsed = System.currentTimeMillis() - started
-    logLine("simulator ${method} ${path} status=${status} elapsedMs=${elapsed}")
-    [status: status, body: responseBody, json: parseJson(responseBody)]
-  } catch (SocketTimeoutException timeout) {
-    throw new SocketTimeoutException("step=${currentStep} simulator ${method} ${path} timed out after ${timeoutMs}ms")
-  } finally {
-    conn.disconnect()
+    try {
+      long started = System.currentTimeMillis()
+      int status = conn.responseCode
+      InputStream stream = status >= 400 ? conn.errorStream : conn.inputStream
+      String responseBody = stream == null ? '' : stream.getText('UTF-8')
+      long elapsed = System.currentTimeMillis() - started
+      logLine("simulator ${method} ${path} status=${status} elapsedMs=${elapsed}")
+      return [status: status, body: responseBody, json: parseJson(responseBody)]
+    } catch (SocketTimeoutException timeout) {
+      lastError = new SocketTimeoutException("step=${currentStep} simulator ${method} ${path} timed out after ${timeoutMs}ms")
+    } catch (IOException ioe) {
+      lastError = ioe
+    } finally {
+      conn.disconnect()
+    }
+    if (attempt < attempts) {
+      logLine("simulator ${method} ${path} transient failure attempt=${attempt}/${attempts}: ${lastError.message ?: lastError.class.name}; retrying")
+      sleep(500L * attempt)
+    }
   }
+  throw lastError
 }
 
 def requireStatus = { Map response, List<Integer> statuses, String step ->
