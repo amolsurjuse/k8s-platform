@@ -543,9 +543,9 @@ if [ "$status" -ne 0 ]; then
   exit "$status"
 fi
 
-if awk -F, 'NR==1 { for (i=1; i<=NF; i++) if ($i == "success") success=i; next } success && $success == "false" { found=1 } END { exit found ? 0 : 1 }' "$JTL"; then
+if grep -q ',false,' "$JTL"; then
   echo "JMeter assertions failed. See jmeter-results/electrahub-regression.jtl and jmeter-report/index.html."
-  awk -F, 'NR==1 { for (i=1; i<=NF; i++) { if ($i == "label") label=i; if ($i == "responseMessage") msg=i; if ($i == "success") success=i } next } success && $success == "false" { print "FAILED: " $label " - " $msg }' "$JTL" | head -20 || true
+  grep ',false,' "$JTL" | head -20 | sed 's/^/FAILED: /' || true
   exit 1
 fi
 

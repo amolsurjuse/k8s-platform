@@ -315,6 +315,18 @@ def discoverChargers = { String token ->
 
   if (dynamicConnectorSelection) {
     def chargers = list.json?.data?.ocpiChargers ?: []
+    def activePairs = [] as Set
+    def activeBeforeSelection = requireStatus(atStep('active sessions before connector selection') {
+      request('GET', '/session/api/v1/sessions/active', null, token)
+    }, [200], 'active sessions before connector selection')
+    def activeSessions = activeBeforeSelection.json instanceof List ? activeBeforeSelection.json : []
+    for (def session : activeSessions) {
+      String activeChargerId = String.valueOf(session.simulator?.chargerId ?: session.chargerId ?: '')
+      String activeConnectorId = String.valueOf(session.simulator?.connectorId ?: session.connectorId ?: '')
+      if (activeChargerId && activeConnectorId) {
+        activePairs << "${activeChargerId}/${activeConnectorId}"
+      }
+    }
     def candidates = []
     for (def charger : chargers) {
       if (String.valueOf(charger.status ?: '').equalsIgnoreCase('OFFLINE')) continue
@@ -323,12 +335,14 @@ def discoverChargers = { String token ->
           String connectorStatus = String.valueOf(connector.status ?: '')
           boolean connectorAvailable = connector.available == true || connectorStatus.equalsIgnoreCase('AVAILABLE')
           boolean idleFeeOk = action != 'idle-fee' || charger.pricing?.idleFee?.enabled == true
-          if (connectorAvailable && idleFeeOk) {
+          boolean notAlreadyActive = !activePairs.contains("${charger.chargerId ?: ''}/${connector.id ?: ''}")
+          if (connectorAvailable && idleFeeOk && notAlreadyActive) {
             candidates << [charger: charger, connector: connector]
           }
         }
       }
     }
+    logLine("dynamic connector selection candidates=${candidates.size()} activePairs=${activePairs.size()}")
     candidates.sort { left, right ->
       String leftKey = "${left.charger.chargerId ?: ''}/${left.connector.id ?: ''}"
       String rightKey = "${right.charger.chargerId ?: ''}/${right.connector.id ?: ''}"

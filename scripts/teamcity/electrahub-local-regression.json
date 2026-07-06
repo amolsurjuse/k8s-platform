@@ -20,7 +20,7 @@
   "regressionSseSeconds": "60",
   "regressionHostHeader": "",
   "regressionDynamicConnectorSelection": "true",
-  "regressionConnectorStartAttempts": "12",
+  "regressionConnectorStartAttempts": "100",
   "regressionRequestTimeoutMs": "120000",
   "regressionSessionCommandTimeoutMs": "180000"
 }
