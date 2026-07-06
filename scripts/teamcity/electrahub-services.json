@@ -206,10 +206,10 @@
       "projectId": "Amy_OcppSimulatorUi",
       "buildTypeId": "Amy_OcppSimulatorUi_Build",
       "vcsRootId": "Amy_OcppSimulator_HttpsGithubComAmolsurjuseOcpiSimulatorRefsHeadsDevelop",
-      "gitUrl": "https://github.com/amolsurjuse/ocpi-simulator-ui.git",
+      "gitUrl": "https://github.com/amolsurjuse/ocpi-simulator.git",
       "gitBranch": "develop",
-      "appDir": ".",
-      "buildCommand": "npm run build -- --configuration production --base-href /ocpp-simulator-ui/",
+      "appDir": "ui",
+      "buildCommand": "npm run build -- --configuration production --base-href /",
       "dockerImage": "amolsurjuse/ocpi-simulator-ui",
       "agentName": "teamcity-agent-node",
       "deployVersionFile": "charts/config/services/ocpp-simulator-ui/us/version/dev-version.yaml"
