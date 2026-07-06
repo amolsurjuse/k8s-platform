@@ -323,6 +323,25 @@ def discoverChargers = { String token ->
   if (dynamicConnectorSelection) {
     def chargers = list.json?.data?.ocpiChargers ?: []
     def activePairs = [] as Set
+    def simulatorAvailablePairs = [] as Set
+    def simulatorInventory = simulatorRequest('GET', '/api/v1/chargers?limit=1000', null, requestTimeoutMs)
+    if ((simulatorInventory.status as int) == 200) {
+      def simulatorChargers = simulatorInventory.json?.items instanceof List ? simulatorInventory.json.items : []
+      for (def simulatorCharger : simulatorChargers) {
+        String simulatorChargerId = String.valueOf(simulatorCharger.chargerId ?: '')
+        for (def summary : (simulatorCharger.connectorSummary ?: [])) {
+          String simulatorConnectorRef = String.valueOf(summary.connectorRef ?: '')
+          String simulatorStatus = String.valueOf(summary.status ?: '')
+          boolean simulatorAvailable = simulatorStatus.equalsIgnoreCase('AVAILABLE') || simulatorStatus.equalsIgnoreCase('PREPARING')
+          if (simulatorChargerId && simulatorConnectorRef && simulatorAvailable) {
+            simulatorAvailablePairs << "${simulatorChargerId}/${simulatorConnectorRef}"
+          }
+        }
+      }
+      logLine("simulator available connector refs=${simulatorAvailablePairs.size()}")
+    } else {
+      logLine("simulator connector inventory unavailable HTTP ${simulatorInventory.status}; using charger service inventory only")
+    }
     def chargerIds = chargers.collect { String.valueOf(it.chargerId ?: '') }.findAll { it }
     if (!chargerIds.isEmpty()) {
       String query = chargerIds.collect { "chargerIds=${URLEncoder.encode(it, 'UTF-8')}" }.join('&')
@@ -347,7 +366,8 @@ def discoverChargers = { String token ->
           boolean connectorAvailable = connector.available == true || connectorStatus.equalsIgnoreCase('AVAILABLE')
           boolean idleFeeOk = action != 'idle-fee' || charger.pricing?.idleFee?.enabled == true
           boolean notAlreadyActive = !activePairs.contains("${charger.chargerId ?: ''}/${connector.id ?: ''}")
-          if (connectorAvailable && idleFeeOk && notAlreadyActive) {
+          boolean simulatorHasConnector = simulatorAvailablePairs.isEmpty() || simulatorAvailablePairs.contains("${charger.chargerId ?: ''}/${connector.id ?: ''}")
+          if (connectorAvailable && idleFeeOk && notAlreadyActive && simulatorHasConnector) {
             candidates << [charger: charger, connector: connector]
           }
         }
