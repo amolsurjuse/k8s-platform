@@ -27,7 +27,7 @@ config:
     OCPP_SERVICE_URL: "http://ocpp-service:8082"
     ELASTICSEARCH_URIS: "http://elasticsearch:9200"
     SESSION_ELASTICSEARCH_ENABLED: "true"
-    SIMULATOR_PUBLIC_URL: "https://ocpp-simulator-dev.electrahub.net/ocpp-simulator-ui/"
+    SIMULATOR_PUBLIC_URL: "https://ocpp-simulator-dev.electrahub.net/"
     AUTH_CACHE_TTL: "3600"
     AUTH_OFFLINE_POLICY: "REJECT"
     SPRING_RABBITMQ_HOST: "rabbitmq"
