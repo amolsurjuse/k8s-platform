@@ -60,6 +60,7 @@ class PipelineConfig:
     app_dir: str
     npm_install_command: str
     build_command: str
+    node_image: str
     test_command: str
     k8s_branch: str
     deploy_version_file: str
@@ -119,6 +120,7 @@ class PipelineConfig:
             app_dir=str(raw.get("appDir") or ".").strip(),
             npm_install_command=str(raw.get("npmInstallCommand") or "npm ci").strip(),
             build_command=str(raw.get("buildCommand") or "npm run build").strip(),
+            node_image=str(raw.get("nodeImage") or "node:22-bookworm").strip(),
             test_command=str(raw.get("testCommand") or "").strip(),
             k8s_branch=str(raw.get("k8sBranch") or "develop").strip(),
             deploy_version_file=deploy_version_file,
@@ -440,16 +442,27 @@ def create_maven_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     script = f"mvn{pom_arg} {cfg.maven_goals}{args}"
     create_script_step(tc, cfg, "Maven Build", script)
 
+def sh_single_quote(value: str) -> str:
+    return "'" + value.replace("'", "'\"'\"'") + "'"
+
+
 def create_source_build_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     if cfg.build_kind == "maven":
         create_maven_step(tc, cfg)
     elif cfg.build_kind == "go":
         create_script_step(tc, cfg, "Go Test", cfg.test_command or "go test ./...")
     elif cfg.build_kind == "node":
+        node_commands = sh_single_quote(f"""node --version
+npm --version
+{cfg.npm_install_command}
+{cfg.build_command}""")
         script = f"""set -eu
 cd "{cfg.app_dir}"
-{cfg.npm_install_command}
-{cfg.build_command}
+docker run --rm \
+  -v "$PWD":/workspace \
+  -w /workspace \
+  "{cfg.node_image}" \
+  sh -lc {node_commands}
 """
         create_script_step(tc, cfg, "Node Build", script)
     elif cfg.build_kind == "docker":
