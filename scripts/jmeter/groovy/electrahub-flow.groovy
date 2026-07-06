@@ -578,6 +578,15 @@ def sendSimulatorChargingStop = {
       forwardOcpp: true
     ])
   }
+  String stopBody = String.valueOf(response.body ?: '')
+  String normalizedStopBody = stopBody.toLowerCase(Locale.ROOT)
+  if ((response.status as int) == 400 &&
+    (normalizedStopBody.contains('"status":"stopped"') ||
+      normalizedStopBody.contains('connector not found') ||
+      normalizedStopBody.contains('transaction not found'))) {
+    logLine("simulator charging stop returned non-fatal HTTP 400 after unplug signal charger=${chargerId} connectorNumber=${number} body=${stopBody}")
+    return
+  }
   if ((response.status as int) == 404) {
     logLine("simulator charging stop returned 404; falling back to OCPP Available unplug signal charger=${chargerId} connectorNumber=${number} body=${response.body}")
     sendSimulatorStatus('Available')
