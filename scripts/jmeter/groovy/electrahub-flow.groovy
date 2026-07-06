@@ -14,7 +14,7 @@ import java.util.UUID
 def slurper = new JsonSlurper()
 def action = (Parameters ?: 'full').trim()
 def baseUrl = props.getProperty('base_url', 'https://api.dev.electrahub.net').replaceAll('/+$', '')
-def simulatorUrl = props.getProperty('simulator_url', 'https://ocpp-simulator-dev.electrahub.net').replaceAll('/+$', '')
+def simulatorUrl = props.getProperty('simulator_url', 'https://ocpp-simulator.electrahub.net').replaceAll('/+$', '')
 def requestHostHeader = props.getProperty('request_host_header', '').trim()
 def runId = props.getProperty('run_id')
 if (!runId) {
