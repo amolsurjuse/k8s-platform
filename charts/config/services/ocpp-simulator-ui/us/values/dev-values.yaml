@@ -9,7 +9,7 @@ resources:
     memory: "256Mi"
 
 ingress:
-  enabled: true
+  enabled: false
   className: "nginx"
   host: "ocpp-simulator-dev.electrahub.net"
   annotations:
