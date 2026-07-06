@@ -14,7 +14,7 @@
   "jmeterImage": "amolsurjuse/electrahub-jmeter:5.6.3-java17",
   "jmeterPlan": "scripts/jmeter/03-full-e2e-charging-100-users.jmx",
   "regressionBaseUrl": "https://api.electrahub.net",
-  "regressionUsers": "1",
+  "regressionUsers": "5",
   "regressionRampSeconds": "10",
   "regressionHoldSeconds": "120",
   "regressionSseSeconds": "60",
@@ -22,5 +22,7 @@
   "regressionDynamicConnectorSelection": "true",
   "regressionConnectorStartAttempts": "100",
   "regressionRequestTimeoutMs": "120000",
-  "regressionSessionCommandTimeoutMs": "180000"
+  "regressionSessionCommandTimeoutMs": "180000",
+  "jmeterLoadStages": "5:30:120:60 10:60:120:60 20:120:120:60 50:300:120:60",
+  "jmeterLoadMaxErrorPercent": "0"
 }

@@ -635,33 +635,23 @@ EOF_STAGE
   fi
 
   stats="$(awk -F, '
-    NR==1 {
-      for (i=1; i<=NF; i++) {
-        if ($i == "success") success=i
-        if ($i == "elapsed") elapsed=i
-      }
-      next
-    }
-    {
+    NR > 1 {
       total++
-      if (success && $success == "false") failed++
-      if (elapsed) {
-        sum += $elapsed
-        if ($elapsed > max) max = $elapsed
-      }
+      elapsed = $2 + 0
+      sum += elapsed
+      if (elapsed > max) max = elapsed
     }
     END {
-      err = total ? failed * 100 / total : 100
       avg = total ? sum / total : 0
-      printf "%d,%d,%.2f,%.0f,%.0f", total, failed, err, avg, max
+      printf "%d,%.0f,%.0f", total, avg, max
     }
   ' "$JTL")"
 
   total="$(echo "$stats" | cut -d, -f1)"
-  failed="$(echo "$stats" | cut -d, -f2)"
-  error_percent="$(echo "$stats" | cut -d, -f3)"
-  avg_elapsed="$(echo "$stats" | cut -d, -f4)"
-  max_elapsed="$(echo "$stats" | cut -d, -f5)"
+  avg_elapsed="$(echo "$stats" | cut -d, -f2)"
+  max_elapsed="$(echo "$stats" | cut -d, -f3)"
+  failed="$(grep -c ',false,' "$JTL" || true)"
+  error_percent="$(awk "BEGIN { printf \\"%.2f\\", ($total ? ($failed * 100 / $total) : 100) }")"
 
   if [ "$status" -ne 0 ]; then
     result="JMETER_EXIT_${status}"
@@ -677,7 +667,7 @@ EOF_STAGE
   if [ "$result" != "PASS" ]; then
     echo "Load ladder stopped at stage ${stage_number}; breakpoint is around users=$USERS."
     echo "Recent failures:"
-    awk -F, 'NR==1 { for (i=1; i<=NF; i++) { if ($i == "label") label=i; if ($i == "responseMessage") msg=i; if ($i == "success") success=i } next } success && $success == "false" { print "FAILED: " $label " - " $msg }' "$JTL" | head -20 || true
+    grep ',false,' "$JTL" | head -20 | sed 's/^/FAILED: /' || true
     echo "##teamcity[publishArtifacts '$RESULT_ROOT/** => jmeter-load']"
     exit 1
   fi

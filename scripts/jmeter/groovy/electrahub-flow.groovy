@@ -299,7 +299,7 @@ def setupPayment = { String token ->
 
 def discoverChargers = { String token ->
   String countryArg = props.getProperty('charger_country_code', '').trim()
-  if (!countryArg && action == 'idle-fee') {
+  if (!countryArg && ['charging', 'full', 'idle-fee', 'subscription-discount'].contains(action)) {
     countryArg = 'US'
   }
   String countryFilter = countryArg ? "countryCode: \"${countryArg}\", " : ''
@@ -324,6 +324,7 @@ def discoverChargers = { String token ->
     def chargers = list.json?.data?.ocpiChargers ?: []
     def activePairs = [] as Set
     def simulatorAvailablePairs = [] as Set
+    def simulatorConnectorNumbers = [:]
     def simulatorInventory = simulatorRequest('GET', '/api/v1/chargers?limit=1000', null, requestTimeoutMs)
     if ((simulatorInventory.status as int) == 200) {
       def simulatorChargers = simulatorInventory.json?.items instanceof List ? simulatorInventory.json.items : []
@@ -331,10 +332,15 @@ def discoverChargers = { String token ->
         String simulatorChargerId = String.valueOf(simulatorCharger.chargerId ?: '')
         for (def summary : (simulatorCharger.connectorSummary ?: [])) {
           String simulatorConnectorRef = String.valueOf(summary.connectorRef ?: '')
+          int simulatorConnectorNumber = (summary.connectorId ?: connectorNumberFromId(simulatorConnectorRef, 1)) as int
           String simulatorStatus = String.valueOf(summary.status ?: '')
           boolean simulatorAvailable = simulatorStatus.equalsIgnoreCase('AVAILABLE') || simulatorStatus.equalsIgnoreCase('PREPARING')
-          if (simulatorChargerId && simulatorConnectorRef && simulatorAvailable) {
-            simulatorAvailablePairs << "${simulatorChargerId}/${simulatorConnectorRef}"
+          if (simulatorChargerId && simulatorConnectorRef) {
+            String simulatorPair = "${simulatorChargerId}/${simulatorConnectorRef}"
+            simulatorConnectorNumbers[simulatorPair] = simulatorConnectorNumber
+            if (simulatorAvailable) {
+              simulatorAvailablePairs << simulatorPair
+            }
           }
         }
       }
@@ -362,13 +368,14 @@ def discoverChargers = { String token ->
       if (String.valueOf(charger.status ?: '').equalsIgnoreCase('OFFLINE')) continue
       for (def evse : (charger.evses ?: [])) {
         for (def connector : (evse.connectors ?: [])) {
+          String connectorPair = "${charger.chargerId ?: ''}/${connector.id ?: ''}"
           String connectorStatus = String.valueOf(connector.status ?: '')
           boolean connectorAvailable = connector.available == true || connectorStatus.equalsIgnoreCase('AVAILABLE')
           boolean idleFeeOk = action != 'idle-fee' || charger.pricing?.idleFee?.enabled == true
-          boolean notAlreadyActive = !activePairs.contains("${charger.chargerId ?: ''}/${connector.id ?: ''}")
-          boolean simulatorHasConnector = simulatorAvailablePairs.isEmpty() || simulatorAvailablePairs.contains("${charger.chargerId ?: ''}/${connector.id ?: ''}")
+          boolean notAlreadyActive = !activePairs.contains(connectorPair)
+          boolean simulatorHasConnector = simulatorAvailablePairs.isEmpty() || simulatorAvailablePairs.contains(connectorPair)
           if (connectorAvailable && idleFeeOk && notAlreadyActive && simulatorHasConnector) {
-            candidates << [charger: charger, connector: connector]
+            candidates << [charger: charger, connector: connector, simulatorConnectorNumber: simulatorConnectorNumbers[connectorPair]]
           }
         }
       }
@@ -384,7 +391,7 @@ def discoverChargers = { String token ->
         chargerId: item.charger.chargerId as String,
         locationId: item.charger.location?.ocpiLocationId as String,
         connectorId: item.connector.id as String,
-        connectorNumber: connectorNumberFromId(item.connector.id as String, 1),
+        connectorNumber: (item.simulatorConnectorNumber ?: connectorNumberFromId(item.connector.id as String, 1)) as int,
         connectorType: (item.connector.standard ?: connectorType) as String
       ]
     }
@@ -395,13 +402,13 @@ def discoverChargers = { String token ->
       locationId = selected.charger.location?.ocpiLocationId as String
       connectorId = selected.connector.id as String
       connectorType = (selected.connector.standard ?: connectorType) as String
-      connectorNumber = connectorNumberFromId(connectorId, connectorNumber ?: 1)
+      connectorNumber = (selected.simulatorConnectorNumber ?: connectorNumberFromId(connectorId, connectorNumber ?: 1)) as int
       vars.put('chargerId', chargerId)
       vars.put('locationId', locationId)
       vars.put('connectorId', connectorId)
       vars.put('connectorNumber', String.valueOf(connectorNumber))
       vars.put('connectorType', connectorType)
-      logLine("selected available connector ${chargerId}/${connectorId} location=${locationId} candidate=${Math.floorMod(threadIndex - 1, candidates.size()) + 1}/${candidates.size()}")
+      logLine("selected available connector ${chargerId}/${connectorId} simulatorConnectorNumber=${connectorNumber} location=${locationId} candidate=${Math.floorMod(threadIndex - 1, candidates.size()) + 1}/${candidates.size()}")
     } else if (action == 'idle-fee') {
       throw new IllegalStateException('dynamic connector selection found no available idle-fee connector')
     } else if (dynamicConnectorSelection) {
