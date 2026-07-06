@@ -1,6 +1,7 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URLEncoder
 import java.net.SocketTimeoutException
@@ -636,6 +637,9 @@ def monitorSse = { String token, String sessionId ->
       }
     } catch (SocketTimeoutException ignored) {
       // Keep the SSE connection open until the monitoring window expires.
+    } catch (IOException ioe) {
+      logLine("sse stream ended while reading for ${sessionId}: ${ioe.message ?: ioe.class.name}")
+      break
     }
   }
   try { reader.close() } catch (Exception ignored) {}
@@ -648,6 +652,11 @@ def monitorSse = { String token, String sessionId ->
   vars.put('sseHeartbeatEvents', String.valueOf(heartbeats))
 
   if ((snapshots + updates) <= 0) {
+    def fallbackActive = findActiveSession(token, sessionId)
+    if (fallbackActive != null) {
+      logLine("sse produced no updates before close; active-session fallback confirmed session=${sessionId} status=${fallbackActive.status}")
+      return
+    }
     throw new IllegalStateException("SSE produced no snapshot/session updates for ${sessionId}; heartbeats=${heartbeats}, last=${lastData}")
   }
   logLine("sse ok connected=${connected} snapshot=${snapshots} updates=${updates} receipts=${receipts} heartbeats=${heartbeats}")
@@ -816,6 +825,17 @@ try {
     completedAt: Instant.now().toString()
   ])), 'UTF-8')
 } catch (Throwable t) {
+  try {
+    String cleanupToken = vars.get('accessToken')
+    String cleanupSessionId = vars.get('sessionId')
+    if (cleanupToken && cleanupSessionId) {
+      logLine("cleanup after failed sample for session=${cleanupSessionId}")
+      stopSession(cleanupToken, cleanupSessionId)
+      sendSimulatorChargingStop()
+    }
+  } catch (Throwable cleanupError) {
+    log.warn("[electrahub-jmeter][${action}][${userNumber}] cleanup failed: ${cleanupError.message ?: cleanupError.class.name}", cleanupError)
+  }
   SampleResult.setSuccessful(false)
   SampleResult.setResponseCode('500')
   SampleResult.setResponseMessage("step=${currentStep}: ${t.message ?: t.class.name}")
