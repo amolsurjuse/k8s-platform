@@ -9,7 +9,7 @@ resources:
     memory: "512Mi"
 
 ingress:
-  enabled: true
+  enabled: false
   className: "nginx"
   host: "ocpp-simulator.electrahub.net"
   annotations:
@@ -32,3 +32,23 @@ pdb:
 metrics:
   servicemonitor:
     enabled: false
+
+extraIngresses:
+  - fullname: ocpp-simulator-api
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: "/$1"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    rules:
+      - host: "ocpp-simulator.electrahub.net"
+        paths:
+          - path: /(api(?:/.*)?|ocpp(?:/.*)?|ws(?:/.*)?|healthz|readyz)
+            pathType: ImplementationSpecific
+            serviceName: ocpp-simulator
+            servicePort: 8081
+    tls:
+      - hosts:
+          - "ocpp-simulator.electrahub.net"
+        secretName: "electrahub-prod-tls"
