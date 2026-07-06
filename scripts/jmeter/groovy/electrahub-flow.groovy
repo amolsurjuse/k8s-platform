@@ -2,6 +2,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 import java.net.HttpURLConnection
+import java.net.URLEncoder
 import java.net.SocketTimeoutException
 import java.nio.charset.StandardCharsets
 import java.time.Instant
@@ -321,15 +322,19 @@ def discoverChargers = { String token ->
   if (dynamicConnectorSelection) {
     def chargers = list.json?.data?.ocpiChargers ?: []
     def activePairs = [] as Set
-    def activeBeforeSelection = requireStatus(atStep('active sessions before connector selection') {
-      request('GET', '/session/api/v1/sessions/active', null, token)
-    }, [200], 'active sessions before connector selection')
-    def activeSessions = activeBeforeSelection.json instanceof List ? activeBeforeSelection.json : []
-    for (def session : activeSessions) {
-      String activeChargerId = String.valueOf(session.simulator?.chargerId ?: session.chargerId ?: '')
-      String activeConnectorId = String.valueOf(session.simulator?.connectorId ?: session.connectorId ?: '')
-      if (activeChargerId && activeConnectorId) {
-        activePairs << "${activeChargerId}/${activeConnectorId}"
+    def chargerIds = chargers.collect { String.valueOf(it.chargerId ?: '') }.findAll { it }
+    if (!chargerIds.isEmpty()) {
+      String query = chargerIds.collect { "chargerIds=${URLEncoder.encode(it, 'UTF-8')}" }.join('&')
+      def activeBeforeSelection = requireStatus(atStep('global active sessions before connector selection') {
+        request('GET', "/session/api/v1/sessions/internal/active-by-chargers?${query}", null, token)
+      }, [200], 'global active sessions before connector selection')
+      def activeSessions = activeBeforeSelection.json instanceof List ? activeBeforeSelection.json : []
+      for (def session : activeSessions) {
+        String activeChargerId = String.valueOf(session.chargerId ?: '')
+        String activeConnectorId = String.valueOf(session.connectorRef ?: '')
+        if (activeChargerId && activeConnectorId) {
+          activePairs << "${activeChargerId}/${activeConnectorId}"
+        }
       }
     }
     def candidates = []
@@ -378,6 +383,8 @@ def discoverChargers = { String token ->
       logLine("selected available connector ${chargerId}/${connectorId} location=${locationId} candidate=${Math.floorMod(threadIndex - 1, candidates.size()) + 1}/${candidates.size()}")
     } else if (action == 'idle-fee') {
       throw new IllegalStateException('dynamic connector selection found no available idle-fee connector')
+    } else if (dynamicConnectorSelection) {
+      throw new IllegalStateException('dynamic connector selection found no globally available connector')
     } else {
       logLine('dynamic connector selection found no available connector; using CSV connector')
     }
