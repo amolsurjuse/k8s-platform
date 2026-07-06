@@ -28,7 +28,7 @@
       "vcsRootId": "ElectraHub_DriverPortalUi_VcsRoot",
       "gitUrl": "https://github.com/amolsurjuse/driver-portal-frontend.git",
       "gitBranch": "develop",
-      "appDir": "driver-portal-frontend",
+      "appDir": ".",
       "npmInstallCommand": "npm install",
       "buildCommand": "npm run build -- --configuration production",
       "dockerImage": "amolsurjuse/driver-portal-frontend",
