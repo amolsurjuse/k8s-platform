@@ -49,6 +49,11 @@ def logLine = { String message ->
 
 def json = { Object value -> JsonOutput.toJson(value) }
 
+def connectorNumberFromId = { String id, int fallback ->
+  def matcher = (id ?: '') =~ /(\d+)\D*$/
+  matcher.find() ? (matcher.group(1) as int) : fallback
+}
+
 def parseJson = { String body ->
   if (!body) return null
   try {
@@ -353,7 +358,7 @@ def discoverChargers = { String token ->
         chargerId: item.charger.chargerId as String,
         locationId: item.charger.location?.ocpiLocationId as String,
         connectorId: item.connector.id as String,
-        connectorNumber: 1,
+        connectorNumber: connectorNumberFromId(item.connector.id as String, 1),
         connectorType: (item.connector.standard ?: connectorType) as String
       ]
     }
@@ -364,7 +369,7 @@ def discoverChargers = { String token ->
       locationId = selected.charger.location?.ocpiLocationId as String
       connectorId = selected.connector.id as String
       connectorType = (selected.connector.standard ?: connectorType) as String
-      connectorNumber = 1
+      connectorNumber = connectorNumberFromId(connectorId, connectorNumber ?: 1)
       vars.put('chargerId', chargerId)
       vars.put('locationId', locationId)
       vars.put('connectorId', connectorId)
