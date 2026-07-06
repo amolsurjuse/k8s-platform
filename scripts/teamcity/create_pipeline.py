@@ -398,10 +398,14 @@ def clear_agent_requirements(tc: TeamCityClient, cfg: PipelineConfig, requiremen
 
 
 def ensure_agent_requirement(tc: TeamCityClient, cfg: PipelineConfig) -> None:
-    if not cfg.agent_name:
-        print("Skipped agent requirement")
-        return
     requirements = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}/agent-requirements")
+    if not cfg.agent_name:
+        if int(requirements.get("count", 0)) > 0:
+            clear_agent_requirements(tc, cfg, requirements)
+            print("Removed agent requirement")
+        else:
+            print("Skipped agent requirement")
+        return
     agent_requirements = requirements.get("agent-requirement", [])
     if len(agent_requirements) == 1 and agent_requirement_matches_agent_name(agent_requirements[0], cfg.agent_name):
         print("Agent requirement already configured")

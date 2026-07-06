@@ -15,7 +15,7 @@
       "dockerImage": "amolsurjuse/admin-portal-ui",
       "dockerUseBuildx": true,
       "dockerPlatforms": "linux/amd64,linux/arm64",
-      "agentName": "teamcity-agent-node",
+      "agentName": "",
       "deployVersionFile": "charts/config/services/admin-portal-ui/us/version/dev-version.yaml"
     },
     {
@@ -34,7 +34,7 @@
       "dockerImage": "amolsurjuse/driver-portal-frontend",
       "dockerUseBuildx": true,
       "dockerPlatforms": "linux/amd64,linux/arm64",
-      "agentName": "teamcity-agent-node",
+      "agentName": "",
       "deployVersionFile": "charts/config/services/driver-portal-ui/us/version/dev-version.yaml"
     },
     {
@@ -53,7 +53,7 @@
       "dockerImage": "amolsurjuse/ocpi-simulator-ui",
       "dockerUseBuildx": true,
       "dockerPlatforms": "linux/amd64,linux/arm64",
-      "agentName": "teamcity-agent-node",
+      "agentName": "",
       "deployVersionFile": "charts/config/services/ocpp-simulator-ui/us/version/dev-version.yaml"
     }
   ]
