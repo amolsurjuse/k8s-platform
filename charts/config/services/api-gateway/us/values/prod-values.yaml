@@ -8,10 +8,17 @@ extraSecretEnv:
   - name: "APP_SECURITY_JWT_SECRET"
     secretName: "auth-jwt-prod-secret"
     secretKey: "APP_SECURITY_JWT_SECRET"
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-prod-secret"
+    secretKey: "redis-password"
 
 config:
   data:
     APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
+    APP_HTTP_LOGGING_ENABLED: "false"
+    APP_HTTP_LOGGING_INCLUDE_BODIES: "false"
+    APP_HTTP_LOGGING_FULL_REQUEST_RESPONSE: "false"
+    LOGGING_LEVEL_COM_ELECTRAHUB_GATEWAY: "INFO"
 
 resources:
   requests:

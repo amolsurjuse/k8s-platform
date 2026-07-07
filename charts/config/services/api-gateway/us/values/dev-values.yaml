@@ -1,5 +1,10 @@
 replicaCount: 1
 
+extraSecretEnv:
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-dev-secret"
+    secretKey: "redis-password"
+
 resources:
   requests:
     cpu: "100m"
