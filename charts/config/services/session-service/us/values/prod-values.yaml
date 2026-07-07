@@ -25,11 +25,11 @@ config:
     SESSION_ANALYTICS_KAFKA_ENABLED: "false"
     SESSION_ANALYTICS_RECEIPT_TOPIC: "eh.charging.receipt.generated.v1"
     SIMULATOR_PUBLIC_URL: "https://ocpp-simulator.electrahub.net/"
-    SERVER_TOMCAT_THREADS_MAX: "96"
-    SERVER_TOMCAT_THREADS_MIN_SPARE: "16"
+    SERVER_TOMCAT_THREADS_MAX: "64"
+    SERVER_TOMCAT_THREADS_MIN_SPARE: "12"
     SERVER_TOMCAT_ACCEPT_COUNT: "100"
-    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "20"
-    SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "5"
+    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "12"
+    SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "4"
     SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "10000"
 
 startupProbe:
@@ -40,11 +40,11 @@ startupProbe:
 
 resources:
   requests:
-    cpu: "100m"
-    memory: "256Mi"
-  limits:
-    cpu: "500m"
+    cpu: "250m"
     memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
 
 ingress:
   # TEMPORARY: bypass api-gateway ONLY for the active-sessions SSE stream

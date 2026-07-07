@@ -30,11 +30,11 @@ startupProbe:
 
 resources:
   requests:
-    cpu: "100m"
-    memory: "256Mi"
-  limits:
-    cpu: "500m"
+    cpu: "250m"
     memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
 
 ingress:
   # TEMPORARY: bypass api-gateway ONLY for the active-sessions SSE stream
