@@ -144,6 +144,11 @@ def request = { String method, String path, Object body = null, String token = n
       String responseBody = stream == null ? '' : stream.getText('UTF-8')
       long elapsed = System.currentTimeMillis() - started
       logLine("http ${method} ${path} status=${status} elapsedMs=${elapsed}")
+      if (attempt < attempts && [429, 502, 503, 504].contains(status)) {
+        logLine("http ${method} ${path} retryable status=${status} attempt=${attempt}/${attempts}; retrying")
+        sleep(500L * attempt)
+        continue
+      }
       return [status: status, body: responseBody, json: parseJson(responseBody)]
     } catch (SocketTimeoutException timeout) {
       lastError = new SocketTimeoutException("step=${currentStep} ${method} ${path} timed out after ${timeoutMs}ms")
