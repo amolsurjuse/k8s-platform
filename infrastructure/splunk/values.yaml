@@ -16,6 +16,18 @@ hec:
   existingSecretName: splunk-hec-secret
   tokenKey: SPLUNK_HEC_TOKEN
 
+indexRetention:
+  enabled: true
+  # Seven days. Splunk uses seconds for frozenTimePeriodInSecs.
+  frozenTimePeriodInSecs: 604800
+  indexes:
+    - main
+    - history
+    - summary
+    - _internal
+    - _audit
+    - _introspection
+
 service:
   type: ClusterIP
   webPort: 8000

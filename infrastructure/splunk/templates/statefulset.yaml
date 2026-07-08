@@ -16,7 +16,24 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "splunk.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        checksum/index-retention: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
+      {{- if .Values.indexRetention.enabled }}
+      initContainers:
+        - name: prepare-index-retention
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+            - cp /config/indexes.conf /work/indexes.conf
+          volumeMounts:
+            - name: splunk-index-retention-source
+              mountPath: /config
+            - name: splunk-index-retention
+              mountPath: /work
+      {{- end }}
       containers:
         - name: splunk
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -64,6 +81,19 @@ spec:
           volumeMounts:
             - name: splunk-var
               mountPath: /opt/splunk/var
+            {{- if .Values.indexRetention.enabled }}
+            - name: splunk-index-retention
+              mountPath: /opt/splunk/etc/system/local/indexes.conf
+              subPath: indexes.conf
+            {{- end }}
+      volumes:
+        {{- if .Values.indexRetention.enabled }}
+        - name: splunk-index-retention-source
+          configMap:
+            name: {{ include "splunk.name" . }}-index-retention
+        - name: splunk-index-retention
+          emptyDir: {}
+        {{- end }}
   volumeClaimTemplates:
     - metadata:
         name: splunk-var

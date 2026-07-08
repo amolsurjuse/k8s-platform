@@ -1,0 +1,15 @@
+{{- if .Values.indexRetention.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "splunk.name" . }}-index-retention
+  labels:
+    {{- include "splunk.labels" . | nindent 4 }}
+data:
+  indexes.conf: |
+{{- range .Values.indexRetention.indexes }}
+    [{{ . }}]
+    frozenTimePeriodInSecs = {{ $.Values.indexRetention.frozenTimePeriodInSecs }}
+
+{{- end }}
+{{- end }}
