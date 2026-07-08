@@ -36,6 +36,19 @@ def postJson = { String url, Object body ->
     return response.body() == null || response.body().isBlank() ? [:] : json.parseText(response.body())
 }
 
+def getJson = { String url ->
+    def request = HttpRequest.newBuilder(URI.create(url))
+            .timeout(Duration.ofSeconds(60))
+            .header('Accept', 'application/json')
+            .GET()
+            .build()
+    def response = client.send(request, HttpResponse.BodyHandlers.ofString())
+    if (response.statusCode() < 200 || response.statusCode() >= 300) {
+        throw new IllegalStateException("GET ${url} failed HTTP ${response.statusCode()}: ${response.body()}")
+    }
+    return response.body() == null || response.body().isBlank() ? [:] : json.parseText(response.body())
+}
+
 def tapUrl = "${simulatorUrl}/api/v1/chargers/${chargerId}/connectors/${connectorNumber}/tap"
 def idempotencyKey = "jmeter-card-present-${runId}-${ctx.getThreadNum()}"
 def tap = postJson(tapUrl, [
@@ -66,6 +79,21 @@ if (!idTag.startsWith('CP:')) {
 if (transactionId.isBlank()) {
     throw new IllegalStateException("Card-present tap did not start a transaction")
 }
+
+def chargerAfterTap = getJson("${simulatorUrl}/api/v1/chargers/${chargerId}")
+def activeTx = (chargerAfterTap?.runtime?.activeTransactions ?: []).find {
+    (it.transactionId ?: '').toString() == transactionId
+}
+if (activeTx == null) {
+    throw new IllegalStateException("Card-present transaction ${transactionId} was not present in simulator active transactions")
+}
+if (!(activeTx.idTag ?: '').toString().startsWith('CP:')) {
+    throw new IllegalStateException("Simulator active transaction ${transactionId} did not keep CP idTag: ${activeTx}")
+}
+if (!'CardPresent'.equalsIgnoreCase((activeTx.source ?: '').toString())) {
+    throw new IllegalStateException("Simulator active transaction ${transactionId} was not marked CardPresent: ${activeTx}")
+}
+
 Thread.sleep(Math.max(1, holdSeconds) * 1000L)
 
 def stopUrl = "${simulatorUrl}/api/v1/chargers/${chargerId}/connectors/${connectorNumber}/charging/stop"
@@ -77,11 +105,20 @@ if (!'STOPPED'.equalsIgnoreCase((stop.status ?: '').toString())) {
     throw new IllegalStateException("Expected STOPPED response for card-present transaction ${transactionId} but received ${stop}")
 }
 
+def chargerAfterStop = getJson("${simulatorUrl}/api/v1/chargers/${chargerId}")
+def stillActive = (chargerAfterStop?.runtime?.activeTransactions ?: []).find {
+    (it.transactionId ?: '').toString() == transactionId
+}
+if (stillActive != null) {
+    throw new IllegalStateException("Card-present transaction ${transactionId} remained active after stop: ${stillActive}")
+}
+
 SampleResult.setResponseData(JsonOutput.prettyPrint(JsonOutput.toJson([
         chargerId: chargerId,
         connectorNumber: connectorNumber,
         idTagPrefix: 'CP',
         transactionId: transactionId,
+        source: activeTx.source,
         stopStatus: stop.status
 ])), 'UTF-8')
 SampleResult.setDataType(org.apache.jmeter.samplers.SampleResult.TEXT)
