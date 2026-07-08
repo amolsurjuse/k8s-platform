@@ -108,7 +108,7 @@ The generated pipelines follow the existing ElectraHub service patterns:
 The regression pipeline is intentionally different:
 
 1. Checks out `k8s-platform`
-2. Runs `scripts/jmeter/03-full-e2e-charging-100-users.jmx` through Dockerized JMeter
+2. Runs `scripts/jmeter/08-charging-feature-regression-suite.jmx` through Dockerized JMeter
 3. Fails the build if any JMeter assertion fails
 4. Publishes the raw `.jtl`, JMeter log, and HTML dashboard as TeamCity artifacts
 5. Uses safe smoke defaults of 5 users, no VCS trigger, and `https://api.dev.electrahub.net`

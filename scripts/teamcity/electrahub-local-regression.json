@@ -12,7 +12,7 @@
   "agentName": "",
   "addVcsTrigger": false,
   "jmeterImage": "amolsurjuse/electrahub-jmeter:5.6.3-java17",
-  "jmeterPlan": "scripts/jmeter/03-full-e2e-charging-100-users.jmx",
+  "jmeterPlan": "scripts/jmeter/08-charging-feature-regression-suite.jmx",
   "regressionBaseUrl": "https://api.electrahub.net",
   "regressionUsers": "5",
   "regressionRampSeconds": "10",

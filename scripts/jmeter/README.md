@@ -25,6 +25,7 @@ Use prod only when explicitly validating production:
 | `05-card-present-charging-flow.jmx` | Validates simulated terminal card tap, dummy payment authorization, OCPP transaction start, dwell, and stop. |
 | `06-idle-fee-charging-flow.jmx` | Validates idle-fee pricing discovery, active-session idle fields, remote-stop unplug requirement, physical unplug completion, and receipt. |
 | `07-subscription-discount-charging-flow.jmx` | Validates the default new-user 20% charging discount, quota-aware active-session pricing, and discounted receipt fields. |
+| `08-charging-feature-regression-suite.jmx` | Existing full charging flow plus focused regression cases for idle fee, subscription discount, low-balance auto-stop, low-balance wallet decisions, and auto top-up recovery. |
 
 ## Recommended Safe Dev Run
 
@@ -145,6 +146,44 @@ jmeter -n -t scripts/jmeter/07-subscription-discount-charging-flow.jmx `
   -Jsse_seconds=15
 ```
 
+## Charging Feature Regression Suite
+
+This is the default plan for `ElectraHub_Regression_JMeterChargingFlow`. It runs the normal driver charging flow and the focused feature checks needed for recent charging changes:
+
+- idle-fee remote stop remains active until unplug and then generates receipt
+- subscription discount appears in active-session pricing and receipt
+- high meter value triggers backend low-balance remote stop
+- wallet balance check returns `LOW_BALANCE` when auto top-up is disabled
+- wallet balance check applies auto top-up and returns `OK` when a valid card is configured
+
+```powershell
+jmeter -n -t scripts/jmeter/08-charging-feature-regression-suite.jmx `
+  -l outputs/jmeter/charging-feature-regression/results.jtl `
+  -j outputs/jmeter/charging-feature-regression/jmeter.log `
+  -Jbase_url=https://api.dev.electrahub.net `
+  -Jsimulator_url=https://ocpp-simulator-dev.electrahub.net `
+  -Jcharger_country_code=US `
+  -Jdynamic_connector_selection=true `
+  -Jusers=5 `
+  -Jramp_seconds=30 `
+  -Jhold_seconds=120 `
+  -Jsse_seconds=60
+```
+
+Useful feature knobs:
+
+```text
+-Jfeature_idle_users=1
+-Jfeature_subscription_users=1
+-Jfeature_low_balance_auto_stop_users=1
+-Jfeature_low_balance_check_users=1
+-Jfeature_auto_topup_users=1
+-Jlow_balance_threshold=10.00
+-Jlow_balance_meter_wh=99999999
+-Jauto_topup_threshold=100.00
+-Jauto_topup_amount=50.00
+```
+
 TeamCity uses the ElectraHub-owned Java 17 image below. Keep this image on Java 17+ because the legacy
 `justb4/jmeter:latest` image currently runs Java 8 and can fail Cloudflare TLS with `handshake_failure`.
 
@@ -263,4 +302,3 @@ EH-US-CHG-0001,US*EHB*LOC*USA001,CON-US-0001,1,CCS-2
 ```
 
 If simulator inventory changes, update this CSV instead of editing JMX files.
-

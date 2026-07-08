@@ -25,8 +25,10 @@ if (!runId) {
 int userOffset = props.getProperty('user_offset', '0') as int
 int threadIndex = ctx.getThreadNum() + 1 + userOffset
 String userNumber = String.format('%03d', threadIndex)
+String actionUserKey = action.replaceAll('[^A-Za-z0-9]+', '-').toLowerCase(Locale.ROOT)
+int actionPhoneBucket = Math.abs(action.hashCode() % 1000)
 String defaultPassword = props.getProperty('test_password', 'LoadTest@12345')
-String email = (vars.get('userEmail') ?: "jmeter+${runId}-${userNumber}@electrahub.test").trim()
+String email = (vars.get('userEmail') ?: "jmeter+${runId}-${actionUserKey}-${userNumber}@electrahub.test").trim()
 String password = (vars.get('userPassword') ?: defaultPassword).trim()
 
 String connectorId = vars.get('connectorId')
@@ -40,6 +42,7 @@ int sseSeconds = props.getProperty('sse_seconds', String.valueOf(Math.min(holdSe
 int requestTimeoutMs = props.getProperty('request_timeout_ms', '120000') as int
 int sessionCommandTimeoutMs = props.getProperty('session_command_timeout_ms', '180000') as int
 BigDecimal walletTopupAmount = new BigDecimal(props.getProperty('wallet_topup_amount', '120.00'))
+BigDecimal lowBalanceThreshold = new BigDecimal(props.getProperty('low_balance_threshold', '10.00'))
 String usersOutput = props.getProperty('users_output', 'scripts/jmeter/data/generated-users.csv')
 String connectorsCsv = props.getProperty('connectors_csv', 'scripts/jmeter/data/connectors-100.csv')
 boolean dynamicConnectorSelection = props.getProperty('dynamic_connector_selection', 'false').toBoolean()
@@ -237,7 +240,7 @@ def registerOrLogin = {
     password: password,
     firstName: 'JMeter',
     lastName: "User${userNumber}",
-    phoneNumber: "+1555${String.format('%08d', threadIndex)}",
+    phoneNumber: "+1555${String.format('%03d%05d', actionPhoneBucket, threadIndex % 100000)}",
     address: [
       line1: '100 Load Test Way',
       line2: null,
@@ -311,6 +314,9 @@ def setupPayment = { String token ->
     expiry: '12/30'
   ], token) }
   requireStatus(card, [201, 200, 409], 'add card')
+  if (card.json?.id) {
+    vars.put('paymentCardId', String.valueOf(card.json.id))
+  }
 
   def topup = atStep('wallet topup') { request('POST', '/payment/api/v1/payment/wallet/topups', [
     amount: walletTopupAmount,
@@ -319,14 +325,103 @@ def setupPayment = { String token ->
   ], token) }
   requireStatus(topup, [201, 200], 'wallet topup')
 
+  def cards = requireStatus(atStep('payment cards after setup') { request('GET', '/payment/api/v1/payment/cards', null, token) }, [200], 'payment cards after setup')
+  if (!vars.get('paymentCardId')) {
+    def firstCard = cards.json instanceof List && !cards.json.isEmpty() ? cards.json[0] : null
+    if (firstCard?.id) {
+      vars.put('paymentCardId', String.valueOf(firstCard.id))
+    }
+  }
   def state = requireStatus(atStep('payment state after setup') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state after setup')
   logLine("payment ready wallet=${state.json?.wallet?.balance}")
   token
 }
 
+def paymentState = { String token, String stepName = 'payment state' ->
+  requireStatus(atStep(stepName) { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], stepName)
+}
+
+def paymentCardId = { String token ->
+  String cardId = vars.get('paymentCardId')
+  if (cardId) return cardId
+  def cards = requireStatus(atStep('payment cards') { request('GET', '/payment/api/v1/payment/cards', null, token) }, [200], 'payment cards')
+  def firstCard = cards.json instanceof List && !cards.json.isEmpty() ? cards.json[0] : null
+  cardId = firstCard?.id ? String.valueOf(firstCard.id) : ''
+  if (!cardId) {
+    throw new IllegalStateException('payment card is required for auto top-up regression')
+  }
+  vars.put('paymentCardId', cardId)
+  cardId
+}
+
+def configureAutoTopUp = { String token, boolean enabled, BigDecimal threshold, BigDecimal amount ->
+  String cardId = paymentCardId(token)
+  def response = requireStatus(atStep(enabled ? 'enable auto top-up' : 'disable auto top-up') {
+    request('PUT', '/payment/api/v1/payment/auto-topup', [
+      enabled: enabled,
+      threshold: threshold,
+      amount: amount,
+      cardId: cardId
+    ], token)
+  }, [200], enabled ? 'enable auto top-up' : 'disable auto top-up')
+  logLine("auto top-up configured enabled=${response.json?.enabled} threshold=${response.json?.threshold} amount=${response.json?.amount} card=${response.json?.cardId}")
+  response
+}
+
+def walletBalance = { Map state ->
+  ((state.json?.wallet?.balance ?: 0) as BigDecimal)
+}
+
+def runSessionBalanceCheck = { String token, BigDecimal projectedCharge, String idempotencySuffix ->
+  String accountId = vars.get('userId') ?: ''
+  if (!accountId) {
+    throw new IllegalStateException('userId is required for session balance check')
+  }
+  def response = requireStatus(atStep('session balance check') {
+    request('POST', '/payment/api/v1/payment/internal/session-balance-checks', [
+      accountId: accountId,
+      sessionId: "jmeter-${runId}-${userNumber}-${idempotencySuffix}",
+      projectedCharge: projectedCharge,
+      lowBalanceThreshold: lowBalanceThreshold,
+      currency: 'USD',
+      idempotencyKey: UUID.randomUUID().toString()
+    ], token)
+  }, [200], 'session balance check')
+  logLine("balance check status=${response.json?.status} sufficient=${response.json?.sufficientBalance} autoTopUp=${response.json?.autoTopUpApplied} before=${response.json?.walletBalanceBefore} after=${response.json?.walletBalanceAfter} projected=${projectedCharge}")
+  response
+}
+
+def validateLowBalanceDecisionFlow = { String token ->
+  configureAutoTopUp(token, false, new BigDecimal(props.getProperty('auto_topup_threshold', '100.00')), new BigDecimal(props.getProperty('auto_topup_amount', '50.00')))
+  BigDecimal balance = walletBalance(paymentState(token, 'payment state before low balance check'))
+  BigDecimal projectedCharge = balance.add(lowBalanceThreshold).add(new BigDecimal(props.getProperty('low_balance_extra_charge', '25.00')))
+  def response = runSessionBalanceCheck(token, projectedCharge, 'low-balance')
+  if (response.json?.autoTopUpApplied == true || response.json?.sufficientBalance == true || String.valueOf(response.json?.status ?: '') != 'LOW_BALANCE') {
+    throw new IllegalStateException("low-balance decision mismatch: ${response.body}")
+  }
+}
+
+def validateAutoTopUpDecisionFlow = { String token ->
+  BigDecimal threshold = new BigDecimal(props.getProperty('auto_topup_threshold', '100.00'))
+  BigDecimal amount = new BigDecimal(props.getProperty('auto_topup_amount', '50.00'))
+  configureAutoTopUp(token, true, threshold, amount)
+  BigDecimal balance = walletBalance(paymentState(token, 'payment state before auto top-up check'))
+  BigDecimal projectedCharge = balance.add(new BigDecimal(props.getProperty('auto_topup_projected_extra_charge', '10.00')))
+  def response = runSessionBalanceCheck(token, projectedCharge, 'auto-topup')
+  String status = String.valueOf(response.json?.status ?: '')
+  if (response.json?.autoTopUpApplied != true || response.json?.sufficientBalance != true || !(status in ['OK', 'AUTO_TOP_UP_APPLIED', 'SUFFICIENT'])) {
+    throw new IllegalStateException("auto top-up decision mismatch: ${response.body}")
+  }
+  BigDecimal before = ((response.json?.walletBalanceBefore ?: 0) as BigDecimal)
+  BigDecimal after = ((response.json?.walletBalanceAfter ?: 0) as BigDecimal)
+  if (!(after > before)) {
+    throw new IllegalStateException("auto top-up did not increase wallet balance: before=${before} after=${after}")
+  }
+}
+
 def discoverChargers = { String token ->
   String countryArg = props.getProperty('charger_country_code', '').trim()
-  if (!countryArg && ['charging', 'full', 'idle-fee', 'subscription-discount'].contains(action)) {
+  if (!countryArg && ['charging', 'full', 'idle-fee', 'subscription-discount', 'low-balance-auto-stop'].contains(action)) {
     countryArg = 'US'
   }
   String countryFilter = countryArg ? "countryCode: \"${countryArg}\", " : ''
@@ -738,6 +833,7 @@ def validateStoppedAndReceipt = { String token, String sessionId, boolean expect
   long deadline = System.currentTimeMillis() + 120000L
   boolean goneFromActive = false
   boolean unplugRequested = false
+  long activeFirstSeenAt = 0L
   while (System.currentTimeMillis() < deadline) {
     def active = activeSession(token)
     def sessions = active.json instanceof List ? active.json : []
@@ -746,11 +842,15 @@ def validateStoppedAndReceipt = { String token, String sessionId, boolean expect
       goneFromActive = true
       break
     }
+    if (activeFirstSeenAt == 0L) {
+      activeFirstSeenAt = System.currentTimeMillis()
+    }
     if (!unplugRequested &&
-      activeMatch.idleFeeEnabled == true &&
-      activeMatch.unplugRequiredToStop == true &&
-      String.valueOf(activeMatch.status ?: '').equalsIgnoreCase('SUSPENDED')) {
-      logLine("session ${sessionId} is idle-fee protected after remote stop; simulating physical unplug before receipt validation")
+      ((activeMatch.idleFeeEnabled == true &&
+        activeMatch.unplugRequiredToStop == true &&
+        String.valueOf(activeMatch.status ?: '').equalsIgnoreCase('SUSPENDED')) ||
+        System.currentTimeMillis() - activeFirstSeenAt >= 10000L)) {
+      logLine("session ${sessionId} still active after remote stop; sending simulator physical stop before receipt validation")
       sendSimulatorChargingStop()
       unplugRequested = true
     }
@@ -795,7 +895,7 @@ def validateSubscriptionDiscountFlow = { String token, String sessionId ->
   }
   logLine("subscription discount active session=${sessionId} regular=${discounted.regularCost} discounted=${discounted.discountedCost ?: discounted.estimatedCost} discount=${discounted.subscriptionDiscountAmount} plan=${discounted.subscriptionPlanCode}")
   stopSession(token, sessionId)
-  sendSimulatorStatus('Available')
+  sendSimulatorChargingStop()
   validateStoppedAndReceipt(token, sessionId, true)
 }
 
@@ -834,21 +934,49 @@ def validateIdleFeeFlow = { String token, String sessionId ->
   validateStoppedAndReceipt(token, sessionId)
 }
 
+def validateLowBalanceAutoStopFlow = { String token, String sessionId ->
+  waitForActiveSessionPredicate(token, sessionId, 'charging active before low balance meter', 60) { session ->
+    ['CHARGING', 'ACTIVE', 'STARTED'].contains(String.valueOf(session.status ?: '').toUpperCase(Locale.ROOT))
+  }
+
+  long meterWh = props.getProperty('low_balance_meter_wh', '99999999') as long
+  sendSimulatorMeterValue(meterWh)
+  def stopRequested = waitForActiveSessionPredicate(token, sessionId, 'low balance remote stop request', 120) { session ->
+    String status = String.valueOf(session.status ?: '').toUpperCase(Locale.ROOT)
+    status in ['FINISHING', 'SUSPENDED', 'COMPLETED', 'STOPPED'] ||
+      session.remoteStopRequestedAt != null ||
+      String.valueOf(session.stopReason ?: '').equalsIgnoreCase('LOW_BALANCE')
+  }
+  logLine("low-balance auto-stop observed session=${sessionId} status=${stopRequested.status} stopReason=${stopRequested.stopReason} remoteStopRequestedAt=${stopRequested.remoteStopRequestedAt} estimatedCost=${stopRequested.estimatedCost}")
+
+  String status = String.valueOf(stopRequested.status ?: '').toUpperCase(Locale.ROOT)
+  if (status == 'SUSPENDED' && stopRequested.unplugRequiredToStop == true) {
+    sendSimulatorChargingStop()
+  }
+  validateStoppedAndReceipt(token, sessionId)
+}
+
 try {
   long startedAt = System.currentTimeMillis()
   String token
 
-  if (action == 'setup' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount') {
+  if (action == 'setup' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-auto-stop' || action == 'low-balance-check' || action == 'auto-top-up-check') {
     token = registerOrLogin()
     appendGeneratedUser()
     token = setupPayment(token)
   } else if (action == 'charging') {
     token = login()
   } else {
-    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, idle-fee, or subscription-discount.")
+    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, idle-fee, subscription-discount, low-balance-auto-stop, low-balance-check, or auto-top-up-check.")
   }
 
-  if (action == 'charging' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount') {
+  if (action == 'low-balance-check') {
+    validateLowBalanceDecisionFlow(token)
+  } else if (action == 'auto-top-up-check') {
+    validateAutoTopUpDecisionFlow(token)
+  }
+
+  if (action == 'charging' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-auto-stop') {
     discoverChargers(token)
     requireStatus(atStep('payment state before start') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state before start')
     String sessionId = startSession(token)
@@ -859,6 +987,8 @@ try {
       validateIdleFeeFlow(token, sessionId)
     } else if (action == 'subscription-discount') {
       validateSubscriptionDiscountFlow(token, sessionId)
+    } else if (action == 'low-balance-auto-stop') {
+      validateLowBalanceAutoStopFlow(token, sessionId)
     } else {
 
       long elapsedSeconds = (System.currentTimeMillis() - startedAt) / 1000L
