@@ -31,3 +31,4 @@ config:
   data:
     SUPPORT_EMAIL: "support@electrahub.com"
     AI_STREAM_TOKEN_DELAY_MS: "0"
+    AI_LLM_TIMEOUT_MS: "2500"
