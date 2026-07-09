@@ -2,7 +2,7 @@ replicaCount: 1
 
 env:
   SPRING_PROFILES_ACTIVE: "prod"
-  APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
+  APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.com,https://www.electrahub.com,https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
 
 extraSecretEnv:
   - name: "APP_SECURITY_JWT_SECRET"
@@ -14,7 +14,7 @@ extraSecretEnv:
 
 config:
   data:
-    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
+    APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.com,https://www.electrahub.com,https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
     APP_HTTP_LOGGING_ENABLED: "false"
     APP_HTTP_LOGGING_INCLUDE_BODIES: "false"
     APP_HTTP_LOGGING_FULL_REQUEST_RESPONSE: "false"
