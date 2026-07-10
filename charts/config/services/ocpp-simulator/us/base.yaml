@@ -14,6 +14,7 @@ config:
     WS_CONNECTOR_BASE_URL: "http://web-socket-connector:8091"
     DEFAULT_CSMS_URL: "ws://ocpp-service:8082/ws/ocpp"
     PAYMENT_SERVICE_URL: "http://payment-service:8083"
+    SESSION_SERVICE_URL: "http://session-service:8083/api/v1"
     AUTO_SEED_CHARGERS: "true"
     AUTO_SYNC_ENVIRONMENT_CHARGERS: "true"
     ENVIRONMENT_SYNC_URL: "http://charger-management-service:8086"
