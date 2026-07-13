@@ -27,6 +27,8 @@ config:
     OCPP_SERVICE_URL: "http://ocpp-service:8082"
     ELASTICSEARCH_URIS: "http://elasticsearch:9200"
     SESSION_ELASTICSEARCH_ENABLED: "true"
+    SESSION_DEFAULT_IDLE_FEE_CAP: "50.00"
+    SESSION_DEFAULT_SESSION_CAP: "100.00"
     SIMULATOR_PUBLIC_URL: "https://ocpp-simulator-dev.electrahub.net/"
     AUTH_CACHE_TTL: "3600"
     AUTH_OFFLINE_POLICY: "REJECT"
