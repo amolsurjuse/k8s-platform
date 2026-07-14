@@ -49,7 +49,9 @@ config:
     GATEWAY_ROUTE_PRICING: "http://pricing-service:8092"
     GATEWAY_ROUTES_PRICING: "http://pricing-service:8092"
     GATEWAY_ROUTE_NOTIFICATIONS: "http://notification-service:8085/notifications"
+    GATEWAY_ROUTES_NOTIFICATION: "http://notification-service:8085/notifications"
     GATEWAY_ROUTES_NOTIFICATIONS: "http://notification-service:8085/notifications"
+    GATEWAY_IDENTITY_DEFAULT_TENANT: "electrahub"
     GATEWAY_ROUTE_AI: "http://ai-support-service:8094"
     GATEWAY_ROUTES_AI: "http://ai-support-service:8094"
 
