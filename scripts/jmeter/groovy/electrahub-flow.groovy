@@ -943,9 +943,7 @@ def validateLowBalanceAutoStopFlow = { String token, String sessionId ->
   sendSimulatorMeterValue(meterWh)
   def stopRequested = waitForActiveSessionPredicate(token, sessionId, 'low balance remote stop request', 120) { session ->
     String status = String.valueOf(session.status ?: '').toUpperCase(Locale.ROOT)
-    status in ['FINISHING', 'SUSPENDED', 'COMPLETED', 'STOPPED'] ||
-      session.remoteStopRequestedAt != null ||
-      String.valueOf(session.stopReason ?: '').equalsIgnoreCase('LOW_BALANCE')
+    status in ['SUSPENDED', 'COMPLETED', 'STOPPED']
   }
   logLine("low-balance auto-stop observed session=${sessionId} status=${stopRequested.status} stopReason=${stopRequested.stopReason} remoteStopRequestedAt=${stopRequested.remoteStopRequestedAt} estimatedCost=${stopRequested.estimatedCost}")
 
