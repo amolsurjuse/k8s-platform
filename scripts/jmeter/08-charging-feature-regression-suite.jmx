@@ -107,6 +107,38 @@
         </JSR223Sampler>
         <hashTree/>
       </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Idle-fee wallet reserve start guard">
+        <stringProp name="ThreadGroup.num_threads">${__P(feature_idle_wallet_reserve_users,1)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(feature_ramp_seconds,1)}</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopController">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Connector seed CSV">
+          <stringProp name="filename">${__P(connectors_file,scripts/jmeter/data/connectors-100.csv)}</stringProp>
+          <stringProp name="fileEncoding">UTF-8</stringProp>
+          <stringProp name="variableNames">chargerId,locationId,connectorId,connectorNumber,connectorType</stringProp>
+          <boolProp name="ignoreFirstLine">true</boolProp>
+          <stringProp name="delimiter">,</stringProp>
+          <boolProp name="quotedData">false</boolProp>
+          <boolProp name="recycle">true</boolProp>
+          <boolProp name="stopThread">false</boolProp>
+          <stringProp name="shareMode">shareMode.all</stringProp>
+        </CSVDataSet>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Reject wallet below idle cap plus base reserve">
+          <stringProp name="cacheKey">electrahub-flow-idle-wallet-reserve</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/electrahub-flow.groovy</stringProp>
+          <stringProp name="parameters">idle-fee-wallet-reserve</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+      </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Low-balance auto-stop contract">
         <stringProp name="ThreadGroup.num_threads">${__P(feature_low_balance_auto_stop_users,1)}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">${__P(feature_ramp_seconds,1)}</stringProp>

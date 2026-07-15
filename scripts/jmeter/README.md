@@ -25,7 +25,7 @@ Use prod only when explicitly validating production:
 | `05-card-present-charging-flow.jmx` | Validates simulated terminal card tap, dummy payment authorization, OCPP transaction start, dwell, and stop. |
 | `06-idle-fee-charging-flow.jmx` | Validates idle-fee pricing discovery, active-session idle fields, remote-stop unplug requirement, physical unplug completion, and receipt. |
 | `07-subscription-discount-charging-flow.jmx` | Validates the default new-user 20% charging discount, quota-aware active-session pricing, and discounted receipt fields. |
-| `08-charging-feature-regression-suite.jmx` | Existing full charging flow plus focused regression cases for idle fee, subscription discount, low-balance auto-stop, low-balance wallet decisions, and auto top-up recovery. |
+| `08-charging-feature-regression-suite.jmx` | Existing full charging flow plus focused regression cases for idle fee, idle-cap wallet reservation, subscription discount, low-balance auto-stop, low-balance wallet decisions, and auto top-up recovery. |
 
 ## Recommended Safe Dev Run
 
@@ -151,6 +151,7 @@ jmeter -n -t scripts/jmeter/07-subscription-discount-charging-flow.jmx `
 This is the default plan for `ElectraHub_Regression_JMeterChargingFlow`. It runs the normal driver charging flow and the focused feature checks needed for recent charging changes:
 
 - idle-fee remote stop remains active until unplug and then generates receipt
+- wallet start is rejected when the balance is below the idle-fee cap plus the base reserve
 - subscription discount appears in active-session pricing and receipt
 - high meter value triggers backend low-balance remote stop
 - wallet balance check returns `LOW_BALANCE` when auto top-up is disabled
@@ -174,6 +175,7 @@ Useful feature knobs:
 
 ```text
 -Jfeature_idle_users=1
+-Jfeature_idle_wallet_reserve_users=1
 -Jfeature_subscription_users=1
 -Jfeature_low_balance_auto_stop_users=1
 -Jfeature_low_balance_check_users=1
@@ -182,6 +184,7 @@ Useful feature knobs:
 -Jlow_balance_meter_wh=99999999
 -Jauto_topup_threshold=100.00
 -Jauto_topup_amount=50.00
+-Jidle_fee_wallet_insufficient_balance=54.99
 ```
 
 TeamCity uses the ElectraHub-owned Java 17 image below. Keep this image on Java 17+ because the legacy

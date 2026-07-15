@@ -318,8 +318,11 @@ def setupPayment = { String token ->
     vars.put('paymentCardId', String.valueOf(card.json.id))
   }
 
+  BigDecimal setupTopupAmount = action == 'idle-fee-wallet-reserve'
+    ? new BigDecimal(props.getProperty('idle_fee_wallet_insufficient_balance', '54.99'))
+    : walletTopupAmount
   def topup = atStep('wallet topup') { request('POST', '/payment/api/v1/payment/wallet/topups', [
-    amount: walletTopupAmount,
+    amount: setupTopupAmount,
     source: 'MANUAL',
     note: "JMeter ${runId}"
   ], token) }
@@ -421,7 +424,7 @@ def validateAutoTopUpDecisionFlow = { String token ->
 
 def discoverChargers = { String token ->
   String countryArg = props.getProperty('charger_country_code', '').trim()
-  if (!countryArg && ['charging', 'full', 'idle-fee', 'subscription-discount', 'low-balance-auto-stop'].contains(action)) {
+  if (!countryArg && ['charging', 'full', 'idle-fee', 'idle-fee-wallet-reserve', 'subscription-discount', 'low-balance-auto-stop'].contains(action)) {
     countryArg = 'US'
   }
   String countryFilter = countryArg ? "countryCode: \"${countryArg}\", " : ''
@@ -493,7 +496,7 @@ def discoverChargers = { String token ->
           String connectorPair = "${charger.chargerId ?: ''}/${connector.id ?: ''}"
           String connectorStatus = String.valueOf(connector.status ?: '')
           boolean connectorAvailable = connector.available == true || connectorStatus.equalsIgnoreCase('AVAILABLE')
-          boolean idleFeeOk = action != 'idle-fee' || charger.pricing?.idleFee?.enabled == true
+          boolean idleFeeOk = !['idle-fee', 'idle-fee-wallet-reserve'].contains(action) || charger.pricing?.idleFee?.enabled == true
           boolean notAlreadyActive = !activePairs.contains(connectorPair)
           boolean simulatorHasConnector = simulatorAvailablePairs.isEmpty() || simulatorAvailablePairs.contains(connectorPair)
           if (connectorAvailable && idleFeeOk && notAlreadyActive && simulatorHasConnector) {
@@ -531,7 +534,7 @@ def discoverChargers = { String token ->
       vars.put('connectorNumber', String.valueOf(connectorNumber))
       vars.put('connectorType', connectorType)
       logLine("selected available connector ${chargerId}/${connectorId} simulatorConnectorNumber=${connectorNumber} location=${locationId} candidate=${Math.floorMod(threadIndex - 1, candidates.size()) + 1}/${candidates.size()}")
-    } else if (action == 'idle-fee') {
+    } else if (['idle-fee', 'idle-fee-wallet-reserve'].contains(action)) {
       throw new IllegalStateException('dynamic connector selection found no available idle-fee connector')
     } else if (dynamicConnectorSelection) {
       throw new IllegalStateException('dynamic connector selection found no globally available connector')
@@ -556,7 +559,7 @@ def discoverChargers = { String token ->
   if (view.body.contains('"errors"')) {
     throw new IllegalStateException("charger graphql view returned errors for ${chargerId}/${connectorId}: ${view.body}")
   }
-  if (action == 'idle-fee') {
+  if (['idle-fee', 'idle-fee-wallet-reserve'].contains(action)) {
     def charger = view.json?.data?.ocpiCharger
     def idleFee = charger?.pricing?.idleFee
     if (idleFee?.enabled != true) {
@@ -656,6 +659,45 @@ def startSession = { String token ->
 
 def activeSession = { String token ->
   requireStatus(atStep('active sessions') { request('GET', '/session/api/v1/sessions/active', null, token) }, [200], 'active sessions')
+}
+
+def validateIdleFeeWalletReserveStart = { String token ->
+  if (!chargerId || !connectorId || !locationId) {
+    throw new IllegalStateException('idle-fee wallet reserve validation requires a discovered connector')
+  }
+  def state = paymentState(token, 'payment state before idle-fee reserve start')
+  BigDecimal balance = walletBalance(state)
+  BigDecimal configuredBalance = new BigDecimal(props.getProperty('idle_fee_wallet_insufficient_balance', '54.99'))
+  if (balance.compareTo(configuredBalance) != 0) {
+    throw new IllegalStateException("idle-fee reserve test wallet mismatch: expected=${configuredBalance} actual=${balance}")
+  }
+
+  String uid = vars.get('userId') ?: ''
+  def response = atStep('idle-fee wallet reserve start rejection') {
+    request('POST', '/session/api/v1/sessions/start', [
+      chargerId: chargerId,
+      locationId: locationId,
+      connectorId: connectorId,
+      connectorNumber: connectorNumber,
+      connectorType: connectorType,
+      idToken: uid,
+      paymentMethod: 'WALLET',
+      currency: 'USD',
+      idempotencyKey: UUID.randomUUID().toString()
+    ], token, sessionCommandTimeoutMs)
+  }
+  requireStatus(response, [409], 'idle-fee wallet reserve start rejection')
+  String message = String.valueOf(response.body ?: '').toLowerCase(Locale.ROOT)
+  if (!message.contains('top up') || !message.contains('credit card')) {
+    throw new IllegalStateException("idle-fee reserve rejection must offer top-up and credit-card options: ${response.body}")
+  }
+
+  def active = activeSession(token)
+  def sessions = active.json instanceof List ? active.json : []
+  if (!sessions.isEmpty()) {
+    throw new IllegalStateException("idle-fee reserve rejection created an active session: ${active.body}")
+  }
+  logLine("idle-fee wallet reserve correctly rejected start balance=${balance} charger=${chargerId}/${connectorId}")
 }
 
 def findActiveSession = { String token, String sessionId ->
@@ -958,20 +1000,23 @@ try {
   long startedAt = System.currentTimeMillis()
   String token
 
-  if (action == 'setup' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-auto-stop' || action == 'low-balance-check' || action == 'auto-top-up-check') {
+  if (action == 'setup' || action == 'full' || action == 'idle-fee' || action == 'idle-fee-wallet-reserve' || action == 'subscription-discount' || action == 'low-balance-auto-stop' || action == 'low-balance-check' || action == 'auto-top-up-check') {
     token = registerOrLogin()
     appendGeneratedUser()
     token = setupPayment(token)
   } else if (action == 'charging') {
     token = login()
   } else {
-    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, idle-fee, subscription-discount, low-balance-auto-stop, low-balance-check, or auto-top-up-check.")
+    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, idle-fee, idle-fee-wallet-reserve, subscription-discount, low-balance-auto-stop, low-balance-check, or auto-top-up-check.")
   }
 
   if (action == 'low-balance-check') {
     validateLowBalanceDecisionFlow(token)
   } else if (action == 'auto-top-up-check') {
     validateAutoTopUpDecisionFlow(token)
+  } else if (action == 'idle-fee-wallet-reserve') {
+    discoverChargers(token)
+    validateIdleFeeWalletReserveStart(token)
   }
 
   if (action == 'charging' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-auto-stop') {
