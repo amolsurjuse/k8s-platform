@@ -63,7 +63,7 @@ data:
       splunk_hec:
         type: splunk_hec_logs
         inputs: [exclude_meter_telemetry_from_splunk]
-        endpoint: "{{ if .Values.splunk.quotaGate.enabled }}http://{{ include \"splunk-log-collector.name\" . }}-quota-gate:8088{{ else }}{{ .Values.splunk.endpoint }}{{ end }}"
+        endpoint: "{{ if .Values.splunk.quotaGate.enabled }}http://{{ include "splunk-log-collector.name" . }}-quota-gate:8088{{ else }}{{ .Values.splunk.endpoint }}{{ end }}"
         token: "${SPLUNK_HEC_TOKEN}"
         index: "{{ .Values.splunk.index }}"
         sourcetype: "{{ .Values.splunk.sourceType }}"
