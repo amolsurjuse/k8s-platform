@@ -16,6 +16,12 @@ splunk:
   existingSecretName: splunk-hec-secret
   tokenKey: SPLUNK_HEC_TOKEN
 
+elasticsearch:
+  # Opt-in so non-production environments continue to send logs only to Splunk.
+  enabled: false
+  endpoint: http://elasticsearch:9200
+  index: electrahub-kubernetes-%Y.%m.%d
+
 resources:
   requests:
     cpu: 100m

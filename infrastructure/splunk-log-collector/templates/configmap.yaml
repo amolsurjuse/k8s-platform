@@ -59,3 +59,13 @@ data:
           verify_certificate: false
         healthcheck:
           enabled: false
+{{- if .Values.elasticsearch.enabled }}
+      elasticsearch:
+        type: elasticsearch
+        inputs: [enrich]
+        endpoints:
+          - "{{ .Values.elasticsearch.endpoint }}"
+        mode: bulk
+        bulk:
+          index: "{{ .Values.elasticsearch.index }}"
+{{- end }}

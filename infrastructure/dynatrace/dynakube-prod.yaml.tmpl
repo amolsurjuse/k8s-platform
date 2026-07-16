@@ -1,0 +1,31 @@
+apiVersion: dynatrace.com/v1beta6
+kind: DynaKube
+metadata:
+  name: dynakube
+  namespace: dynatrace
+  annotations:
+    feature.dynatrace.com/k8s-app-enabled: "true"
+spec:
+  apiUrl: "__DT_API_URL__"
+  tokens: dynakube
+  metadataEnrichment:
+    enabled: true
+    namespaceSelector:
+      matchLabels:
+        dt-monitoring: "true"
+  oneAgent:
+    applicationMonitoring:
+      namespaceSelector:
+        matchLabels:
+          dt-monitoring: "true"
+  activeGate:
+    capabilities:
+      - routing
+      - kubernetes-monitoring
+  otlpExporterConfiguration:
+    namespaceSelector:
+      matchLabels:
+        dt-monitoring: "true"
+    signals:
+      traces: {}
+      metrics: {}

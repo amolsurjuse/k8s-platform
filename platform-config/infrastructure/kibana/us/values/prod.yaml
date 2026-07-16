@@ -1,0 +1,9 @@
+fullnameOverride: kibana
+
+elasticsearch:
+  hosts: http://elasticsearch.prod.svc.cluster.local:9200
+
+ingress:
+  enabled: true
+  className: nginx
+  host: kibana.electrahub.net

@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kibana-prod
+  namespace: argocd
+spec:
+  project: electrahub-prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: infrastructure/kibana
+    helm:
+      releaseName: kibana
+      valueFiles:
+        - ../../platform-config/infrastructure/kibana/us/values/prod.yaml
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

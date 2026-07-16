@@ -23,6 +23,8 @@ data:
         service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
       - hostname: grafana.electrahub.net
         service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: kibana.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
       - hostname: argocd.electrahub.net
         service: http://argocd-server.argocd.svc.cluster.local:80
       - hostname: teamcity.electrahub.net

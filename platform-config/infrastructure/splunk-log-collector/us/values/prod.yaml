@@ -6,3 +6,8 @@ splunk:
   endpoint: https://splunk.prod.svc.cluster.local:8088
   index: main
   sourceType: kubernetes:container
+
+elasticsearch:
+  enabled: true
+  endpoint: http://elasticsearch.prod.svc.cluster.local:9200
+  index: electrahub-kubernetes-%Y.%m.%d

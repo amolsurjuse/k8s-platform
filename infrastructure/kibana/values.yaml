@@ -1,0 +1,25 @@
+fullnameOverride: kibana
+
+image:
+  repository: docker.elastic.co/kibana/kibana
+  tag: "8.13.4"
+  pullPolicy: IfNotPresent
+
+elasticsearch:
+  hosts: http://elasticsearch:9200
+
+service:
+  port: 5601
+
+ingress:
+  enabled: false
+  className: nginx
+  host: kibana.electrahub.net
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi

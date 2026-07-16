@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.fullnameOverride }}-log-retention
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: configure-retention
+          image: curlimages/curl:8.10.1
+          env:
+            - name: ELASTICSEARCH_URL
+              value: {{ .Values.elasticsearch.hosts | quote }}
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              until curl --fail --silent --show-error "$ELASTICSEARCH_URL/_cluster/health" >/dev/null; do sleep 5; done
+              curl --fail --silent --show-error -X PUT "$ELASTICSEARCH_URL/_ilm/policy/electrahub-kubernetes-7d" \
+                -H 'Content-Type: application/json' \
+                --data '{"policy":{"phases":{"hot":{"actions":{}},"delete":{"min_age":"7d","actions":{"delete":{}}}}}}'
+              curl --fail --silent --show-error -X PUT "$ELASTICSEARCH_URL/_index_template/electrahub-kubernetes-logs" \
+                -H 'Content-Type: application/json' \
+                --data '{"index_patterns":["electrahub-kubernetes-*"] ,"template":{"settings":{"index.lifecycle.name":"electrahub-kubernetes-7d","index.refresh_interval":"30s","number_of_shards":"1","number_of_replicas":"0"}}}'

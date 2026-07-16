@@ -51,6 +51,7 @@ scrapeTargets:
   - name: notification-service
     namespace: prod
     environment: prod
+    metricsPath: /notifications/actuator/prometheus
     targets: ["notification-service.prod.svc.cluster.local:8085"]
   - name: ai-support-service
     namespace: prod
