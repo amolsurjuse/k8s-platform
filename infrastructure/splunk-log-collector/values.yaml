@@ -15,6 +15,26 @@ splunk:
   sourceType: kubernetes
   existingSecretName: splunk-hec-secret
   tokenKey: SPLUNK_HEC_TOKEN
+  quotaGate:
+    enabled: false
+    maxDailyBytes: 419430400
+    redis:
+      host: redis
+      port: 6379
+      existingSecretName: redis-prod-secret
+      passwordKey: redis-password
+
+quotaGate:
+  image:
+    repository: openresty/openresty
+    tag: "1.25.3.1-alpine"
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 128Mi
 
 elasticsearch:
   # Opt-in so non-production environments continue to send logs only to Splunk.

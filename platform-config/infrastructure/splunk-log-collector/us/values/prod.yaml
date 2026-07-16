@@ -6,6 +6,10 @@ splunk:
   endpoint: https://splunk.prod.svc.cluster.local:8088
   index: main
   sourceType: kubernetes:container
+  quotaGate:
+    enabled: true
+    # Stay below the 500 MB/day Splunk Free ingestion allowance.
+    maxDailyBytes: 419430400
 
 elasticsearch:
   enabled: true
