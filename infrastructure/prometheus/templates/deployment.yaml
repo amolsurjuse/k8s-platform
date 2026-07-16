@@ -6,6 +6,9 @@ metadata:
     {{- include "prometheus.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  # The TSDB uses a ReadWriteOnce volume and cannot be opened by two pods.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "prometheus.name" . }}
