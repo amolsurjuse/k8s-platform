@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elasticsearch-logs-prod
+  namespace: argocd
+spec:
+  project: electrahub-prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: infrastructure/elasticsearch
+    helm:
+      releaseName: elasticsearch-logs
+      valueFiles:
+        - ../../platform-config/infrastructure/elasticsearch-logs/us/values/prod.yaml
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

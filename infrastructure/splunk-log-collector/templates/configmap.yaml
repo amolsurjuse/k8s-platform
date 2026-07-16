@@ -68,4 +68,8 @@ data:
         mode: bulk
         bulk:
           index: "{{ .Values.elasticsearch.index }}"
+        batch:
+          max_bytes: 1048576
+        request:
+          concurrency: 1
 {{- end }}

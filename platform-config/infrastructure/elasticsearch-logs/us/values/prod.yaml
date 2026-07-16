@@ -1,0 +1,28 @@
+fullnameOverride: elasticsearch-logs
+
+replicaCount: 1
+
+image:
+  repository: docker.elastic.co/elasticsearch/elasticsearch
+  tag: "8.13.4"
+
+esConfig:
+  clusterName: electrahub-logs
+  javaOpts: "-Xms512m -Xmx512m"
+  singleNode: true
+  xpackSecurityEnabled: false
+
+persistence:
+  enabled: true
+  size: 20Gi
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 1Gi
+  limits:
+    cpu: "1"
+    memory: 2Gi
+
+pdb:
+  enabled: false

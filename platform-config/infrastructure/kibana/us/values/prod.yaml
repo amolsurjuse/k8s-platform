@@ -1,7 +1,7 @@
 fullnameOverride: kibana
 
 elasticsearch:
-  hosts: http://elasticsearch.prod.svc.cluster.local:9200
+  hosts: http://elasticsearch-logs.prod.svc.cluster.local:9200
 
 ingress:
   enabled: true

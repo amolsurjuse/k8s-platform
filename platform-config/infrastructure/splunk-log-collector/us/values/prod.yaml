@@ -8,8 +8,7 @@ splunk:
   sourceType: kubernetes:container
 
 elasticsearch:
+  # Enabled after the dedicated log Elasticsearch cluster is healthy.
   enabled: false
-  # Application Elasticsearch is reserved for session, pricing, and billing queries.
-  # Enable this only after the dedicated observability Elasticsearch endpoint exists.
   endpoint: http://elasticsearch-logs.prod.svc.cluster.local:9200
   index: electrahub-kubernetes-%Y.%m.%d
