@@ -692,7 +692,11 @@ def clear_steps(tc: TeamCityClient, cfg: PipelineConfig) -> None:
             print(f"Deleted build step: {step_id}")
 
 
-def create_steps_if_empty(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+def create_steps_if_empty(
+    tc: TeamCityClient,
+    cfg: PipelineConfig,
+    replace_existing_steps: bool = False,
+) -> None:
     build_type = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}")
     replaced_existing_steps = False
     if int(build_type.get("steps", {}).get("count", 0)) > 0:
@@ -701,11 +705,11 @@ def create_steps_if_empty(tc: TeamCityClient, cfg: PipelineConfig) -> None:
             create_jmeter_regression_step(tc, cfg)
             print("Replaced JMeter regression step")
             return
-        if cfg.build_kind in ("go", "node"):
+        if replace_existing_steps or cfg.build_kind in ("go", "node"):
             clear_steps(tc, cfg)
             replaced_existing_steps = True
         else:
-            print("Build steps already configured")
+            print("Build steps already configured; use --replace-steps to reconcile them")
             return
 
     if cfg.build_kind == "jmeter":
@@ -789,7 +793,11 @@ def ensure_trigger(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     print("Created VCS trigger")
 
 
-def create_pipeline(tc: TeamCityClient, cfg: PipelineConfig) -> None:
+def create_pipeline(
+    tc: TeamCityClient,
+    cfg: PipelineConfig,
+    replace_existing_steps: bool = False,
+) -> None:
     ensure_parent_project(tc, cfg)
     ensure_project(tc, cfg)
     ensure_vcs_root(tc, cfg)
@@ -797,7 +805,7 @@ def create_pipeline(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     attach_vcs_root(tc, cfg)
     set_parameters(tc, cfg)
     ensure_agent_requirement(tc, cfg)
-    create_steps_if_empty(tc, cfg)
+    create_steps_if_empty(tc, cfg, replace_existing_steps)
     ensure_trigger(tc, cfg)
     print(f"Pipeline is ready: {tc.base_url}/buildConfiguration/{cfg.build_type_id}?mode=builds")
 
@@ -823,6 +831,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--teamcity-url", default=os.getenv("TEAMCITY_URL", "http://localhost:8111"))
     parser.add_argument("--token", default=os.getenv("TEAMCITY_TOKEN", ""))
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--replace-steps",
+        action="store_true",
+        help="Replace existing build steps with the checked-in pipeline definition.",
+    )
     parser.add_argument("--continue-on-error", action="store_true")
     return parser.parse_args()
 
@@ -845,7 +858,7 @@ def main() -> int:
     for index, cfg in enumerate(configs, start=1):
         print(f"\n[{index}/{len(configs)}] {cfg.service_name}")
         try:
-            create_pipeline(tc, cfg)
+            create_pipeline(tc, cfg, args.replace_steps)
         except Exception as exc:
             failures += 1
             eprint(f"ERROR [{cfg.service_name}]: {exc}")
