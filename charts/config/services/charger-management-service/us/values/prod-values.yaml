@@ -5,6 +5,9 @@ extraSecretEnv:
   - name: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
     secretName: "access-context-prod-secret"
     secretKey: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
+  - name: "APP_SECURITY_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
 
 env:
   SPRING_PROFILES_ACTIVE: "prod"
