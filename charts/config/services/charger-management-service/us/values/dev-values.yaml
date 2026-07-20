@@ -2,6 +2,9 @@ secrets:
   existingSecretName: "postgresql-dev-secret"
 
 extraSecretEnv:
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-dev-secret"
+    secretKey: "redis-password"
   - name: "APP_SECURITY_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
