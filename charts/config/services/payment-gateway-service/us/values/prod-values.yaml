@@ -1,0 +1,48 @@
+secrets:
+  existingSecretName: "postgresql-prod-secret"
+
+extraSecretEnv:
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-prod-secret"
+    secretKey: "redis-password"
+  - name: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
+    secretName: "access-context-prod-secret"
+    secretKey: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
+  - name: "APP_SECURITY_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+
+image:
+  pullPolicy: Always
+
+config:
+  data:
+    APP_GATEWAY_MOCK_PROVIDER_ENABLED: "false"
+    APP_GATEWAY_PRODUCTION_ENABLED: "false"
+    MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "0.1"
+
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: "150m"
+    memory: "384Mi"
+  limits:
+    cpu: "750m"
+    memory: "768Mi"
+
+ingress:
+  enabled: false
+
+hpa:
+  enabled: false
+
+pdb:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false

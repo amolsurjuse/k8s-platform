@@ -1,0 +1,73 @@
+fullnameOverride: "payment-gateway-service"
+
+image:
+  repository: amolsurjuse/payment-gateway-service
+
+service:
+  port: 8098
+containerPort: 8098
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
+  JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m -XX:+ExitOnOutOfMemoryError"
+
+secrets:
+  env:
+    ENV_PAYMENT_GATEWAY_DATASOURCE_USERNAME: "POSTGRES_USER"
+    ENV_PAYMENT_GATEWAY_DATASOURCE_PASSWORD: "POSTGRES_PASSWORD"
+
+config:
+  data:
+    SERVER_PORT: "8098"
+    ENV_PAYMENT_GATEWAY_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/appdb"
+    SPRING_LIQUIBASE_ENABLED: "true"
+    SPRING_LIQUIBASE_DEFAULT_SCHEMA: "public"
+    SPRING_LIQUIBASE_LIQUIBASE_SCHEMA: "public"
+    REDIS_HOST: "redis"
+    REDIS_PORT: "6379"
+    REDIS_CONNECT_TIMEOUT: "200ms"
+    REDIS_TIMEOUT: "2s"
+    SPRING_RABBITMQ_HOST: "rabbitmq"
+    SPRING_RABBITMQ_PORT: "5672"
+    SPRING_RABBITMQ_USERNAME: "guest"
+    SPRING_RABBITMQ_PASSWORD: "guest"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+    MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+    MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED: "true"
+    MANAGEMENT_HEALTH_READINESSSTATE_ENABLED: "true"
+    APP_GATEWAY_MOCK_PROVIDER_ENABLED: "true"
+    APP_GATEWAY_PRODUCTION_ENABLED: "false"
+    APP_GATEWAY_ROUTE_CACHE_TTL: "10m"
+    APP_GATEWAY_OPERATION_RECOVERY_FIXED_DELAY: "60000"
+    APP_GATEWAY_OPERATION_RECOVERY_LEASE: "45s"
+    APP_GATEWAY_OPERATION_RECOVERY_INITIAL_BACKOFF: "30s"
+    APP_GATEWAY_OPERATION_RECOVERY_MAX_BACKOFF: "30m"
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 25
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 35
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  periodSeconds: 10
+  failureThreshold: 90
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000

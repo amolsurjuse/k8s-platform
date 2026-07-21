@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/payment-gateway-service
+service:
+  port: 8098
+containerPort: 8098
