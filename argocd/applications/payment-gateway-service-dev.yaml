@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: payment-gateway-service
+  namespace: argocd
+spec:
+  project: electrahub-dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: payment-gateway-service
+      valueFiles:
+        - payment-gateway-service/values.yaml
+        - ../config/services/payment-gateway-service/us/base.yaml
+        - ../config/services/payment-gateway-service/us/values/dev-values.yaml
+        - ../config/services/payment-gateway-service/us/version/dev-version.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

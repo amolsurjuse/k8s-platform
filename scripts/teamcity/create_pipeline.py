@@ -439,7 +439,23 @@ def create_script_step(tc: TeamCityClient, cfg: PipelineConfig, name: str, scrip
 def create_maven_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     pom_arg = "" if cfg.pom_path == "pom.xml" else f" -f {cfg.pom_path}"
     args = f" {cfg.maven_runner_args}" if cfg.maven_runner_args else ""
-    script = f"mvn{pom_arg} {cfg.maven_goals}{args}"
+    command = sh_single_quote(f"""mkdir -p /workspace
+tar -xf - -C /workspace
+cd /workspace
+mvn --version
+mvn{pom_arg} {cfg.maven_goals}{args}""")
+    script = f"""set -eu
+
+# TeamCity agents only need Docker. Keep the Maven repository cache per agent so
+# builds are deterministic without requiring Maven to be installed on the agent.
+MAVEN_CACHE_VOLUME="electrahub-maven-cache"
+docker volume create "$MAVEN_CACHE_VOLUME" >/dev/null
+tar --exclude=.git --exclude=target -cf - . | docker run --rm -i \\
+  --entrypoint sh \\
+  -v "$MAVEN_CACHE_VOLUME:/root/.m2" \\
+  "maven:3.9.9-eclipse-temurin-21" \\
+  -lc {command}
+"""
     create_script_step(tc, cfg, "Maven Build", script)
 
 def sh_single_quote(value: str) -> str:
@@ -733,8 +749,21 @@ test -n "%docker.username%"
 test -n "%docker.password%"
 
 echo "%docker.password%" | docker login -u "%docker.username%" --password-stdin
-docker buildx create --use --name "tc-%build.number%" || docker buildx use "tc-%build.number%"
+# Keep one builder per agent rather than creating one per build. The old build-number
+# builders accumulated persistent BuildKit volumes until the Docker host ran out of disk.
+BUILDER="electrahub-ci-$(hostname | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9_.-' '-')"
+if ! docker buildx inspect "$BUILDER" >/dev/null 2>&1; then
+  docker buildx create --driver docker-container --name "$BUILDER"
+fi
+docker buildx inspect "$BUILDER" --bootstrap
+
+cleanup_build_cache() {{
+  docker buildx prune --builder "$BUILDER" --force --max-used-space 20GB >/dev/null 2>&1 || true
+}}
+trap cleanup_build_cache EXIT
+
 docker buildx build \\
+  --builder "$BUILDER" \\
   --platform "{cfg.docker_platforms}" \\
   --file "{dockerfile_path}" \\
   --tag "{cfg.docker_image}:%build.number%" \\

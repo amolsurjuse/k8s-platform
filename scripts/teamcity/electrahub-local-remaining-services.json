@@ -177,6 +177,22 @@
       "testCommand": "set -eu\ntar --exclude=.git -cf - . | docker run --rm -i golang:1.22-bookworm sh -lc 'mkdir -p /workspace && tar -xf - -C /workspace && cd /workspace && /usr/local/go/bin/go version && /usr/local/go/bin/go test ./...'",
       "agentName": "",
       "deployVersionFile": "charts/config/services/web-socket-connector/us/version/dev-version.yaml"
+    },
+    {
+      "serviceName": "payment-gateway-service",
+      "buildKind": "maven",
+      "teamcityProjectName": "payment-gateway-service",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_PaymentGatewayService",
+      "buildTypeId": "ElectraHub_PaymentGatewayService_Build",
+      "vcsRootId": "ElectraHub_PaymentGatewayService_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/payment-gateway-service.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/payment-gateway-service",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "agentName": "",
+      "deployVersionFile": "charts/config/services/payment-gateway-service/us/version/dev-version.yaml"
     }
   ]
 }
