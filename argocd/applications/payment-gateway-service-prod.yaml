@@ -20,9 +20,5 @@ spec:
         - ../config/services/payment-gateway-service/us/values/prod-values.yaml
         - ../config/services/payment-gateway-service/us/version/prod-version.yaml
   syncPolicy:
-    # Temporary release gate: removed again after the tagged production rollout is healthy.
-    automated:
-      prune: false
-      selfHeal: false
     syncOptions:
       - CreateNamespace=true
