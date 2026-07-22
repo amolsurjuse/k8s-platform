@@ -1,5 +1,10 @@
 replicaCount: 1
 
+extraSecretEnv:
+  - name: "ENVIRONMENT_SYNC_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+
 resources:
   requests:
     cpu: "100m"
