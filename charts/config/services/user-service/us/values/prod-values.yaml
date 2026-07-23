@@ -12,7 +12,9 @@ extraSecretEnv:
 env:
   SPRING_PROFILES_ACTIVE: "prod"
 
-replicaCount: 1
+# Account registration and credential verification perform BCrypt work. Keep
+# several pods warm so a burst of new drivers cannot queue behind one CPU cap.
+replicaCount: 3
 
 config:
   enabled: true
@@ -23,10 +25,10 @@ config:
 
 resources:
   requests:
-    cpu: "100m"
+    cpu: "250m"
     memory: "512Mi"
   limits:
-    cpu: "500m"
+    cpu: "1000m"
     memory: "1Gi"
 
 ingress:

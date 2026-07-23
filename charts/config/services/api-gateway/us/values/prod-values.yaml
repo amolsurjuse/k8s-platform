@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 2
 
 env:
   SPRING_PROFILES_ACTIVE: "prod"
@@ -22,13 +22,16 @@ config:
     APP_HTTP_LOGGING_INCLUDE_BODIES: "false"
     APP_HTTP_LOGGING_FULL_REQUEST_RESPONSE: "false"
     LOGGING_LEVEL_COM_ELECTRAHUB_GATEWAY: "INFO"
+    # A bounded allowance for registration bursts. This remains far below the
+    # ingress timeout and prevents a valid queued BCrypt request becoming a 502.
+    GATEWAY_HTTP_CLIENT_READ_TIMEOUT: "30s"
 
 resources:
   requests:
-    cpu: "100m"
+    cpu: "150m"
     memory: "256Mi"
   limits:
-    cpu: "500m"
+    cpu: "750m"
     memory: "512Mi"
 
 ingress:

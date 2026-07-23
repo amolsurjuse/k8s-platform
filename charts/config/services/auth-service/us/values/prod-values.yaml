@@ -1,4 +1,5 @@
-replicaCount: 1
+# Keep token issuance and calls to user-service independent from a single pod.
+replicaCount: 2
 
 config:
   enabled: true
@@ -28,10 +29,10 @@ env:
 
 resources:
   requests:
-    cpu: "100m"
+    cpu: "200m"
     memory: "256Mi"
   limits:
-    cpu: "500m"
+    cpu: "750m"
     memory: "512Mi"
 
 ingress:
