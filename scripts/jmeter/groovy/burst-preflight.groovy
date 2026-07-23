@@ -136,34 +136,30 @@ try {
     throw new IllegalStateException('burst preflight requires ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN to exclude sessions already active in the session ledger')
   }
 
-  Set<String> activeSessionPairs = new LinkedHashSet<>()
-  List<String> candidateChargerIds = candidatesByKey.values()
-    .collect { String.valueOf(it.chargerId ?: '').trim() }
-    .findAll { !it.isEmpty() }
-    .unique()
-
-  candidateChargerIds.collate(100).each { chargerIds ->
-    String query = chargerIds.collect { chargerId ->
-      "chargerIds=${URLEncoder.encode(chargerId, StandardCharsets.UTF_8)}"
-    }.join('&')
-    def activeResponse = request(
-      'GET',
-      "${baseUrl}/session/api/v1/sessions/internal/active-by-chargers?${query}",
-      null,
+  Set<String> occupiedConnectorPairs = new LinkedHashSet<>()
+  candidatesByKey.values().toList().collate(250).each { connectorBatch ->
+    def occupancyResponse = request(
+      'POST',
+      "${baseUrl}/session/api/v1/sessions/internal/connector-occupancy",
+      [connectors: connectorBatch.collect { connector -> [
+        chargerId: connector.chargerId,
+        connectorRef: connector.connectorId,
+        connectorNumber: connector.connectorNumber
+      ] }],
       cleanupAdminToken
     )
-    def activeSessions = activeResponse instanceof List ? activeResponse : []
-    activeSessions.each { session ->
-      String chargerId = String.valueOf(session.chargerId ?: '').trim()
-      String connectorRef = String.valueOf(session.connectorRef ?: '').trim()
+    def occupiedConnectors = occupancyResponse instanceof List ? occupancyResponse : []
+    occupiedConnectors.each { connector ->
+      String chargerId = String.valueOf(connector.chargerId ?: '').trim()
+      String connectorRef = String.valueOf(connector.connectorRef ?: '').trim()
       if (!chargerId.isEmpty() && !connectorRef.isEmpty()) {
-        activeSessionPairs.add("${chargerId}/${connectorRef}")
+        occupiedConnectorPairs.add("${chargerId}/${connectorRef}")
       }
     }
   }
 
   def candidates = candidatesByKey.values()
-    .findAll { candidate -> !activeSessionPairs.contains("${candidate.chargerId}/${candidate.connectorId}") }
+    .findAll { candidate -> !occupiedConnectorPairs.contains("${candidate.chargerId}/${candidate.connectorId}") }
     .toList()
     .sort { left, right ->
     "${left.chargerId}/${left.connectorId}" <=> "${right.chargerId}/${right.connectorId}"
@@ -193,7 +189,7 @@ try {
     graphQlChargersScanned: graphQlChargers,
     graphQlAvailableConnectors: graphQlAvailableConnectors,
     eligibleExclusiveConnectors: candidates.size(),
-    activeSessionPairsFiltered: activeSessionPairs.size(),
+    occupiedConnectorPairsFiltered: occupiedConnectorPairs.size(),
     chargerIdPrefix: chargerIdPrefix,
     selected: selected
   ])), 'UTF-8')
