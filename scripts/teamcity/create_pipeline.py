@@ -663,23 +663,48 @@ EOF_STAGE
     exit 1
   fi
 
-  stats="$(awk -F, '
+  stats="$(awk '
+    function csvField(line, wanted,    index,field,quoted,ch,nextChar) {
+      field = 1
+      quoted = 0
+      value = ""
+      for (index = 1; index <= length(line); index++) {
+        ch = substr(line, index, 1)
+        nextChar = substr(line, index + 1, 1)
+        if (ch == "\\\"") {
+          if (quoted && nextChar == "\\\"") {
+            value = value ch
+            index++
+          } else {
+            quoted = !quoted
+          }
+        } else if (ch == "," && !quoted) {
+          if (field == wanted) return value
+          field++
+          value = ""
+        } else {
+          value = value ch
+        }
+      }
+      return field == wanted ? value : ""
+    }
     NR > 1 {
       total++
-      elapsed = $2 + 0
+      elapsed = csvField($0, 2) + 0
       sum += elapsed
       if (elapsed > max) max = elapsed
+      if (csvField($0, 8) == "false") failed++
     }
     END {
       avg = total ? sum / total : 0
-      printf "%d,%.0f,%.0f", total, avg, max
+      printf "%d,%.0f,%.0f,%d", total, avg, max, failed
     }
   ' "$JTL")"
 
   total="$(echo "$stats" | cut -d, -f1)"
   avg_elapsed="$(echo "$stats" | cut -d, -f2)"
   max_elapsed="$(echo "$stats" | cut -d, -f3)"
-  failed="$(grep -c ',false,' "$JTL" || true)"
+  failed="$(echo "$stats" | cut -d, -f4)"
   error_percent="$(awk "BEGIN { printf \\"%.2f\\", ($total ? ($failed * 100 / $total) : 100) }")"
 
   if [ "$status" -ne 0 ]; then
@@ -695,8 +720,36 @@ EOF_STAGE
 
   if [ "$result" != "PASS" ]; then
     echo "Load ladder stopped at stage ${stage_number}; breakpoint is around users=$USERS."
-    echo "Recent failures:"
-    grep ',false,' "$JTL" | head -20 | sed 's/^/FAILED: /' || true
+    echo "Failed sample labels and response codes:"
+    awk '
+      function csvField(line, wanted,    index,field,quoted,ch,nextChar) {
+        field = 1
+        quoted = 0
+        value = ""
+        for (index = 1; index <= length(line); index++) {
+          ch = substr(line, index, 1)
+          nextChar = substr(line, index + 1, 1)
+          if (ch == "\\\"") {
+            if (quoted && nextChar == "\\\"") {
+              value = value ch
+              index++
+            } else {
+              quoted = !quoted
+            }
+          } else if (ch == "," && !quoted) {
+            if (field == wanted) return value
+            field++
+            value = ""
+          } else {
+            value = value ch
+          }
+        }
+        return field == wanted ? value : ""
+      }
+      NR > 1 && csvField($0, 8) == "false" {
+        printf "FAILED: label=%s responseCode=%s\\n", csvField($0, 3), csvField($0, 4)
+      }
+    ' "$JTL" | head -20 || true
     echo "##teamcity[publishArtifacts '$RESULT_ROOT/** => jmeter-load']"
     exit 1
   fi
