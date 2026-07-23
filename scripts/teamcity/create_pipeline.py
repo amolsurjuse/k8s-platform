@@ -160,12 +160,16 @@ class TeamCityClient:
             return {"Authorization": f"Basic {basic}", "Accept": "application/json"}
         return {"Authorization": f"Bearer {self.token}", "Accept": "application/json"}
 
-    def request(self, method: str, path: str, body: dict[str, Any] | None = None) -> Any:
+    def request(self, method: str, path: str, body: dict[str, Any] | str | None = None) -> Any:
         headers = self._headers()
         data = None
         if body is not None:
-            data = json.dumps(body).encode("utf-8")
-            headers["Content-Type"] = "application/json"
+            if isinstance(body, str):
+                data = body.encode("utf-8")
+                headers["Content-Type"] = "text/plain"
+            else:
+                data = json.dumps(body).encode("utf-8")
+                headers["Content-Type"] = "application/json"
 
         if self.dry_run:
             if method.upper() == "GET":
@@ -181,14 +185,19 @@ class TeamCityClient:
                 return {}
             print(f"DRY-RUN {method} {path}")
             if body is not None:
-                print(json.dumps(body, indent=2))
+                print(body if isinstance(body, str) else json.dumps(body, indent=2))
             return {}
 
         request = urllib.request.Request(self._url(path), data=data, method=method.upper(), headers=headers)
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
                 payload = response.read().decode("utf-8")
-                return json.loads(payload) if payload else {}
+                if not payload:
+                    return {}
+                try:
+                    return json.loads(payload)
+                except json.JSONDecodeError:
+                    return payload
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")
             raise RuntimeError(f"{method} {path} failed with HTTP {exc.code}: {detail}") from exc
@@ -291,7 +300,25 @@ def ensure_parent_project(tc: TeamCityClient, cfg: PipelineConfig) -> None:
 
 def ensure_vcs_root(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     if tc.exists(f"/app/rest/vcs-roots/id:{cfg.vcs_root_id}"):
-        print(f"VCS root exists: {cfg.vcs_root_id}")
+        locator = f"id:{cfg.vcs_root_id}"
+        encoded_locator = urllib.parse.quote(locator, safe=":")
+        tc.request(
+            "PUT",
+            f"/app/rest/vcs-roots/{encoded_locator}/name",
+            f"{cfg.git_url}#refs/heads/{cfg.git_branch}",
+        )
+        for name, value in (
+            ("branch", f"refs/heads/{cfg.git_branch}"),
+            ("teamcity:branchSpec", "refs/heads/*"),
+            ("url", cfg.git_url),
+        ):
+            encoded_name = urllib.parse.quote(name, safe="")
+            tc.request(
+                "PUT",
+                f"/app/rest/vcs-roots/{encoded_locator}/properties/{encoded_name}",
+                value,
+            )
+        print(f"Updated VCS root: {cfg.vcs_root_id}")
         return
     tc.request("POST", "/app/rest/vcs-roots", {
         "id": cfg.vcs_root_id,
