@@ -664,17 +664,17 @@ EOF_STAGE
   fi
 
   stats="$(awk '
-    function csvField(line, wanted,    index,field,quoted,ch,nextChar) {
+    function csvField(line, wanted,    position,field,quoted,ch,nextChar) {
       field = 1
       quoted = 0
       value = ""
-      for (index = 1; index <= length(line); index++) {
-        ch = substr(line, index, 1)
-        nextChar = substr(line, index + 1, 1)
+      for (position = 1; position <= length(line); position++) {
+        ch = substr(line, position, 1)
+        nextChar = substr(line, position + 1, 1)
         if (ch == "\\\"") {
           if (quoted && nextChar == "\\\"") {
             value = value ch
-            index++
+            position++
           } else {
             quoted = !quoted
           }
@@ -722,17 +722,17 @@ EOF_STAGE
     echo "Load ladder stopped at stage ${stage_number}; breakpoint is around users=$USERS."
     echo "Failed sample labels and response codes:"
     awk '
-      function csvField(line, wanted,    index,field,quoted,ch,nextChar) {
+      function csvField(line, wanted,    position,field,quoted,ch,nextChar) {
         field = 1
         quoted = 0
         value = ""
-        for (index = 1; index <= length(line); index++) {
-          ch = substr(line, index, 1)
-          nextChar = substr(line, index + 1, 1)
+        for (position = 1; position <= length(line); position++) {
+          ch = substr(line, position, 1)
+          nextChar = substr(line, position + 1, 1)
           if (ch == "\\\"") {
             if (quoted && nextChar == "\\\"") {
               value = value ch
-              index++
+              position++
             } else {
               quoted = !quoted
             }
