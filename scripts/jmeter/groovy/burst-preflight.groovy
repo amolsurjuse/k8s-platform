@@ -2,6 +2,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 import java.net.HttpURLConnection
+import java.net.URLEncoder
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.time.Instant
@@ -30,7 +31,7 @@ def writeRequest = { HttpURLConnection connection, Object body ->
   connection.outputStream.withCloseable { stream -> stream.write(bytes) }
 }
 
-def request = { String method, String endpoint, Object body = null ->
+def request = { String method, String endpoint, Object body = null, String authorization = null ->
   HttpURLConnection connection = (HttpURLConnection) new URL(endpoint).openConnection()
   connection.requestMethod = method
   connection.connectTimeout = 30000
@@ -38,6 +39,9 @@ def request = { String method, String endpoint, Object body = null ->
   connection.setRequestProperty('Accept', 'application/json')
   connection.setRequestProperty('User-Agent', 'ElectraHubBurstPreflight/1.0')
   connection.setRequestProperty('X-ElectraHub-Test-Run', runId)
+  if (authorization != null && !authorization.trim().isEmpty()) {
+    connection.setRequestProperty('Authorization', "Bearer ${authorization.trim()}")
+  }
   writeRequest(connection, body)
   try {
     int status = connection.responseCode
@@ -127,7 +131,41 @@ try {
     if (chargers.size() < pageSize) break
   }
 
-  def candidates = candidatesByKey.values().toList().sort { left, right ->
+  String cleanupAdminToken = String.valueOf(System.getenv('ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN') ?: '').trim()
+  if (cleanupAdminToken.isEmpty()) {
+    throw new IllegalStateException('burst preflight requires ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN to exclude sessions already active in the session ledger')
+  }
+
+  Set<String> activeSessionPairs = new LinkedHashSet<>()
+  List<String> candidateChargerIds = candidatesByKey.values()
+    .collect { String.valueOf(it.chargerId ?: '').trim() }
+    .findAll { !it.isEmpty() }
+    .unique()
+
+  candidateChargerIds.collate(100).each { chargerIds ->
+    String query = chargerIds.collect { chargerId ->
+      "chargerIds=${URLEncoder.encode(chargerId, StandardCharsets.UTF_8)}"
+    }.join('&')
+    def activeResponse = request(
+      'GET',
+      "${baseUrl}/session/api/v1/sessions/internal/active-by-chargers?${query}",
+      null,
+      cleanupAdminToken
+    )
+    def activeSessions = activeResponse instanceof List ? activeResponse : []
+    activeSessions.each { session ->
+      String chargerId = String.valueOf(session.chargerId ?: '').trim()
+      String connectorRef = String.valueOf(session.connectorRef ?: '').trim()
+      if (!chargerId.isEmpty() && !connectorRef.isEmpty()) {
+        activeSessionPairs.add("${chargerId}/${connectorRef}")
+      }
+    }
+  }
+
+  def candidates = candidatesByKey.values()
+    .findAll { candidate -> !activeSessionPairs.contains("${candidate.chargerId}/${candidate.connectorId}") }
+    .toList()
+    .sort { left, right ->
     "${left.chargerId}/${left.connectorId}" <=> "${right.chargerId}/${right.connectorId}"
   }
   if (candidates.size() < requiredUsers) {
@@ -155,6 +193,7 @@ try {
     graphQlChargersScanned: graphQlChargers,
     graphQlAvailableConnectors: graphQlAvailableConnectors,
     eligibleExclusiveConnectors: candidates.size(),
+    activeSessionPairsFiltered: activeSessionPairs.size(),
     chargerIdPrefix: chargerIdPrefix,
     selected: selected
   ])), 'UTF-8')
