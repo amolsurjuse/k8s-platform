@@ -1,5 +1,10 @@
 replicaCount: 1
 
+# Fleet/runtime state and WebSocket ownership are local until the planned
+# Redis lease + shared command-bus design is introduced.
+deploymentStrategy:
+  type: Recreate
+
 extraSecretEnv:
   - name: "ENVIRONMENT_SYNC_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"

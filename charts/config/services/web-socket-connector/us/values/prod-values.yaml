@@ -1,5 +1,9 @@
 replicaCount: 1
 
+# Connection ownership is held in this pod's in-memory socket registry.
+deploymentStrategy:
+  type: Recreate
+
 resources:
   requests:
     cpu: "100m"

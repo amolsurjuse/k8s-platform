@@ -1,5 +1,10 @@
 replicaCount: 2
 
+# Leave empty for Kubernetes' default rolling update. Stateful WebSocket
+# workloads can opt into Recreate in their environment values so two pods never
+# own the same charge-point identity during a rollout.
+deploymentStrategy: {}
+
 image:
   repository: ""
   tag: ""

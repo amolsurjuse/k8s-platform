@@ -136,6 +136,24 @@ try {
     throw new IllegalStateException('burst preflight requires ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN to exclude sessions already active in the session ledger')
   }
 
+  // The simulator projection is not enough for a command-path load test. A
+  // connector is eligible only when OCPP has the same charge point locally
+  // connected; this prevents a stale simulator state from causing remote-start
+  // failures after the burst is already under way.
+  def ocppConnectionResponse = request(
+    'GET',
+    "${baseUrl}/ocpp/api/v1/ocpp/connections?size=1000",
+    null,
+    cleanupAdminToken
+  )
+  Set<String> locallyConnectedChargePoints = new LinkedHashSet<>()
+  (ocppConnectionResponse instanceof List ? ocppConnectionResponse : []).each { connection ->
+    String chargePointId = String.valueOf(connection.chargePointId ?: '').trim()
+    if (chargePointId && connection.active == true && connection.localConnected == true) {
+      locallyConnectedChargePoints.add(chargePointId)
+    }
+  }
+
   Set<String> occupiedConnectorPairs = new LinkedHashSet<>()
   candidatesByKey.values().toList().collate(250).each { connectorBatch ->
     def occupancyResponse = request(
@@ -159,13 +177,16 @@ try {
   }
 
   def candidates = candidatesByKey.values()
-    .findAll { candidate -> !occupiedConnectorPairs.contains("${candidate.chargerId}/${candidate.connectorId}") }
+    .findAll { candidate ->
+      locallyConnectedChargePoints.contains(candidate.chargerId) &&
+        !occupiedConnectorPairs.contains("${candidate.chargerId}/${candidate.connectorId}")
+    }
     .toList()
     .sort { left, right ->
     "${left.chargerId}/${left.connectorId}" <=> "${right.chargerId}/${right.connectorId}"
   }
   if (candidates.size() < requiredUsers) {
-    throw new IllegalStateException("burst preflight found only ${candidates.size()} exclusive live connectors for ${requiredUsers} requested users; simulatorConnected=${simulatorConnectedChargers}, simulatorAvailable=${simulatorAvailableConnectors}, graphQlChargers=${graphQlChargers}, graphQlAvailable=${graphQlAvailableConnectors}")
+    throw new IllegalStateException("burst preflight found only ${candidates.size()} exclusive end-to-end live connectors for ${requiredUsers} requested users; simulatorConnected=${simulatorConnectedChargers}, ocppLocallyConnected=${locallyConnectedChargePoints.size()}, simulatorAvailable=${simulatorAvailableConnectors}, graphQlChargers=${graphQlChargers}, graphQlAvailable=${graphQlAvailableConnectors}")
   }
 
   File target = new File(connectorsFile)
@@ -185,6 +206,7 @@ try {
     requestedUsers: requiredUsers,
     allocatedConnectors: selected.size(),
     simulatorConnectedChargers: simulatorConnectedChargers,
+    ocppLocallyConnectedChargePoints: locallyConnectedChargePoints.size(),
     simulatorAvailableConnectors: simulatorAvailableConnectors,
     graphQlChargersScanned: graphQlChargers,
     graphQlAvailableConnectors: graphQlAvailableConnectors,

@@ -11,6 +11,11 @@ extraSecretEnv:
 
 replicaCount: 1
 
+# OCPP sessions are socket-local today. Recreate prevents a rollout from
+# briefly accepting two live WebSocket sessions for one charge point.
+deploymentStrategy:
+  type: Recreate
+
 env:
   SPRING_PROFILES_ACTIVE: "prod"
   JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1024m"
