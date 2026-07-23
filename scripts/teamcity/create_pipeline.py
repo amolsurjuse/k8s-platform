@@ -617,8 +617,8 @@ echo "MaxErrorPercent=$MAX_ERROR_PERCENT"
 echo "DynamicConnectorSelection=%regression.dynamic.connector.selection% ConnectorStartAttempts=%regression.connector.start.attempts%"
 echo "JMeter image=%jmeter.image%"
 
-if [ -z "${ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN:-}" ]; then
-  echo "ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN is required for the card-burst cleanup flow. Configure it as a protected TeamCity environment parameter."
+if [ -z "${ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN:-}" ] && { [ -z "${ELECTRAHUB_LOAD_CLEANUP_ADMIN_EMAIL:-}" ] || [ -z "${ELECTRAHUB_LOAD_CLEANUP_ADMIN_PASSWORD:-}" ]; }; then
+  echo "The card-burst cleanup flow requires a protected cleanup admin token or protected cleanup admin email/password parameters."
   exit 1
 fi
 
@@ -648,6 +648,8 @@ EOF_STAGE
   CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
     -w /work \
     -e ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN \
+    -e ELECTRAHUB_LOAD_CLEANUP_ADMIN_EMAIL \
+    -e ELECTRAHUB_LOAD_CLEANUP_ADMIN_PASSWORD \
     -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2" \
     "%jmeter.image%" \
     -n \

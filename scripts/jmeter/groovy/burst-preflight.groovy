@@ -133,8 +133,24 @@ try {
 
   String cleanupAdminToken = String.valueOf(System.getenv('ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN') ?: '').trim()
   if (cleanupAdminToken.isEmpty()) {
-    throw new IllegalStateException('burst preflight requires ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN to exclude sessions already active in the session ledger')
+    String cleanupAdminEmail = String.valueOf(System.getenv('ELECTRAHUB_LOAD_CLEANUP_ADMIN_EMAIL') ?: '').trim()
+    String cleanupAdminPassword = String.valueOf(System.getenv('ELECTRAHUB_LOAD_CLEANUP_ADMIN_PASSWORD') ?: '').trim()
+    if (cleanupAdminEmail.isEmpty() || cleanupAdminPassword.isEmpty()) {
+      throw new IllegalStateException('burst preflight requires a protected cleanup admin token or cleanup admin email/password')
+    }
+
+    def cleanupAdminLogin = request('POST', "${baseUrl}/auth/api/auth/login", [
+      email: cleanupAdminEmail,
+      password: cleanupAdminPassword
+    ])
+    cleanupAdminToken = String.valueOf(cleanupAdminLogin?.accessToken ?: '').trim()
+    if (cleanupAdminToken.isEmpty()) {
+      throw new IllegalStateException('cleanup admin login returned no access token')
+    }
   }
+  // Each ladder stage runs in a fresh JMeter process. Keep its short-lived
+  // token in JMeter properties only; it is never printed or persisted.
+  props.put('cleanup_admin_token', cleanupAdminToken)
 
   // The simulator projection is not enough for a command-path load test. A
   // connector is eligible only when OCPP has the same charge point locally
