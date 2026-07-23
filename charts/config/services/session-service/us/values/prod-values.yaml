@@ -12,7 +12,10 @@ extraSecretEnv:
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
 
-replicaCount: 2
+# A charging burst drives both synchronous starts and OCPP status/meter events.
+# Four replicas isolate that fan-out while keeping the aggregate PostgreSQL
+# connection budget below the production server limit.
+replicaCount: 4
 
 env:
   SPRING_PROFILES_ACTIVE: "prod"
@@ -31,9 +34,9 @@ config:
     SERVER_TOMCAT_THREADS_MAX: "64"
     SERVER_TOMCAT_THREADS_MIN_SPARE: "12"
     SERVER_TOMCAT_ACCEPT_COUNT: "100"
-    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "12"
+    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "16"
     SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "4"
-    SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "10000"
+    SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "30000"
 
 startupProbe:
   enabled: true
