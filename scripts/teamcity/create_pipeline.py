@@ -204,6 +204,36 @@ class TeamCityClient:
         except urllib.error.URLError as exc:
             raise RuntimeError(f"{method} {path} failed: {exc.reason}") from exc
 
+    def request_text(self, method: str, path: str, body: str) -> str:
+        """Update TeamCity primitive REST properties that require text/plain.
+
+        Most TeamCity endpoints accept JSON, but VCS root names and individual
+        property values are primitive resources.  TeamCity rejects those calls
+        when the request advertises application/json in Accept.
+        """
+        if self.dry_run:
+            print(f"DRY-RUN {method} {path}")
+            print(body)
+            return ""
+
+        headers = self._headers()
+        headers["Accept"] = "text/plain"
+        headers["Content-Type"] = "text/plain"
+        request = urllib.request.Request(
+            self._url(path),
+            data=body.encode("utf-8"),
+            method=method.upper(),
+            headers=headers,
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return response.read().decode("utf-8")
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"{method} {path} failed with HTTP {exc.code}: {detail}") from exc
+        except urllib.error.URLError as exc:
+            raise RuntimeError(f"{method} {path} failed: {exc.reason}") from exc
+
     def exists(self, path: str) -> bool:
         if self.dry_run:
             print(f"DRY-RUN GET {path}")
@@ -302,7 +332,7 @@ def ensure_vcs_root(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     if tc.exists(f"/app/rest/vcs-roots/id:{cfg.vcs_root_id}"):
         locator = f"id:{cfg.vcs_root_id}"
         encoded_locator = urllib.parse.quote(locator, safe=":")
-        tc.request(
+        tc.request_text(
             "PUT",
             f"/app/rest/vcs-roots/{encoded_locator}/name",
             f"{cfg.git_url}#refs/heads/{cfg.git_branch}",
@@ -313,7 +343,7 @@ def ensure_vcs_root(tc: TeamCityClient, cfg: PipelineConfig) -> None:
             ("url", cfg.git_url),
         ):
             encoded_name = urllib.parse.quote(name, safe="")
-            tc.request(
+            tc.request_text(
                 "PUT",
                 f"/app/rest/vcs-roots/{encoded_locator}/properties/{encoded_name}",
                 value,
