@@ -13,7 +13,7 @@ replicaCount: 1
 
 env:
   SPRING_PROFILES_ACTIVE: "prod"
-  JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m"
+  JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1024m"
 
 config:
   data:
@@ -41,8 +41,8 @@ resources:
     cpu: "250m"
     memory: "512Mi"
   limits:
-    cpu: "1"
-    memory: "1Gi"
+    cpu: "2"
+    memory: "2Gi"
 
 ingress:
   enabled: false
