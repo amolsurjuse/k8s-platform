@@ -1,0 +1,41 @@
+fullnameOverride: vllm
+
+# Keep disabled on clusters without a GPU. Set replicaCount: 1 only after a GPU node
+# with at least 24GiB VRAM has been assigned and the model cache has adequate storage.
+replicaCount: 0
+
+image:
+  repository: vllm/vllm-openai
+  tag: v0.10.1
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+model:
+  repository: Qwen/Qwen3-8B
+  servedName: sparky-qwen3-8b
+  maxModelLen: 8192
+  gpuMemoryUtilization: "0.88"
+  dtype: auto
+  quantization: ""
+  trustRemoteCode: false
+
+persistence:
+  enabled: false
+  size: 24Gi
+
+resources:
+  requests:
+    cpu: "2"
+    memory: 8Gi
+    nvidia.com/gpu: "1"
+  limits:
+    cpu: "8"
+    memory: 16Gi
+    nvidia.com/gpu: "1"
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,6 @@
+# Production currently has no allocatable NVIDIA GPU. Keep the runtime disabled
+# until a GPU node with at least 24GiB VRAM is available.
+replicaCount: 0
+
+persistence:
+  enabled: false

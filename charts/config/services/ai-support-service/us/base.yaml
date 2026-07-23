@@ -15,17 +15,33 @@ secrets:
   optional: true
   env:
     OPENAI_API_KEY: OPENAI_API_KEY
+    GEMINI_API_KEY: GEMINI_API_KEY
 
 config:
   data:
     SERVER_PORT: "8094"
     AI_PROVIDER_ENABLED: "true"
     AI_PROVIDER: "openai"
+    AI_PROVIDER_CHAIN: "openai"
     OPENAI_BASE_URL: "https://api.openai.com"
     OLLAMA_BASE_URL: "http://ollama:11434"
     AI_MODEL: "gpt-4.1-mini"
+    AI_VLLM_ENABLED: "false"
+    VLLM_BASE_URL: "http://vllm:8000"
+    VLLM_MODEL: "sparky-qwen3-8b"
+    AI_VLLM_TIMEOUT_MS: "7000"
+    AI_OLLAMA_ENABLED: "true"
+    OLLAMA_MODEL: "electrahub-sparky:4b"
+    AI_OLLAMA_TIMEOUT_MS: "14000"
+    AI_OLLAMA_MAX_CONCURRENT_REQUESTS: "1"
+    AI_GEMINI_ENABLED: "false"
+    AI_HOSTED_FALLBACK_ENABLED: "false"
+    GEMINI_BASE_URL: "https://generativelanguage.googleapis.com"
+    GEMINI_MODEL: "gemini-2.5-flash-lite"
+    AI_GEMINI_TIMEOUT_MS: "7000"
+    AI_PROVIDER_FAILURE_COOLDOWN_MS: "30000"
     AI_TEMPERATURE: "0.12"
-    AI_MAX_OUTPUT_TOKENS: "320"
+    AI_MAX_OUTPUT_TOKENS: "180"
     AI_LLM_TIMEOUT_MS: "30000"
     AI_DIAGNOSTICS_TIMEOUT_MS: "1800"
     AI_DIAGNOSTICS_TOTAL_TIMEOUT_MS: "3000"

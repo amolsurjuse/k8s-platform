@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vllm-prod
+  namespace: argocd
+spec:
+  project: electrahub-prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: infrastructure/vllm
+    helm:
+      releaseName: vllm
+      valueFiles:
+        - values.yaml
+        - ../../platform-config/infrastructure/vllm/us/values/prod.yaml
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
