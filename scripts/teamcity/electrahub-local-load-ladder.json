@@ -12,17 +12,17 @@
   "agentName": "",
   "addVcsTrigger": false,
   "jmeterImage": "amolsurjuse/electrahub-jmeter:5.6.3-java17",
-  "jmeterPlan": "scripts/jmeter/03-full-e2e-charging-100-users.jmx",
+  "jmeterPlan": "scripts/jmeter/09-card-burst-cleanup.jmx",
   "regressionBaseUrl": "https://api.electrahub.net",
   "regressionUsers": "5",
   "regressionRampSeconds": "60",
   "regressionHoldSeconds": "60",
   "regressionSseSeconds": "30",
   "regressionHostHeader": "",
-  "regressionDynamicConnectorSelection": "true",
-  "regressionConnectorStartAttempts": "20",
+  "regressionDynamicConnectorSelection": "false",
+  "regressionConnectorStartAttempts": "1",
   "regressionRequestTimeoutMs": "120000",
   "regressionSessionCommandTimeoutMs": "180000",
-  "jmeterLoadMaxErrorPercent": "5",
-  "jmeterLoadStages": "5:60:60:30 10:120:90:45 20:180:120:60 35:240:120:60 50:300:120:60 75:450:180:90 100:600:180:90"
+  "jmeterLoadMaxErrorPercent": "0",
+  "jmeterLoadStages": "10:1:60:30 50:1:60:30 100:1:60:30 150:1:60:30 200:1:60:30 250:1:60:30 300:1:60:30 400:1:60:30 450:1:60:30 500:1:60:30"
 }

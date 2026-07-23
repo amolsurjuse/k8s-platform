@@ -46,6 +46,15 @@ BigDecimal lowBalanceThreshold = new BigDecimal(props.getProperty('low_balance_t
 String usersOutput = props.getProperty('users_output', 'scripts/jmeter/data/generated-users.csv')
 String connectorsCsv = props.getProperty('connectors_csv', 'scripts/jmeter/data/connectors-100.csv')
 boolean dynamicConnectorSelection = props.getProperty('dynamic_connector_selection', 'false').toBoolean()
+String sessionPaymentMethod = props.getProperty('session_payment_method', action == 'card-burst' ? 'CARD' : 'WALLET').trim().toUpperCase(Locale.ROOT)
+boolean cardOnlyPayment = sessionPaymentMethod in ['CARD', 'CREDIT_CARD']
+boolean exclusiveConnectorAllocation = props.getProperty('exclusive_connector_allocation', action == 'card-burst' ? 'true' : 'false').toBoolean()
+boolean cleanupTestAccount = props.getProperty('cleanup_test_account', action == 'card-burst' ? 'true' : 'false').toBoolean()
+boolean persistGeneratedUser = props.getProperty('persist_generated_user', action == 'card-burst' ? 'false' : 'true').toBoolean()
+String cleanupAdminToken = props.getProperty(
+  'cleanup_admin_token',
+  System.getenv('ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN') ?: ''
+).trim()
 String currentStep = 'init'
 
 def logLine = { String message ->
@@ -265,6 +274,7 @@ def registerOrLogin = {
 }
 
 def appendGeneratedUser = {
+  if (!persistGeneratedUser) return
   String uid = vars.get('userId') ?: ''
   if (!uid) return
   File file = new File(usersOutput)
@@ -310,7 +320,7 @@ def setupPayment = { String token ->
   def card = atStep('add card') { request('POST', '/payment/api/v1/payment/cards', [
     brand: 'Visa',
     nickname: "JMeter ${userNumber}",
-    cardNumber: "411111111111${String.format('%04d', threadIndex % 10000)}",
+    cardNumber: props.getProperty('test_card_number', '4242424242424242'),
     expiry: '12/30'
   ], token) }
   requireStatus(card, [201, 200, 409], 'add card')
@@ -318,15 +328,19 @@ def setupPayment = { String token ->
     vars.put('paymentCardId', String.valueOf(card.json.id))
   }
 
-  BigDecimal setupTopupAmount = action == 'idle-fee-wallet-reserve'
-    ? new BigDecimal(props.getProperty('idle_fee_wallet_insufficient_balance', '54.99'))
-    : walletTopupAmount
-  def topup = atStep('wallet topup') { request('POST', '/payment/api/v1/payment/wallet/topups', [
-    amount: setupTopupAmount,
-    source: 'MANUAL',
-    note: "JMeter ${runId}"
-  ], token) }
-  requireStatus(topup, [201, 200], 'wallet topup')
+  if (!cardOnlyPayment) {
+    BigDecimal setupTopupAmount = action == 'idle-fee-wallet-reserve'
+      ? new BigDecimal(props.getProperty('idle_fee_wallet_insufficient_balance', '54.99'))
+      : walletTopupAmount
+    def topup = atStep('wallet topup') { request('POST', '/payment/api/v1/payment/wallet/topups', [
+      amount: setupTopupAmount,
+      source: 'MANUAL',
+      note: "JMeter ${runId}"
+    ], token) }
+    requireStatus(topup, [201, 200], 'wallet topup')
+  } else {
+    logLine('card-only payment selected; wallet top-up is intentionally skipped')
+  }
 
   def cards = requireStatus(atStep('payment cards after setup') { request('GET', '/payment/api/v1/payment/cards', null, token) }, [200], 'payment cards after setup')
   if (!vars.get('paymentCardId')) {
@@ -336,7 +350,7 @@ def setupPayment = { String token ->
     }
   }
   def state = requireStatus(atStep('payment state after setup') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state after setup')
-  logLine("payment ready wallet=${state.json?.wallet?.balance}")
+  logLine("payment ready method=${sessionPaymentMethod} wallet=${state.json?.wallet?.balance} card=${vars.get('paymentCardId') ?: 'unknown'}")
   token
 }
 
@@ -355,6 +369,47 @@ def paymentCardId = { String token ->
   }
   vars.put('paymentCardId', cardId)
   cardId
+}
+
+def deleteTestPaymentCard = { String token ->
+  String cardId = vars.get('paymentCardId') ?: ''
+  if (!cardId) {
+    logLine('test account cleanup did not find an active card to remove')
+    return
+  }
+  def response = atStep('remove test payment card') {
+    request('DELETE', "/payment/api/v1/payment/cards/${URLEncoder.encode(cardId, 'UTF-8')}", null, token)
+  }
+  requireStatus(response, [200, 204, 404], 'remove test payment card')
+  vars.put('paymentCardDeleted', 'true')
+  logLine("removed generated payment card=${cardId}")
+}
+
+def deleteTestUser = {
+  if (!cleanupTestAccount) return
+  String normalizedEmail = email.toLowerCase(Locale.ROOT)
+  if (!normalizedEmail.endsWith('@electrahub.test')) {
+    throw new IllegalStateException("refusing to delete a non-test account: ${email}")
+  }
+  if (!cleanupAdminToken || cleanupAdminToken.startsWith('%')) {
+    throw new IllegalStateException('cleanup_test_account requires the protected cleanup_admin_token parameter')
+  }
+  String uid = vars.get('userId') ?: ''
+  if (!uid) {
+    throw new IllegalStateException('generated test user has no userId; refusing account cleanup')
+  }
+  def response = atStep('delete generated test user') {
+    request('DELETE', "/user/api/v1/admin/users/${URLEncoder.encode(uid, 'UTF-8')}", null, cleanupAdminToken)
+  }
+  requireStatus(response, [200, 202, 204, 404], 'delete generated test user')
+  vars.put('testUserDeleted', 'true')
+  logLine("deleted generated test user=${uid}")
+}
+
+def cleanupGeneratedTestArtifacts = { String token ->
+  if (!cleanupTestAccount || !token) return
+  deleteTestPaymentCard(token)
+  deleteTestUser()
 }
 
 def configureAutoTopUp = { String token, boolean enabled, BigDecimal threshold, BigDecimal amount ->
@@ -592,15 +647,7 @@ def startSession = { String token ->
     }
   }
   if (attempts.isEmpty()) {
-    def csvCandidates = readCsvConnectorCandidates()
-    if (!csvCandidates.isEmpty()) {
-      int startAt = Math.max(0, Math.min(threadIndex - 1, csvCandidates.size() - 1))
-      int maxAttempts = Math.min(csvCandidates.size(), Math.max(5, props.getProperty('connector_start_attempts', String.valueOf(csvCandidates.size())) as int))
-      for (int i = 0; i < maxAttempts; i++) {
-        attempts << csvCandidates[(startAt + i) % csvCandidates.size()]
-      }
-      logLine("using connector csv fallback attempts=${attempts.size()} startIndex=${startAt + 1}/${csvCandidates.size()}")
-    } else {
+    if (exclusiveConnectorAllocation) {
       attempts << [
         chargerId: chargerId,
         locationId: locationId,
@@ -608,6 +655,25 @@ def startSession = { String token ->
         connectorNumber: connectorNumber,
         connectorType: connectorType
       ]
+      logLine("using exclusively allocated connector ${chargerId}/${connectorId}")
+    } else {
+      def csvCandidates = readCsvConnectorCandidates()
+      if (!csvCandidates.isEmpty()) {
+        int startAt = Math.max(0, Math.min(threadIndex - 1, csvCandidates.size() - 1))
+        int maxAttempts = Math.min(csvCandidates.size(), Math.max(5, props.getProperty('connector_start_attempts', String.valueOf(csvCandidates.size())) as int))
+        for (int i = 0; i < maxAttempts; i++) {
+          attempts << csvCandidates[(startAt + i) % csvCandidates.size()]
+        }
+        logLine("using connector csv fallback attempts=${attempts.size()} startIndex=${startAt + 1}/${csvCandidates.size()}")
+      } else {
+        attempts << [
+          chargerId: chargerId,
+          locationId: locationId,
+          connectorId: connectorId,
+          connectorNumber: connectorNumber,
+          connectorType: connectorType
+        ]
+      }
     }
   }
 
@@ -633,7 +699,7 @@ def startSession = { String token ->
       connectorNumber: connectorNumber,
       connectorType: connectorType,
       idToken: uid,
-      paymentMethod: 'WALLET',
+      paymentMethod: sessionPaymentMethod,
       currency: 'USD',
       idempotencyKey: UUID.randomUUID().toString()
     ]
@@ -646,7 +712,7 @@ def startSession = { String token ->
       logLine("started session=${sessionId} charger=${chargerId}/${connectorId} status=${response.json.status} remote=${response.json.remoteStartStatus} attempt=${attemptNumber}/${attempts.size()}")
       return sessionId
     }
-    if ([409, 503].contains(response.status as int) && attemptNumber < attempts.size()) {
+    if (!exclusiveConnectorAllocation && [409, 503].contains(response.status as int) && attemptNumber < attempts.size()) {
       logLine("start skipped ${chargerId}/${connectorId} HTTP ${response.status}; trying next connector")
       sleep(1000)
       continue
@@ -775,7 +841,11 @@ def sendSimulatorChargingStop = {
     (normalizedStopBody.contains('"status":"stopped"') ||
       normalizedStopBody.contains('connector not found') ||
       normalizedStopBody.contains('transaction not found'))) {
-    logLine("simulator charging stop returned non-fatal HTTP 400 after unplug signal charger=${chargerId} connectorNumber=${number} body=${stopBody}")
+    logLine("simulator charging stop returned non-fatal HTTP 400 after unplug signal; publishing Available fallback charger=${chargerId} connectorNumber=${number} body=${stopBody}")
+    sendSimulatorStatus('Available')
+    if ((props.getProperty('allow_backend_ocpp_status_fallback', 'false') as String).toBoolean()) {
+      sendBackendOcppStatus('Available')
+    }
     return
   }
   if ((response.status as int) == 404) {
@@ -874,8 +944,10 @@ def stopSession = { String token, String sessionId ->
 def validateStoppedAndReceipt = { String token, String sessionId, boolean expectSubscriptionDiscount = false ->
   long deadline = System.currentTimeMillis() + 120000L
   boolean goneFromActive = false
-  boolean unplugRequested = false
-  long activeFirstSeenAt = 0L
+  // A receipt confirms financial finalization. It does not prove the vehicle was
+  // unplugged, so always emit the physical disconnect before accepting completion.
+  logLine("sending simulator physical stop for session ${sessionId} before receipt validation")
+  sendSimulatorChargingStop()
   while (System.currentTimeMillis() < deadline) {
     def active = activeSession(token)
     def sessions = active.json instanceof List ? active.json : []
@@ -883,18 +955,6 @@ def validateStoppedAndReceipt = { String token, String sessionId, boolean expect
     if (activeMatch == null) {
       goneFromActive = true
       break
-    }
-    if (activeFirstSeenAt == 0L) {
-      activeFirstSeenAt = System.currentTimeMillis()
-    }
-    if (!unplugRequested &&
-      ((activeMatch.idleFeeEnabled == true &&
-        activeMatch.unplugRequiredToStop == true &&
-        String.valueOf(activeMatch.status ?: '').equalsIgnoreCase('SUSPENDED')) ||
-        System.currentTimeMillis() - activeFirstSeenAt >= 10000L)) {
-      logLine("session ${sessionId} still active after remote stop; sending simulator physical stop before receipt validation")
-      sendSimulatorChargingStop()
-      unplugRequested = true
     }
     sleep(5000)
   }
@@ -1000,14 +1060,18 @@ try {
   long startedAt = System.currentTimeMillis()
   String token
 
-  if (action == 'setup' || action == 'full' || action == 'idle-fee' || action == 'idle-fee-wallet-reserve' || action == 'subscription-discount' || action == 'low-balance-auto-stop' || action == 'low-balance-check' || action == 'auto-top-up-check') {
+  if (action == 'card-burst' && cleanupTestAccount && (!cleanupAdminToken || cleanupAdminToken.startsWith('%'))) {
+    throw new IllegalStateException('card-burst requires a protected cleanup_admin_token so generated accounts are removed')
+  }
+
+  if (action == 'setup' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'idle-fee-wallet-reserve' || action == 'subscription-discount' || action == 'low-balance-auto-stop' || action == 'low-balance-check' || action == 'auto-top-up-check') {
     token = registerOrLogin()
     appendGeneratedUser()
     token = setupPayment(token)
   } else if (action == 'charging') {
     token = login()
   } else {
-    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, idle-fee, idle-fee-wallet-reserve, subscription-discount, low-balance-auto-stop, low-balance-check, or auto-top-up-check.")
+    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, card-burst, idle-fee, idle-fee-wallet-reserve, subscription-discount, low-balance-auto-stop, low-balance-check, or auto-top-up-check.")
   }
 
   if (action == 'low-balance-check') {
@@ -1019,8 +1083,12 @@ try {
     validateIdleFeeWalletReserveStart(token)
   }
 
-  if (action == 'charging' || action == 'full' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-auto-stop') {
-    discoverChargers(token)
+  if (action == 'charging' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-auto-stop') {
+    if (action != 'card-burst') {
+      discoverChargers(token)
+    } else {
+      logLine("using connector allocated by burst preflight ${chargerId}/${connectorId}")
+    }
     requireStatus(atStep('payment state before start') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state before start')
     String sessionId = startSession(token)
     activeSession(token)
@@ -1046,6 +1114,8 @@ try {
     }
   }
 
+  cleanupGeneratedTestArtifacts(token)
+
   SampleResult.setSuccessful(true)
   SampleResult.setResponseCode('200')
   SampleResult.setResponseMessage("${action} completed for ${email}")
@@ -1056,6 +1126,9 @@ try {
     chargerId: chargerId,
     connectorId: connectorId,
     sessionId: vars.get('sessionId'),
+    paymentMethod: sessionPaymentMethod,
+    paymentCardDeleted: vars.get('paymentCardDeleted'),
+    testUserDeleted: vars.get('testUserDeleted'),
     sseSessionEvents: vars.get('sseSessionEvents'),
     sseSnapshotEvents: vars.get('sseSnapshotEvents'),
     completedAt: Instant.now().toString()
@@ -1064,10 +1137,15 @@ try {
   try {
     String cleanupToken = vars.get('accessToken')
     String cleanupSessionId = vars.get('sessionId')
+    boolean terminalReceiptConfirmed = true
     if (cleanupToken && cleanupSessionId) {
       logLine("cleanup after failed sample for session=${cleanupSessionId}")
       stopSession(cleanupToken, cleanupSessionId)
       sendSimulatorChargingStop()
+      validateStoppedAndReceipt(cleanupToken, cleanupSessionId)
+    }
+    if (cleanupToken && terminalReceiptConfirmed) {
+      cleanupGeneratedTestArtifacts(cleanupToken)
     }
   } catch (Throwable cleanupError) {
     log.warn("[electrahub-jmeter][${action}][${userNumber}] cleanup failed: ${cleanupError.message ?: cleanupError.class.name}", cleanupError)

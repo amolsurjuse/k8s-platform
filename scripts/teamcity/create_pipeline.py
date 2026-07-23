@@ -590,6 +590,11 @@ echo "MaxErrorPercent=$MAX_ERROR_PERCENT"
 echo "DynamicConnectorSelection=%regression.dynamic.connector.selection% ConnectorStartAttempts=%regression.connector.start.attempts%"
 echo "JMeter image=%jmeter.image%"
 
+if [ -z "${ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN:-}" ]; then
+  echo "ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN is required for the card-burst cleanup flow. Configure it as a protected TeamCity environment parameter."
+  exit 1
+fi
+
 DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker pull "%jmeter.image%"
 DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm --entrypoint java "%jmeter.image%" -version
 DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm "%jmeter.image%" --version | head -25
@@ -615,6 +620,7 @@ EOF_STAGE
   echo "== Stage ${stage_number}: users=$USERS ramp=${RAMP}s hold=${HOLD}s sse=${SSE}s =="
   CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
     -w /work \
+    -e ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN \
     -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2" \
     "%jmeter.image%" \
     -n \
@@ -633,6 +639,13 @@ EOF_STAGE
     -Jconnector_start_attempts="%regression.connector.start.attempts%" \
     -Jrequest_timeout_ms="%regression.request.timeout.ms%" \
     -Jsession_command_timeout_ms="%regression.session.command.timeout.ms%" \
+    -Jsession_payment_method="CARD" \
+    -Jexclusive_connector_allocation=true \
+    -Jcleanup_test_account=true \
+    -Jconnectors_file="$STAGE_DIR/connectors.csv" \
+    -Jcharger_page_size=200 \
+    -Jcharger_max_pages=10 \
+    -Jcharger_id_prefix="EH-US-" \
     -Jrun_id="tc-%build.number%-stage${stage_number}-u${USERS}" \
     -Jjmeter.save.saveservice.output_format=csv \
     -Jjmeter.save.saveservice.print_field_names=true \
