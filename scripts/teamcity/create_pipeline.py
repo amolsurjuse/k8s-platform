@@ -723,15 +723,16 @@ EOF_STAGE
   fi
 
   stats="$(awk '
-    function csvField(line, wanted,    position,field,quoted,ch,nextChar,value) {
+    function csvField(line, wanted,    position,field,quoted,ch,nextChar,value,quote) {
       field = 1
       quoted = 0
       value = ""
+      quote = sprintf("%c", 34)
       for (position = 1; position <= length(line); position++) {
         ch = substr(line, position, 1)
         nextChar = substr(line, position + 1, 1)
-        if (ch == "\"") {
-          if (quoted && nextChar == "\"") {
+        if (ch == quote) {
+          if (quoted && nextChar == quote) {
             value = value ch
             position++
           } else {
