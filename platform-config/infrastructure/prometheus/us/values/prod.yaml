@@ -59,8 +59,28 @@ scrapeTargets:
     targets: ["ai-support-service.prod.svc.cluster.local:8094"]
 
 podEndpointTargets:
+  - name: api-gateway-pods
+    namespace: prod
+    environment: prod
+    serviceName: api-gateway
+    portName: http
+  - name: auth-service-pods
+    namespace: prod
+    environment: prod
+    serviceName: auth-service
+    portName: http
   - name: session-service-pods
     namespace: prod
     environment: prod
     serviceName: session-service
+    portName: http
+  - name: payment-service-pods
+    namespace: prod
+    environment: prod
+    serviceName: payment-service
+    portName: http
+  - name: ocpp-service-pods
+    namespace: prod
+    environment: prod
+    serviceName: ocpp-service
     portName: http
