@@ -11,6 +11,15 @@ config:
   data:
     PORT: "8081"
     BASE_URL: "http://ocpp-simulator:8081"
+    REDIS_HOST: "redis"
+    REDIS_PORT: "6379"
+    REDIS_TIMEOUT: "500ms"
+    # Enable leader mode only in environment overlays after the Redis password
+    # and pod address are supplied. Single remains safe for local development.
+    SIMULATOR_CLUSTER_MODE: "single"
+    SIMULATOR_CLUSTER_LEASE_KEY: "ocpp-simulator:fleet:leader"
+    SIMULATOR_CLUSTER_LEASE_TTL: "15s"
+    SIMULATOR_CLUSTER_LEASE_RENEW_INTERVAL: "5s"
     WS_CONNECTOR_BASE_URL: "http://web-socket-connector:8091"
     DEFAULT_CSMS_URL: "ws://ocpp-service:8082/ws/ocpp"
     PAYMENT_SERVICE_URL: "http://payment-service:8083"

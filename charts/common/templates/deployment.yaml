@@ -51,6 +51,7 @@ spec:
           {{- $secretName := $secrets.existingSecretName | default "" }}
           {{- $secretOptional := $secrets.optional | default false }}
           {{- $extraSecretEnv := .Values.extraSecretEnv | default list }}
+          {{- $extraFieldRefEnv := .Values.extraFieldRefEnv | default list }}
 
           {{- if and .Values.config.enabled (gt (len .Values.config.data) 0) }}
           envFrom:
@@ -58,7 +59,7 @@ spec:
                 name: {{ include "common.fullname" . }}-config
           {{- end }}
 
-          {{- if or (gt (len $plainEnv) 0) (gt (len $secretsEnv) 0) (gt (len $extraSecretEnv) 0) }}
+          {{- if or (gt (len $plainEnv) 0) (gt (len $secretsEnv) 0) (gt (len $extraSecretEnv) 0) (gt (len $extraFieldRefEnv) 0) }}
           env:
             {{- /* Plain env vars */}}
             {{- range $k, $v := $plainEnv }}
@@ -97,6 +98,23 @@ spec:
                 secretKeyRef:
                   name: {{ $entry.secretName }}
                   key: {{ $entry.secretKey }}
+            {{- end }}
+
+            {{- /* Pod metadata values from the Kubernetes Downward API */}}
+            {{- range $entry := $extraFieldRefEnv }}
+            {{- if not $entry.name }}
+              {{- fail "extraFieldRefEnv[].name is required" }}
+            {{- end }}
+            {{- if not $entry.fieldPath }}
+              {{- fail "extraFieldRefEnv[].fieldPath is required" }}
+            {{- end }}
+            - name: {{ $entry.name }}
+              valueFrom:
+                fieldRef:
+                  fieldPath: {{ $entry.fieldPath }}
+                  {{- if $entry.apiVersion }}
+                  apiVersion: {{ $entry.apiVersion }}
+                  {{- end }}
             {{- end }}
           {{- end }}
 

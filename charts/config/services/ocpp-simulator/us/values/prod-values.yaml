@@ -1,7 +1,7 @@
 replicaCount: 1
 
-# Fleet/runtime state and WebSocket ownership are local until the planned
-# Redis lease + shared command-bus design is introduced.
+# Begin with one elected fleet owner. A standby replica is enabled only after
+# the owner lease and proxy behavior have been verified in production.
 deploymentStrategy:
   type: Recreate
 
@@ -9,6 +9,17 @@ extraSecretEnv:
   - name: "ENVIRONMENT_SYNC_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+  - name: "REDIS_PASSWORD"
+    secretName: "redis-prod-secret"
+    secretKey: "redis-password"
+
+extraFieldRefEnv:
+  - name: "POD_IP"
+    fieldPath: "status.podIP"
+
+config:
+  data:
+    SIMULATOR_CLUSTER_MODE: "leader"
 
 resources:
   requests:
