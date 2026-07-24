@@ -1,9 +1,12 @@
-replicaCount: 1
+replicaCount: 2
 
 # Begin with one elected fleet owner. A standby replica is enabled only after
 # the owner lease and proxy behavior have been verified in production.
 deploymentStrategy:
-  type: Recreate
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
 
 extraSecretEnv:
   - name: "ENVIRONMENT_SYNC_INTERNAL_TOKEN"
@@ -46,7 +49,8 @@ hpa:
   enabled: false
 
 pdb:
-  enabled: false
+  enabled: true
+  minAvailable: 1
 
 metrics:
   servicemonitor:
