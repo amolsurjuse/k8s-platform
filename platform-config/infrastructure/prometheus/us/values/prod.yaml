@@ -57,3 +57,10 @@ scrapeTargets:
     namespace: prod
     environment: prod
     targets: ["ai-support-service.prod.svc.cluster.local:8094"]
+
+podEndpointTargets:
+  - name: session-service-pods
+    namespace: prod
+    environment: prod
+    serviceName: session-service
+    portName: http

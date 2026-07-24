@@ -21,6 +21,7 @@ spec:
         app.kubernetes.io/name: {{ include "prometheus.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ default (include "prometheus.name" .) .Values.serviceAccount.name }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534

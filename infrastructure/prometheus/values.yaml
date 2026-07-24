@@ -26,3 +26,12 @@ resources:
     memory: 2Gi
 
 scrapeTargets: []
+
+# Service DNS resolves to a virtual IP, which exposes only one replica per
+# scrape. Use endpoint discovery for workloads where per-pod JVM evidence is
+# required during capacity tests and incident analysis.
+podEndpointTargets: []
+
+serviceAccount:
+  create: true
+  name: ""
