@@ -22,6 +22,11 @@ env:
   SERVER_TOMCAT_THREADS_MAX: "500"
   SERVER_TOMCAT_THREADS_MIN_SPARE: "50"
   SERVER_TOMCAT_ACCEPT_COUNT: "1000"
+  # Keep charger callbacks off WebSocket I/O threads. The executor is bounded
+  # and preserves callback order per charge point.
+  OCPP_INBOUND_CALL_EXECUTOR_CORE_POOL_SIZE: "64"
+  OCPP_INBOUND_CALL_EXECUTOR_MAX_POOL_SIZE: "64"
+  OCPP_INBOUND_CALL_EXECUTOR_QUEUE_CAPACITY: "2000"
 
 config:
   data:
