@@ -827,7 +827,43 @@ def sendSimulatorMeterValue = { long meterWh ->
   requireStatus(response, [200, 202], 'simulator meter value')
 }
 
-def sendSimulatorChargingStop = {
+def authorizeSimulatorUnplugIfRequired = { String token, String sessionId ->
+  def active = findActiveSession(token, sessionId)
+  if (active == null) {
+    logLine("simulator unplug authorization skipped because session is already terminal session=${sessionId}")
+    return
+  }
+
+  boolean requiresAuthorization = active.idleFeeEnabled == true || active.unplugRequiredToStop == true
+  if (!requiresAuthorization) {
+    return
+  }
+
+  def simulator = active.simulator instanceof Map ? active.simulator : [:]
+  String code = simulator.securityCode == null ? null : String.valueOf(simulator.securityCode).trim()
+  String simulatorChargerId = simulator.chargerId == null ? String.valueOf(chargerId) : String.valueOf(simulator.chargerId)
+  String simulatorConnectorId = simulator.connectorId == null ? String.valueOf(connectorId) : String.valueOf(simulator.connectorId)
+  if (!code) {
+    throw new IllegalStateException("idle-fee session ${sessionId} is missing its simulator security code")
+  }
+
+  def response = atStep('authorize simulator unplug') {
+    request('POST', "/session/api/v1/sessions/${sessionId}/simulator/verify-code", [
+      code: code,
+      action: 'UNPLUG',
+      chargerId: simulatorChargerId,
+      connectorId: simulatorConnectorId
+    ], token, sessionCommandTimeoutMs)
+  }
+  requireStatus(response, [200], 'authorize simulator unplug')
+  if (response.json?.valid != true || String.valueOf(response.json?.action ?: '').toUpperCase(Locale.ROOT) != 'UNPLUG') {
+    throw new IllegalStateException("simulator unplug authorization was not granted for ${sessionId}: ${response.body}")
+  }
+  logLine("simulator unplug authorized session=${sessionId} charger=${simulatorChargerId} connector=${simulatorConnectorId}")
+}
+
+def sendSimulatorChargingStop = { String token, String sessionId ->
+  authorizeSimulatorUnplugIfRequired(token, sessionId)
   int number = (vars.get('connectorNumber') ?: String.valueOf(connectorNumber ?: 1)) as int
   long meterStopWh = (props.getProperty('idle_flow_meter_stop_wh', props.getProperty('idle_flow_meter_wh', '1201500')) as long)
   def response = atStep('simulator charging stop') {
@@ -946,10 +982,8 @@ def stopSession = { String token, String sessionId ->
 def validateStoppedAndReceipt = { String token, String sessionId, boolean expectSubscriptionDiscount = false ->
   long deadline = System.currentTimeMillis() + 120000L
   boolean goneFromActive = false
-  // A receipt confirms financial finalization. It does not prove the vehicle was
-  // unplugged, so always emit the physical disconnect before accepting completion.
-  logLine("sending simulator physical stop for session ${sessionId} before receipt validation")
-  sendSimulatorChargingStop()
+  boolean unplugRequested = false
+  long activeFirstSeenAt = 0L
   while (System.currentTimeMillis() < deadline) {
     def active = activeSession(token)
     def sessions = active.json instanceof List ? active.json : []
@@ -957,6 +991,18 @@ def validateStoppedAndReceipt = { String token, String sessionId, boolean expect
     if (activeMatch == null) {
       goneFromActive = true
       break
+    }
+    if (activeFirstSeenAt == 0L) {
+      activeFirstSeenAt = System.currentTimeMillis()
+    }
+    if (!unplugRequested &&
+      ((activeMatch.idleFeeEnabled == true &&
+        activeMatch.unplugRequiredToStop == true &&
+        String.valueOf(activeMatch.status ?: '').equalsIgnoreCase('SUSPENDED')) ||
+        System.currentTimeMillis() - activeFirstSeenAt >= 10000L)) {
+      logLine("session ${sessionId} still active after remote stop; sending simulator physical stop before receipt validation")
+      sendSimulatorChargingStop(token, sessionId)
+      unplugRequested = true
     }
     sleep(5000)
   }
@@ -999,7 +1045,6 @@ def validateSubscriptionDiscountFlow = { String token, String sessionId ->
   }
   logLine("subscription discount active session=${sessionId} regular=${discounted.regularCost} discounted=${discounted.discountedCost ?: discounted.estimatedCost} discount=${discounted.subscriptionDiscountAmount} plan=${discounted.subscriptionPlanCode}")
   stopSession(token, sessionId)
-  sendSimulatorChargingStop()
   validateStoppedAndReceipt(token, sessionId, true)
 }
 
@@ -1034,7 +1079,6 @@ def validateIdleFeeFlow = { String token, String sessionId ->
   }
   logLine("backend idle tick ok session=${sessionId} billableMinutes=${wholeIdleMinutes} idleSeconds=${afterBackendTick.idleSeconds} idleFeeAmount=${afterBackendTick.idleFeeAmount} estimatedCost=${afterBackendTick.estimatedCost}")
 
-  sendSimulatorChargingStop()
   validateStoppedAndReceipt(token, sessionId)
 }
 
@@ -1051,10 +1095,6 @@ def validateLowBalanceAutoStopFlow = { String token, String sessionId ->
   }
   logLine("low-balance auto-stop observed session=${sessionId} status=${stopRequested.status} stopReason=${stopRequested.stopReason} remoteStopRequestedAt=${stopRequested.remoteStopRequestedAt} estimatedCost=${stopRequested.estimatedCost}")
 
-  String status = String.valueOf(stopRequested.status ?: '').toUpperCase(Locale.ROOT)
-  if (status == 'SUSPENDED' && stopRequested.unplugRequiredToStop == true) {
-    sendSimulatorChargingStop()
-  }
   validateStoppedAndReceipt(token, sessionId)
 }
 
@@ -1139,12 +1179,12 @@ try {
   try {
     String cleanupToken = vars.get('accessToken')
     String cleanupSessionId = vars.get('sessionId')
-    boolean terminalReceiptConfirmed = true
+    boolean terminalReceiptConfirmed = false
     if (cleanupToken && cleanupSessionId) {
       logLine("cleanup after failed sample for session=${cleanupSessionId}")
       stopSession(cleanupToken, cleanupSessionId)
-      sendSimulatorChargingStop()
       validateStoppedAndReceipt(cleanupToken, cleanupSessionId)
+      terminalReceiptConfirmed = true
     }
     if (cleanupToken && terminalReceiptConfirmed) {
       cleanupGeneratedTestArtifacts(cleanupToken)
