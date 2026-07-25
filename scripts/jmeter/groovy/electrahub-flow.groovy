@@ -634,6 +634,7 @@ def startSession = { String token ->
     throw new IllegalStateException('chargerId, connectorId, and locationId are required. Check connectors CSV.')
   }
   String uid = vars.get('userId') ?: ''
+  String startCardId = cardOnlyPayment ? paymentCardId(token) : null
   def attempts = []
   String candidatesJson = vars.get('connectorCandidatesJson')
   if (dynamicConnectorSelection && candidatesJson) {
@@ -700,6 +701,7 @@ def startSession = { String token ->
       connectorType: connectorType,
       idToken: uid,
       paymentMethod: sessionPaymentMethod,
+      cardId: startCardId,
       currency: 'USD',
       idempotencyKey: UUID.randomUUID().toString()
     ]
