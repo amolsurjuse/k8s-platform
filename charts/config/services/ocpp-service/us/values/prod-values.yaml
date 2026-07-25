@@ -27,11 +27,16 @@ env:
   OCPP_INBOUND_CALL_EXECUTOR_CORE_POOL_SIZE: "64"
   OCPP_INBOUND_CALL_EXECUTOR_MAX_POOL_SIZE: "64"
   OCPP_INBOUND_CALL_EXECUTOR_QUEUE_CAPACITY: "2000"
-  # Meter and status telemetry are intentionally isolated from lifecycle
-  # callbacks. The service coalesces it per connector before delivery.
-  OCPP_TELEMETRY_EXECUTOR_CORE_POOL_SIZE: "16"
-  OCPP_TELEMETRY_EXECUTOR_MAX_POOL_SIZE: "16"
+  # Lifecycle callbacks are ordered per connector; meter and status updates
+  # remain coalesced behind them. Keep enough workers for a burst without
+  # allowing individual connector streams to reorder.
+  OCPP_TELEMETRY_EXECUTOR_CORE_POOL_SIZE: "32"
+  OCPP_TELEMETRY_EXECUTOR_MAX_POOL_SIZE: "32"
   OCPP_TELEMETRY_EXECUTOR_QUEUE_CAPACITY: "1000"
+  OCPP_SESSION_CALLBACK_MAX_LIFECYCLE_EVENTS_PER_CONNECTOR: "32"
+  OCPP_SESSION_CALLBACK_RETRY_MAX_ATTEMPTS: "8"
+  OCPP_SESSION_CALLBACK_RETRY_INITIAL_BACKOFF_MS: "250"
+  OCPP_SESSION_CALLBACK_RETRY_MAX_BACKOFF_MS: "5000"
 
 config:
   data:

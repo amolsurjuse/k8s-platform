@@ -102,6 +102,53 @@ data:
           "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
           "targets": [{ "expr": "histogram_quantile(0.95, sum by (le, action, outcome) (rate(electrahub_ocpp_remote_command_duration_seconds_bucket{service=\"ocpp-service\"}[5m])))", "legendFormat": "p95", "refId": "A" }],
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 33 }
+        },
+        {
+          "id": 10,
+          "type": "timeseries",
+          "title": "OCPP Lifecycle Callback Backlog",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "max(ocpp_session_callbacks_pending_lifecycle{service=\"ocpp-service\"})", "legendFormat": "pending lifecycle callbacks", "refId": "A" }],
+          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 41 }
+        },
+        {
+          "id": 11,
+          "type": "timeseries",
+          "title": "OCPP Lifecycle Retries and Dead Letters",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [
+            { "expr": "sum by (type) (increase(ocpp_session_callbacks_retries_total{service=\"ocpp-service\"}[5m]))", "legendFormat": "retries {{`{{type}}`}}", "refId": "A" },
+            { "expr": "sum by (type) (increase(ocpp_session_callbacks_dead_letters_total{service=\"ocpp-service\"}[5m]))", "legendFormat": "dead letters {{`{{type}}`}}", "refId": "B" }
+          ],
+          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 41 }
+        },
+        {
+          "id": 12,
+          "type": "timeseries",
+          "title": "Session Service Hikari Pool Pressure",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [
+            { "expr": "max by (pod) (hikaricp_connections_active{service=\"session-service\"})", "legendFormat": "active {{`{{pod}}`}}", "refId": "A" },
+            { "expr": "max by (pod) (hikaricp_connections_pending{service=\"session-service\"})", "legendFormat": "pending {{`{{pod}}`}}", "refId": "B" },
+            { "expr": "max by (pod) (hikaricp_connections_max{service=\"session-service\"})", "legendFormat": "max {{`{{pod}}`}}", "refId": "C" }
+          ],
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 41 }
+        },
+        {
+          "id": 13,
+          "type": "timeseries",
+          "title": "Burst JVM Heap by Pod",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "sum by (service, pod) (jvm_memory_used_bytes{service=~\"ocpp-service|session-service\",area=\"heap\"})", "legendFormat": "{{`{{service}}`}} {{`{{pod}}`}}", "refId": "A" }],
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 49 }
+        },
+        {
+          "id": 14,
+          "type": "timeseries",
+          "title": "Burst JVM Live Threads by Pod",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "max by (service, pod) (jvm_threads_live_threads{service=~\"ocpp-service|session-service\"})", "legendFormat": "{{`{{service}}`}} {{`{{pod}}`}}", "refId": "A" }],
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 49 }
         }
       ]
     }
