@@ -17,7 +17,7 @@ spec:
       valueFiles:
         - session-service/values.yaml
         - ../config/services/session-service/us/base.yaml
-        - ../config/services/session-service/us/values/prod-values.yaml
+        - ../config/services/session-service/us/prod.yaml
         - ../config/services/session-service/us/version/prod-version.yaml
   syncPolicy:
     syncOptions:
