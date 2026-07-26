@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: electrahub-prod
+  namespace: argocd
+spec:
+  description: ElectraHub production workloads
+  sourceRepos:
+    - https://github.com/amolsurjuse/k8s-platform.git
+  destinations:
+    - namespace: prod
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
