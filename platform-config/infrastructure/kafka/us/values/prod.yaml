@@ -1,0 +1,22 @@
+fullnameOverride: kafka
+replicaCount: 3
+controllerQuorumVoters: "0@kafka-0.kafka-headless:9093,1@kafka-1.kafka-headless:9093,2@kafka-2.kafka-headless:9093"
+
+persistence:
+  size: 50Gi
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: "2"
+    memory: 2Gi
+
+topics:
+  replicationFactor: 3
+  minInSyncReplicas: 2
+
+pdb:
+  enabled: true
+  minAvailable: 2

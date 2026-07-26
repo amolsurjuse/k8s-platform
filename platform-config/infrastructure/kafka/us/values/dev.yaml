@@ -1,0 +1,12 @@
+fullnameOverride: kafka
+replicaCount: 1
+
+persistence:
+  size: 10Gi
+
+topics:
+  replicationFactor: 1
+  minInSyncReplicas: 1
+
+pdb:
+  enabled: false

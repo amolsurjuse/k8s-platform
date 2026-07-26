@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kafka.name" . }}-topics
+  labels:
+    {{- include "kafka.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 12
+  template:
+    metadata:
+      labels:
+        {{- include "kafka.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: topics
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/bash", "-ec"]
+          args:
+            - |
+              until /opt/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.name" . }}:9092 --list >/dev/null 2>&1; do sleep 5; done
+              create_topic() {
+                /opt/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.name" . }}:9092 --create --if-not-exists \
+                  --topic "$1" --partitions "$2" --replication-factor {{ .Values.topics.replicationFactor }} \
+                  --config min.insync.replicas={{ .Values.topics.minInSyncReplicas }}
+              }
+              create_topic ocpp.device-events.v2 {{ .Values.topics.deviceEventsPartitions }}
+              create_topic dead-letter.v2 {{ .Values.topics.deadLetterPartitions }}
+              create_topic session.lifecycle.v2 {{ .Values.topics.lifecyclePartitions }}
+              create_topic eh.charging.receipt.generated.v1 {{ .Values.topics.lifecyclePartitions }}

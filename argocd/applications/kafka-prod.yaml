@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: session-service-prod
+  name: kafka-prod
   namespace: argocd
 spec:
   project: electrahub-prod
@@ -11,14 +11,11 @@ spec:
   source:
     repoURL: https://github.com/amolsurjuse/k8s-platform.git
     targetRevision: develop
-    path: charts/common
+    path: infrastructure/kafka
     helm:
-      releaseName: session-service
+      releaseName: kafka
       valueFiles:
-        - session-service/values.yaml
-        - ../config/services/session-service/us/base.yaml
-        - ../config/services/session-service/us/values/prod-values.yaml
-        - ../config/services/session-service/us/version/prod-version.yaml
+        - ../../platform-config/infrastructure/kafka/us/values/prod.yaml
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
