@@ -24,7 +24,7 @@ image:
   pullPolicy: Always
 
 podAnnotations:
-  electrahub.io/config-revision: "ocpp-kafka-consumer-v1"
+  electrahub.io/config-revision: "ocpp-lifecycle-reliability-v2"
 
 config:
   data:
@@ -36,6 +36,8 @@ config:
     SESSION_OCPP_EVENT_GROUP_ID: "session-lifecycle-v2"
     SESSION_OCPP_EVENT_DEAD_LETTER_TOPIC: "dead-letter.v2"
     SESSION_OCPP_EVENT_CONCURRENCY: "8"
+    SESSION_OCPP_EVENT_INBOX_RETENTION_DAYS: "14"
+    SPRING_KAFKA_CONSUMER_MAX_POLL_RECORDS: "100"
     SESSION_ANALYTICS_KAFKA_ENABLED: "false"
     SESSION_ANALYTICS_RECEIPT_TOPIC: "eh.charging.receipt.generated.v1"
     SIMULATOR_PUBLIC_URL: "https://ocpp-simulator.electrahub.net/"
@@ -100,4 +102,4 @@ pdb:
 
 metrics:
   servicemonitor:
-    enabled: false
+    enabled: true

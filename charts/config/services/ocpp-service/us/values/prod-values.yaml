@@ -87,4 +87,4 @@ pdb:
 
 metrics:
   servicemonitor:
-    enabled: false
+    enabled: true

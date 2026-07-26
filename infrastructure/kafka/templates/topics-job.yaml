@@ -30,5 +30,7 @@ spec:
               }
               create_topic ocpp.device-events.v2 {{ .Values.topics.deviceEventsPartitions }}
               create_topic dead-letter.v2 {{ .Values.topics.deadLetterPartitions }}
+              /opt/kafka/bin/kafka-configs.sh --bootstrap-server {{ include "kafka.name" . }}:9092 \
+                --entity-type topics --entity-name dead-letter.v2 --alter --add-config retention.ms=1209600000
               create_topic session.lifecycle.v2 {{ .Values.topics.lifecyclePartitions }}
               create_topic eh.charging.receipt.generated.v1 {{ .Values.topics.lifecyclePartitions }}

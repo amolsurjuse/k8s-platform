@@ -29,7 +29,7 @@ resources:
 topics:
   deviceEventsPartitions: 24
   lifecyclePartitions: 12
-  deadLetterPartitions: 6
+  deadLetterPartitions: 24
   replicationFactor: 1
   minInSyncReplicas: 1
 
