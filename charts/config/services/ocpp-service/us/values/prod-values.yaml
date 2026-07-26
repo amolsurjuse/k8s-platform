@@ -11,6 +11,9 @@ extraSecretEnv:
 
 replicaCount: 1
 
+podAnnotations:
+  electrahub.io/config-revision: "ocpp-kafka-producer-v1"
+
 # OCPP sessions are socket-local today. Recreate prevents a rollout from
 # briefly accepting two live WebSocket sessions for one charge point.
 deploymentStrategy:
@@ -42,6 +45,12 @@ config:
   data:
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
     SPRING_LIQUIBASE_ENABLED: "false"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+    OCPP_EVENT_KAFKA_ENABLED: "true"
+    OCPP_LEGACY_SESSION_CALLBACKS_ENABLED: "false"
+    OCPP_DEVICE_EVENT_TOPIC: "ocpp.device-events.v2"
+    OCPP_EVENT_TENANT_ID: "electrahub"
+    OCPP_EVENT_PUBLISH_TIMEOUT: "3s"
 
 startupProbe:
   enabled: true
