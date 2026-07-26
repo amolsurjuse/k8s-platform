@@ -16,6 +16,9 @@ config:
     LOGGING_LEVEL_COM_ELECTRAHUB_IDENTITY_OBSERVABILITY: "WARN"
     APP_SECURITY_OAUTH_GOOGLE_ENABLED: "true"
     APP_SECURITY_OAUTH_GOOGLE_AUDIENCES: "980843194952-sk5qap0mioa9qf5pbcv43kuujn7r405j.apps.googleusercontent.com,980843194952-01u6ejpuhqlqh9j7o5bicui674uf6k8h.apps.googleusercontent.com"
+    APP_SECURITY_OAUTH_FACEBOOK_ENABLED: "true"
+    APP_SECURITY_OAUTH_FACEBOOK_APP_ID: "2072104083371434"
+    APP_SECURITY_OAUTH_FACEBOOK_AUTO_PROVISION_USERS: "true"
     APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
     APP_DRIVER_RESET_PASSWORD_URL: "https://driver-portal.electrahub.net/reset-password"
 
@@ -29,6 +32,9 @@ extraSecretEnv:
   - name: "APP_SECURITY_JWT_SECRET"
     secretName: "auth-jwt-prod-secret"
     secretKey: "APP_SECURITY_JWT_SECRET"
+  - name: "APP_SECURITY_OAUTH_FACEBOOK_APP_SECRET"
+    secretName: "facebook-oauth-prod-secret"
+    secretKey: "APP_SECURITY_OAUTH_FACEBOOK_APP_SECRET"
 
 env:
   JAVA_TOOL_OPTIONS: "-Xms128m -Xmx384m -XX:+ExitOnOutOfMemoryError"
