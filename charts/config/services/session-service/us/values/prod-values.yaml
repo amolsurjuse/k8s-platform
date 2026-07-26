@@ -24,7 +24,7 @@ image:
   pullPolicy: Always
 
 podAnnotations:
-  electrahub.io/config-revision: "ocpp-lifecycle-reliability-v2"
+  electrahub.io/config-revision: "ocpp-workload-isolation-v3"
 
 config:
   data:
@@ -35,9 +35,11 @@ config:
     SESSION_OCPP_EVENT_TOPIC: "ocpp.device-events.v2"
     SESSION_OCPP_EVENT_GROUP_ID: "session-lifecycle-v2"
     SESSION_OCPP_EVENT_DEAD_LETTER_TOPIC: "dead-letter.v2"
-    SESSION_OCPP_EVENT_CONCURRENCY: "8"
+    # Keep the Kafka lane below the JDBC pool ceiling. Telemetry is Redis-only;
+    # the remaining lifecycle writes cannot consume every connection needed by HTTP starts.
+    SESSION_OCPP_EVENT_CONCURRENCY: "4"
     SESSION_OCPP_EVENT_INBOX_RETENTION_DAYS: "14"
-    SPRING_KAFKA_CONSUMER_MAX_POLL_RECORDS: "100"
+    SPRING_KAFKA_CONSUMER_MAX_POLL_RECORDS: "50"
     SESSION_ANALYTICS_KAFKA_ENABLED: "false"
     SESSION_ANALYTICS_RECEIPT_TOPIC: "eh.charging.receipt.generated.v1"
     SIMULATOR_PUBLIC_URL: "https://ocpp-simulator.electrahub.net/"
