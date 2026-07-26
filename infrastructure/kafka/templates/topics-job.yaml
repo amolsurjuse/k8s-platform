@@ -27,6 +27,12 @@ spec:
                 /opt/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.name" . }}:9092 --create --if-not-exists \
                   --topic "$1" --partitions "$2" --replication-factor {{ .Values.topics.replicationFactor }} \
                   --config min.insync.replicas={{ .Values.topics.minInSyncReplicas }}
+                current_partitions=$(/opt/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.name" . }}:9092 \
+                  --describe --topic "$1" | sed -n '1s/.*PartitionCount: \([0-9][0-9]*\).*/\1/p')
+                if [ -n "$current_partitions" ] && [ "$current_partitions" -lt "$2" ]; then
+                  /opt/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.name" . }}:9092 \
+                    --alter --topic "$1" --partitions "$2"
+                fi
               }
               create_topic ocpp.device-events.v2 {{ .Values.topics.deviceEventsPartitions }}
               create_topic dead-letter.v2 {{ .Values.topics.deadLetterPartitions }}
