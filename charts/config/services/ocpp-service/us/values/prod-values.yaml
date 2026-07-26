@@ -85,6 +85,3 @@ hpa:
 pdb:
   enabled: false
 
-metrics:
-  servicemonitor:
-    enabled: true
