@@ -14,6 +14,8 @@ config:
     SERVER_TOMCAT_ACCEPT_COUNT: "250"
     SERVER_TOMCAT_MAX_CONNECTIONS: "600"
     LOGGING_LEVEL_COM_ELECTRAHUB_IDENTITY_OBSERVABILITY: "WARN"
+    APP_SECURITY_OAUTH_GOOGLE_ENABLED: "true"
+    APP_SECURITY_OAUTH_GOOGLE_AUDIENCES: "980843194952-sk5qap0mioa9qf5pbcv43kuujn7r405j.apps.googleusercontent.com,980843194952-01u6ejpuhqlqh9j7o5bicui674uf6k8h.apps.googleusercontent.com"
     APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
     APP_DRIVER_RESET_PASSWORD_URL: "https://driver-portal.electrahub.net/reset-password"
 
