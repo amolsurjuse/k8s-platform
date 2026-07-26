@@ -722,44 +722,35 @@ EOF_STAGE
     exit 1
   fi
 
-  stats="$(awk '
-    function csvField(line, wanted,    position,field,quoted,ch,nextChar,value,quote) {
-      field = 1
-      quoted = 0
-      value = ""
-      quote = sprintf("%c", 34)
-      for (position = 1; position <= length(line); position++) {
-        ch = substr(line, position, 1)
-        nextChar = substr(line, position + 1, 1)
-        if (ch == quote) {
-          if (quoted && nextChar == quote) {
-            value = value ch
-            position++
-          } else {
-            quoted = !quoted
-          }
-        } else if (ch == "," && !quoted) {
-          if (field == wanted) return value
-          field++
-          value = ""
-        } else {
-          value = value ch
-        }
-      }
-      return field == wanted ? value : ""
-    }
-    NR > 1 {
-      total++
-      elapsed = csvField($0, 2) + 0
-      sum += elapsed
-      if (elapsed > max) max = elapsed
-      if (csvField($0, 8) == "false") failed++
-    }
-    END {
-      avg = total ? sum / total : 0
-      printf "%d,%.0f,%.0f,%d", total, avg, max, failed
-    }
-  ' "$JTL")"
+  # JMeter writes quoted response messages that can contain embedded newlines.
+  # A line-oriented awk parser silently splits those records and can turn a
+  # failed stage into a false pass. Parse the CSV records with Python instead.
+  stats="$(python3 - "$JTL" <<'PY'
+import csv
+import sys
+
+path = sys.argv[1]
+total = 0
+failed = 0
+elapsed_sum = 0
+max_elapsed = 0
+
+with open(path, newline="", encoding="utf-8") as handle:
+    reader = csv.DictReader(handle)
+    if reader.fieldnames is None or not {"elapsed", "success"}.issubset(reader.fieldnames):
+        raise SystemExit("JMeter JTL is missing the elapsed or success column")
+    for row in reader:
+        total += 1
+        elapsed = int(row.get("elapsed") or 0)
+        elapsed_sum += elapsed
+        max_elapsed = max(max_elapsed, elapsed)
+        if str(row.get("success")).lower() != "true":
+            failed += 1
+
+average = elapsed_sum / total if total else 0
+print(f"{total},{average:.0f},{max_elapsed},{failed}")
+PY
+)"
 
   total="$(echo "$stats" | cut -d, -f1)"
   avg_elapsed="$(echo "$stats" | cut -d, -f2)"

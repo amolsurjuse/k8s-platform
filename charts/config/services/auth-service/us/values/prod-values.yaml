@@ -1,12 +1,19 @@
-# Keep token issuance and calls to user-service independent from a single pod.
-replicaCount: 2
+# Registration, token issuance, and user-service calls must remain available
+# during a burst. Four warm replicas keep a 250-user burst below the bounded
+# request concurrency of each pod.
+replicaCount: 4
 
 config:
   enabled: true
   data:
     ENV_AUTH_DATASOURCE_URL: "jdbc:postgresql://postgresql:5432/user_db"
-    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
+    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "8"
     SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
+    SERVER_TOMCAT_THREADS_MAX: "96"
+    SERVER_TOMCAT_THREADS_MIN_SPARE: "16"
+    SERVER_TOMCAT_ACCEPT_COUNT: "250"
+    SERVER_TOMCAT_MAX_CONNECTIONS: "600"
+    LOGGING_LEVEL_COM_ELECTRAHUB_IDENTITY_OBSERVABILITY: "WARN"
     APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
     APP_DRIVER_RESET_PASSWORD_URL: "https://driver-portal.electrahub.net/reset-password"
 
@@ -22,6 +29,7 @@ extraSecretEnv:
     secretKey: "APP_SECURITY_JWT_SECRET"
 
 env:
+  JAVA_TOOL_OPTIONS: "-Xms128m -Xmx384m -XX:+ExitOnOutOfMemoryError"
   SPRING_PROFILES_ACTIVE: "prod"
   SPRING_LIQUIBASE_ENABLED: "true"
   APP_CORS_ALLOWED_ORIGIN_PATTERNS: "https://electrahub.net,https://www.electrahub.net,https://api.electrahub.net,https://admin-portal.electrahub.net,https://driver-portal.electrahub.net,https://ocpp-simulator.electrahub.net"
@@ -29,11 +37,11 @@ env:
 
 resources:
   requests:
-    cpu: "200m"
-    memory: "256Mi"
-  limits:
-    cpu: "750m"
+    cpu: "500m"
     memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "768Mi"
 
 ingress:
   enabled: false
