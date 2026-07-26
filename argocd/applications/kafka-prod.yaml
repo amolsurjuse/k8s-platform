@@ -17,5 +17,8 @@ spec:
       valueFiles:
         - ../../platform-config/infrastructure/kafka/us/values/prod.yaml
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
