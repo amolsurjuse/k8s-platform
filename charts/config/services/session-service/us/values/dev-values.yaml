@@ -14,6 +14,9 @@ replicaCount: 2
 image:
   pullPolicy: Always
 
+podAnnotations:
+  electrahub.io/config-revision: "ocpp-kafka-consumer-v1"
+
 config:
   data:
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
