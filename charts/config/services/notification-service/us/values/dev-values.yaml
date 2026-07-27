@@ -32,9 +32,6 @@ config:
     NOTIFICATION_DRIVER_RESET_PASSWORD_URL: "https://driver-portal-dev.electrahub.net/reset-password"
 
 extraSecretEnv:
-  - name: FIREBASE_PROJECT_ID
-    secretName: notification-firebase-secret
-    secretKey: FIREBASE_PROJECT_ID
   - name: FIREBASE_SERVICE_ACCOUNT_BASE64
     secretName: notification-firebase-secret
     secretKey: FIREBASE_SERVICE_ACCOUNT_BASE64
