@@ -8,9 +8,17 @@ config:
     SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
     APP_DRIVER_RESET_PASSWORD_URL: "https://driver-portal-dev.electrahub.net/reset-password"
     APP_DRIVER_VERIFY_EMAIL_URL: "https://driver-portal-dev.electrahub.net/verify-email"
+    APP_SECURITY_OAUTH_FACEBOOK_ENABLED: "true"
+    APP_SECURITY_OAUTH_FACEBOOK_APP_ID: "2072104083371434"
+    APP_SECURITY_OAUTH_FACEBOOK_AUTO_PROVISION_USERS: "true"
 
 secrets:
   existingSecretName: "auth-secrets-dev"
+
+extraSecretEnv:
+  - name: "APP_SECURITY_OAUTH_FACEBOOK_APP_SECRET"
+    secretName: "facebook-oauth-dev-secret"
+    secretKey: "APP_SECURITY_OAUTH_FACEBOOK_APP_SECRET"
 
 env:
   SPRING_PROFILES_ACTIVE: "dev"
