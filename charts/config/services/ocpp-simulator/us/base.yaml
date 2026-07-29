@@ -1,4 +1,6 @@
 fullnameOverride: "ocpp-simulator"
+podAnnotations:
+  electrahub.io/config-revision: "all-region-fleet-v1"
 image:
   repository: amolsurjuse/ocpi-simulator
   tag: "19"
