@@ -27,7 +27,7 @@ config:
     AUTO_SEED_CHARGERS: "true"
     AUTO_SYNC_ENVIRONMENT_CHARGERS: "true"
     ENVIRONMENT_SYNC_URL: "http://charger-management-service:8086"
-    ENVIRONMENT_SYNC_CHARGERS_PATH: "/api/v1/internal/simulator/chargers/connectors?search=EH-US"
+    ENVIRONMENT_SYNC_CHARGERS_PATH: "/api/v1/internal/simulator/chargers/connectors"
     ENVIRONMENT_SYNC_SESSIONS_PATH: "http://session-service:8083/api/v1/sessions/internal/active-by-chargers"
     ENVIRONMENT_SYNC_INTERVAL: "60s"
     ENVIRONMENT_SYNC_SKIP_TLS_VERIFY: "false"
@@ -35,9 +35,9 @@ config:
     # Reconcile in bounded batches so reconnecting a fleet cannot stampede OCPP.
     AUTO_CONNECT_INTERVAL: "3s"
     AUTO_CONNECT_MAX_ATTEMPTS_PER_RUN: "32"
-    AUTO_CONNECT_FLEET_LIMIT: "1000"
+    AUTO_CONNECT_FLEET_LIMIT: "1500"
     AUTO_CONNECT_ERROR_BACKOFF: "5s"
-    ENVIRONMENT_SYNC_FLEET_LIMIT: "1000"
+    ENVIRONMENT_SYNC_FLEET_LIMIT: "1500"
     AUTO_CHARGER_IDS: >-
       EH-BOS-CHG-001,EH-SFO-CHG-001,EH-US-CHG-0001,EH-US-CHG-0002,EH-US-CHG-0003,EH-US-CHG-0004,EH-US-CHG-0005,EH-US-CHG-0006,
       EH-US-CHG-0007,EH-US-CHG-0008,EH-US-CHG-0009,EH-US-CHG-0010,EH-US-CHG-0081,
