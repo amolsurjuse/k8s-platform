@@ -14,6 +14,7 @@
       "dockerUseBuildx": true,
       "dockerPlatforms": "linux/amd64,linux/arm64",
       "copyBuildArtifacts": true,
+      "mavenPostgresTests": true,
       "agentName": "",
       "addVcsTrigger": false,
       "deployVersionFile": "charts/config/services/community-voting-service/us/version/prod-version.yaml"
