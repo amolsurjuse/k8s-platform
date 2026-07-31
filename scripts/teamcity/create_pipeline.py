@@ -529,8 +529,7 @@ CID="$(docker create -i --entrypoint sh \\
 cleanup() {{ docker rm -f "$CID" >/dev/null 2>&1 || true; }}
 trap cleanup EXIT
 
-tar --exclude=.git --exclude=target -cf - . | docker cp - "$CID":/workspace
-docker start -a "$CID"
+tar --exclude=.git --exclude=target -cf - . | docker start -a -i "$CID"
 rm -rf target
 docker cp "$CID":/workspace/target ./target
 test -d target
@@ -561,6 +560,9 @@ tar --exclude=.git --exclude=node_modules --exclude=dist -cf - . | docker run --
         create_script_step(tc, cfg, "Node Build", script)
     elif cfg.build_kind == "flutter":
         flutter_commands = sh_single_quote("""set -eu
+mkdir -p /workspace
+tar -xf - -C /workspace
+cd /workspace
 flutter --version
 flutter pub get
 dart format --output=none --set-exit-if-changed lib test
@@ -569,12 +571,11 @@ flutter test --coverage
 flutter build apk --debug --dart-define=USE_REAL_API=true --dart-define=GATEWAY_BASE_URL=https://api.electrahub.net
 """)
         script = f"""set -eu
-CID="$(docker create -w /workspace "{cfg.flutter_image}" sh -lc {flutter_commands})"
+CID="$(docker create -i "{cfg.flutter_image}" sh -lc {flutter_commands})"
 cleanup() {{ docker rm -f "$CID" >/dev/null 2>&1 || true; }}
 trap cleanup EXIT
 
-tar --exclude=.git --exclude=build --exclude=.dart_tool -cf - . | docker cp - "$CID":/workspace
-docker start -a "$CID"
+tar --exclude=.git --exclude=build --exclude=.dart_tool -cf - . | docker start -a -i "$CID"
 mkdir -p build/app/outputs/flutter-apk
 docker cp "$CID":/workspace/build/app/outputs/flutter-apk/app-debug.apk build/app/outputs/flutter-apk/app-debug.apk
 test -s build/app/outputs/flutter-apk/app-debug.apk
