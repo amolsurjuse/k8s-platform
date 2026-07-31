@@ -57,10 +57,12 @@ class PipelineConfig:
     pom_path: str
     maven_goals: str
     maven_runner_args: str
+    copy_build_artifacts: bool
     app_dir: str
     npm_install_command: str
     build_command: str
     node_image: str
+    flutter_image: str
     test_command: str
     k8s_branch: str
     deploy_version_file: str
@@ -94,7 +96,7 @@ class PipelineConfig:
         vcs_root_id = str(raw.get("vcsRootId") or f"{project_id}_VcsRoot").strip()
         docker_image = str(raw.get("dockerImage") or "").strip()
         deploy_version_file = str(raw.get("deployVersionFile") or "").strip()
-        if build_kind != "jmeter":
+        if build_kind not in ("jmeter", "flutter"):
             docker_image = require(docker_image, "dockerImage")
             deploy_version_file = require(deploy_version_file, "deployVersionFile")
 
@@ -117,10 +119,12 @@ class PipelineConfig:
             pom_path=str(raw.get("pomPath") or "pom.xml").strip(),
             maven_goals=str(raw.get("mavenGoals") or "clean package").strip(),
             maven_runner_args=str(raw.get("mavenRunnerArgs") or "").strip(),
+            copy_build_artifacts=bool(raw.get("copyBuildArtifacts", False)),
             app_dir=str(raw.get("appDir") or ".").strip(),
             npm_install_command=str(raw.get("npmInstallCommand") or "npm ci").strip(),
             build_command=str(raw.get("buildCommand") or "npm run build").strip(),
             node_image=str(raw.get("nodeImage") or "node:22-bookworm").strip(),
+            flutter_image=str(raw.get("flutterImage") or "ghcr.io/cirruslabs/flutter:3.44.0").strip(),
             test_command=str(raw.get("testCommand") or "").strip(),
             k8s_branch=str(raw.get("k8sBranch") or "develop").strip(),
             deploy_version_file=deploy_version_file,
@@ -513,6 +517,24 @@ tar --exclude=.git --exclude=target -cf - . | docker run --rm -i \\
   "maven:3.9.9-eclipse-temurin-21" \\
   -lc {command}
 """
+    if cfg.copy_build_artifacts:
+        script = f"""set -eu
+
+MAVEN_CACHE_VOLUME="electrahub-maven-cache"
+docker volume create "$MAVEN_CACHE_VOLUME" >/dev/null
+CID="$(docker create -i --entrypoint sh \\
+  -v "$MAVEN_CACHE_VOLUME:/root/.m2" \\
+  "maven:3.9.9-eclipse-temurin-21" \\
+  -lc {command})"
+cleanup() {{ docker rm -f "$CID" >/dev/null 2>&1 || true; }}
+trap cleanup EXIT
+
+tar --exclude=.git --exclude=target -cf - . | docker cp - "$CID":/workspace
+docker start -a "$CID"
+rm -rf target
+docker cp "$CID":/workspace/target ./target
+test -d target
+"""
     create_script_step(tc, cfg, "Maven Build", script)
 
 def sh_single_quote(value: str) -> str:
@@ -537,12 +559,34 @@ cd "{cfg.app_dir}"
 tar --exclude=.git --exclude=node_modules --exclude=dist -cf - . | docker run --rm -i "{cfg.node_image}" sh -lc {node_commands}
 """
         create_script_step(tc, cfg, "Node Build", script)
+    elif cfg.build_kind == "flutter":
+        flutter_commands = sh_single_quote("""set -eu
+flutter --version
+flutter pub get
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze --no-fatal-infos
+flutter test --coverage
+flutter build apk --debug --dart-define=USE_REAL_API=true --dart-define=GATEWAY_BASE_URL=https://api.electrahub.net
+""")
+        script = f"""set -eu
+CID="$(docker create -w /workspace "{cfg.flutter_image}" sh -lc {flutter_commands})"
+cleanup() {{ docker rm -f "$CID" >/dev/null 2>&1 || true; }}
+trap cleanup EXIT
+
+tar --exclude=.git --exclude=build --exclude=.dart_tool -cf - . | docker cp - "$CID":/workspace
+docker start -a "$CID"
+mkdir -p build/app/outputs/flutter-apk
+docker cp "$CID":/workspace/build/app/outputs/flutter-apk/app-debug.apk build/app/outputs/flutter-apk/app-debug.apk
+test -s build/app/outputs/flutter-apk/app-debug.apk
+echo "##teamcity[publishArtifacts 'build/app/outputs/flutter-apk/app-debug.apk => pulsevote-android']"
+"""
+        create_script_step(tc, cfg, "Flutter Quality and APK", script)
     elif cfg.build_kind == "docker":
         print("Skipping source build step for docker-only pipeline")
     elif cfg.build_kind == "jmeter":
         print("Skipping source build step for JMeter regression pipeline")
     else:
-        raise ValueError(f"Unsupported buildKind {cfg.build_kind!r}. Use maven, go, node, docker, or jmeter.")
+        raise ValueError(f"Unsupported buildKind {cfg.build_kind!r}. Use maven, go, node, flutter, docker, or jmeter.")
 
 
 def create_jmeter_regression_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
@@ -823,6 +867,13 @@ def create_steps_if_empty(
         return
 
     create_source_build_step(tc, cfg)
+
+    if cfg.build_kind == "flutter":
+        if replaced_existing_steps:
+            print("Replaced flutter build steps")
+        else:
+            print("Created Flutter artifact build step")
+        return
 
     dockerfile_path = cfg.dockerfile_path
     docker_context = cfg.docker_context

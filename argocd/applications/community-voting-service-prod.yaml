@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: community-voting-service-prod
+  namespace: argocd
+spec:
+  project: electrahub-prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/common
+    helm:
+      releaseName: community-voting-service
+      valueFiles:
+        - community-voting-service/values.yaml
+        - ../config/services/community-voting-service/us/base.yaml
+        - ../config/services/community-voting-service/us/values/prod-values.yaml
+        - ../config/services/community-voting-service/us/version/prod-version.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
