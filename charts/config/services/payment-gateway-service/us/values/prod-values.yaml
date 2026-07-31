@@ -11,6 +11,18 @@ extraSecretEnv:
   - name: "APP_SECURITY_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+  - name: "APP_GATEWAY_STRIPE_CREDENTIAL"
+    secretName: "payment-gateway-provider-prod"
+    secretKey: "APP_GATEWAY_STRIPE_CREDENTIAL"
+  - name: "APP_GATEWAY_STRIPE_PUBLISHABLE_KEY"
+    secretName: "payment-gateway-provider-prod"
+    secretKey: "APP_GATEWAY_STRIPE_PUBLISHABLE_KEY"
+  - name: "APP_GATEWAY_STRIPE_WEBHOOK_SECRET"
+    secretName: "payment-gateway-provider-prod"
+    secretKey: "APP_GATEWAY_STRIPE_WEBHOOK_SECRET"
+  - name: "APP_GATEWAY_TOKEN_ENCRYPTION_KEY"
+    secretName: "payment-gateway-provider-prod"
+    secretKey: "APP_GATEWAY_TOKEN_ENCRYPTION_KEY"
 
 env:
   SPRING_PROFILES_ACTIVE: "prod"
