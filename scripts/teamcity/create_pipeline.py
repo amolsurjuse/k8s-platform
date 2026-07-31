@@ -58,7 +58,6 @@ class PipelineConfig:
     maven_goals: str
     maven_runner_args: str
     copy_build_artifacts: bool
-    maven_postgres_tests: bool
     app_dir: str
     npm_install_command: str
     build_command: str
@@ -121,7 +120,6 @@ class PipelineConfig:
             maven_goals=str(raw.get("mavenGoals") or "clean package").strip(),
             maven_runner_args=str(raw.get("mavenRunnerArgs") or "").strip(),
             copy_build_artifacts=bool(raw.get("copyBuildArtifacts", False)),
-            maven_postgres_tests=bool(raw.get("mavenPostgresTests", False)),
             app_dir=str(raw.get("appDir") or ".").strip(),
             npm_install_command=str(raw.get("npmInstallCommand") or "npm ci").strip(),
             build_command=str(raw.get("buildCommand") or "npm run build").strip(),
@@ -520,44 +518,15 @@ tar --exclude=.git --exclude=target -cf - . | docker run --rm -i \\
   -lc {command}
 """
     if cfg.copy_build_artifacts:
-        test_setup = ""
-        container_options = ""
-        cleanup_test = ""
-        if cfg.maven_postgres_tests:
-            test_setup = """TEST_SUFFIX="%build.id%"
-TEST_NETWORK="community-voting-test-$TEST_SUFFIX"
-TEST_DATABASE_CONTAINER="community-voting-postgres-$TEST_SUFFIX"
-docker network create "$TEST_NETWORK" >/dev/null
-docker run -d --name "$TEST_DATABASE_CONTAINER" --network "$TEST_NETWORK" \\
-  -e POSTGRES_DB=pulsevote_test \\
-  -e POSTGRES_USER=pulsevote \\
-  -e POSTGRES_PASSWORD=pulsevote \\
-  --health-cmd 'pg_isready -U pulsevote -d pulsevote_test' \\
-  --health-interval 2s --health-timeout 2s --health-retries 30 \\
-  postgres:18-alpine >/dev/null
-for attempt in $(seq 1 30); do
-  [ "$(docker inspect -f '{{.State.Health.Status}}' "$TEST_DATABASE_CONTAINER")" = healthy ] && break
-  [ "$attempt" -eq 30 ] && { docker logs "$TEST_DATABASE_CONTAINER"; exit 1; }
-  sleep 2
-done
-"""
-            container_options = """  --network "$TEST_NETWORK" \\
-  -e TEST_DATABASE_URL=jdbc:postgresql://community-voting-postgres-$TEST_SUFFIX:5432/pulsevote_test \\
-  -e TEST_DATABASE_USERNAME=pulsevote \\
-  -e TEST_DATABASE_PASSWORD=pulsevote \\
-"""
-            cleanup_test = """docker rm -f "$TEST_DATABASE_CONTAINER" >/dev/null 2>&1 || true
-docker network rm "$TEST_NETWORK" >/dev/null 2>&1 || true
-"""
         script = f"""set -eu
 
 MAVEN_CACHE_VOLUME="electrahub-maven-cache"
 docker volume create "$MAVEN_CACHE_VOLUME" >/dev/null
-{test_setup}CID="$(docker create -i --entrypoint sh \\
-{container_options}  -v "$MAVEN_CACHE_VOLUME:/root/.m2" \\
+CID="$(docker create -i --entrypoint sh \\
+  -v "$MAVEN_CACHE_VOLUME:/root/.m2" \\
   "maven:3.9.9-eclipse-temurin-21" \\
   -lc {command})"
-cleanup() {{ docker rm -f "$CID" >/dev/null 2>&1 || true; {cleanup_test}}}
+cleanup() {{ docker rm -f "$CID" >/dev/null 2>&1 || true; }}
 trap cleanup EXIT
 
 tar --exclude=.git --exclude=target -cf - . | docker start -a -i "$CID"
