@@ -21,7 +21,9 @@ image:
 config:
   data:
     APP_GATEWAY_MOCK_PROVIDER_ENABLED: "false"
-    APP_GATEWAY_PRODUCTION_ENABLED: "false"
+    APP_GATEWAY_PRODUCTION_ENABLED: "true"
+    APP_GATEWAY_2C2P_WEBHOOK_BASE_URL: "https://api.electrahub.net/payment-gateway/api/v1/gateway/webhooks"
+    APP_GATEWAY_MOLLIE_WEBHOOK_BASE_URL: "https://api.electrahub.net/payment-gateway/api/v1/gateway/webhooks"
     MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "0.1"
 
 replicaCount: 2

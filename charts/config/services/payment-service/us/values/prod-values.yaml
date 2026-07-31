@@ -1,6 +1,11 @@
 secrets:
   existingSecretName: "postgresql-prod-secret"
 
+extraSecretEnv:
+  - name: "PAYMENT_GATEWAY_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+
 env:
   SPRING_PROFILES_ACTIVE: "prod"
 

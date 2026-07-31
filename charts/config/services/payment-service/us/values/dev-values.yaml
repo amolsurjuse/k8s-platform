@@ -1,6 +1,11 @@
 secrets:
   existingSecretName: "postgresql-dev-secret"
 
+extraSecretEnv:
+  - name: "PAYMENT_GATEWAY_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+
 replicaCount: 1
 
 resources:

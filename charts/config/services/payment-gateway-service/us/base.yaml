@@ -42,6 +42,13 @@ config:
     APP_GATEWAY_OPERATION_RECOVERY_LEASE: "45s"
     APP_GATEWAY_OPERATION_RECOVERY_INITIAL_BACKOFF: "30s"
     APP_GATEWAY_OPERATION_RECOVERY_MAX_BACKOFF: "30m"
+    APP_GATEWAY_STRIPE_BASE_URL: "https://api.stripe.com"
+    APP_GATEWAY_RAZORPAY_BASE_URL: "https://api.razorpay.com"
+    APP_GATEWAY_MOLLIE_BASE_URL: "https://api.mollie.com"
+    APP_GATEWAY_ADYEN_TEST_BASE_URL: "https://checkout-test.adyen.com/v72"
+    APP_GATEWAY_2C2P_BASE_URL: "https://sandbox-pgw.2c2p.com"
+    APP_GATEWAY_2C2P_WEBHOOK_BASE_URL: "https://api-dev.electrahub.net/payment-gateway/api/v1/gateway/webhooks"
+    APP_GATEWAY_MOLLIE_WEBHOOK_BASE_URL: "https://api-dev.electrahub.net/payment-gateway/api/v1/gateway/webhooks"
 
 readinessProbe:
   enabled: true
