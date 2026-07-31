@@ -1,0 +1,36 @@
+{
+  "pipelines": [
+    {
+      "serviceName": "community-voting-service",
+      "buildKind": "maven",
+      "teamcityProjectName": "community-voting-service",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_CommunityVotingService",
+      "buildTypeId": "ElectraHub_CommunityVotingService_Build",
+      "vcsRootId": "ElectraHub_CommunityVotingService_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/community-voting-service.git",
+      "gitBranch": "develop",
+      "dockerImage": "amolsurjuse/community-voting-service",
+      "dockerUseBuildx": true,
+      "dockerPlatforms": "linux/amd64,linux/arm64",
+      "copyBuildArtifacts": true,
+      "agentName": "",
+      "addVcsTrigger": false,
+      "deployVersionFile": "charts/config/services/community-voting-service/us/version/prod-version.yaml"
+    },
+    {
+      "serviceName": "community-voting-mobile",
+      "buildKind": "flutter",
+      "teamcityProjectName": "community-voting-mobile",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_CommunityVotingMobile",
+      "buildTypeId": "ElectraHub_CommunityVotingMobile_Build",
+      "vcsRootId": "ElectraHub_CommunityVotingMobile_VcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/community-voting-ui.git",
+      "gitBranch": "develop",
+      "flutterImage": "ghcr.io/cirruslabs/flutter:3.44.0",
+      "agentName": "",
+      "addVcsTrigger": true
+    }
+  ]
+}

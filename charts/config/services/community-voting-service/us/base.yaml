@@ -1,0 +1,64 @@
+fullnameOverride: "community-voting-service"
+
+image:
+  repository: amolsurjuse/community-voting-service
+
+service:
+  port: 8080
+containerPort: 8080
+
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+  JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"
+
+secrets:
+  existingSecretName: "community-voting-database"
+  env:
+    DATABASE_URL: "url"
+    DATABASE_USERNAME: "username"
+    DATABASE_PASSWORD: "password"
+
+extraSecretEnv:
+  - name: "JWT_SECRET"
+    secretName: "auth-jwt-prod-secret"
+    secretKey: "APP_SECURITY_JWT_SECRET"
+  - name: "RECEIPT_TOKEN_KEY"
+    secretName: "community-voting-crypto"
+    secretKey: "receipt-token-key"
+
+config:
+  data:
+    SERVER_PORT: "8080"
+    JWT_ISSUER: "auth-service"
+    DATABASE_POOL_SIZE: "20"
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,metrics,prometheus"
+    MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+
+startupProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  periodSeconds: 5
+  failureThreshold: 24
+
+readinessProbe:
+  enabled: true
+  path: /actuator/health/readiness
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /actuator/health/liveness
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001

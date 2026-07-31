@@ -1,0 +1,5 @@
+image:
+  repository: amolsurjuse/community-voting-service
+service:
+  port: 8080
+containerPort: 8080
