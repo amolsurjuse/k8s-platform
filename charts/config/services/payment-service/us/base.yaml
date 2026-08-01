@@ -34,9 +34,9 @@ config:
     PAYMENT_GATEWAY_SERVICE_URL: "http://payment-gateway-service:8098"
     PAYMENT_GATEWAY_ROUTING_ENABLED: "false"
     PAYMENT_GATEWAY_ROUTING_ENFORCEMENT_ENABLED: "false"
-    PAYMENT_GATEWAY_EXECUTION_ENABLED: "false"
-    PAYMENT_GATEWAY_EXECUTION_PILOT_NETWORK_IDS: ""
-    PAYMENT_WALLET_EXTERNAL_TOP_UP_ENABLED: "false"
+    PAYMENT_GATEWAY_EXECUTION_ENABLED: "true"
+    PAYMENT_GATEWAY_EXECUTION_PILOT_NETWORK_IDS: "NW-US-EAST-01"
+    PAYMENT_WALLET_EXTERNAL_TOP_UP_ENABLED: "true"
     APP_CORS_ALLOWED_ORIGINS: "http://localhost:4200,https://dev.electrahub.com,https://dev.electrahub.com:8443,http://driver-portal-dev.electrahub.com:8080,https://driver-portal-dev.electrahub.com:8443"
 
 readinessProbe:
