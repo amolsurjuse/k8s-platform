@@ -98,6 +98,9 @@ spec:
                 secretKeyRef:
                   name: {{ $entry.secretName }}
                   key: {{ $entry.secretKey }}
+                  {{- if hasKey $entry "optional" }}
+                  optional: {{ $entry.optional }}
+                  {{- end }}
             {{- end }}
 
             {{- /* Pod metadata values from the Kubernetes Downward API */}}

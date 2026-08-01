@@ -20,6 +20,10 @@ extraSecretEnv:
   - name: "APP_GATEWAY_STRIPE_WEBHOOK_SECRET"
     secretName: "payment-gateway-provider-prod"
     secretKey: "APP_GATEWAY_STRIPE_WEBHOOK_SECRET"
+  - name: "APP_GATEWAY_MOLLIE_CREDENTIAL"
+    secretName: "payment-gateway-provider-prod"
+    secretKey: "APP_GATEWAY_MOLLIE_CREDENTIAL"
+    optional: true
   - name: "APP_GATEWAY_TOKEN_ENCRYPTION_KEY"
     secretName: "payment-gateway-provider-prod"
     secretKey: "APP_GATEWAY_TOKEN_ENCRYPTION_KEY"

@@ -8,6 +8,14 @@ extraSecretEnv:
   - name: "APP_SECURITY_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+  - name: "APP_GATEWAY_MOLLIE_CREDENTIAL"
+    secretName: "payment-gateway-provider-dev"
+    secretKey: "APP_GATEWAY_MOLLIE_CREDENTIAL"
+    optional: true
+  - name: "APP_GATEWAY_2C2P_DEMO_SECRET_KEY"
+    secretName: "payment-gateway-provider-dev"
+    secretKey: "APP_GATEWAY_2C2P_DEMO_SECRET_KEY"
+    optional: true
 
 replicaCount: 1
 
