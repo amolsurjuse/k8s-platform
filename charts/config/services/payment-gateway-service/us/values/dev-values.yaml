@@ -12,9 +12,29 @@ extraSecretEnv:
     secretName: "payment-gateway-provider-dev"
     secretKey: "APP_GATEWAY_MOLLIE_CREDENTIAL"
     optional: true
+  - name: "APP_GATEWAY_RAZORPAY_CREDENTIAL"
+    secretName: "payment-gateway-provider-dev"
+    secretKey: "APP_GATEWAY_RAZORPAY_CREDENTIAL"
+    optional: true
+  - name: "APP_GATEWAY_RAZORPAY_WEBHOOK_SECRET"
+    secretName: "payment-gateway-provider-dev"
+    secretKey: "APP_GATEWAY_RAZORPAY_WEBHOOK_SECRET"
+    optional: true
+  - name: "APP_GATEWAY_ADYEN_CREDENTIAL"
+    secretName: "payment-gateway-provider-dev"
+    secretKey: "APP_GATEWAY_ADYEN_CREDENTIAL"
+    optional: true
+  - name: "APP_GATEWAY_ADYEN_WEBHOOK_SECRET"
+    secretName: "payment-gateway-provider-dev"
+    secretKey: "APP_GATEWAY_ADYEN_WEBHOOK_SECRET"
+    optional: true
   - name: "APP_GATEWAY_2C2P_DEMO_SECRET_KEY"
     secretName: "payment-gateway-provider-dev"
     secretKey: "APP_GATEWAY_2C2P_DEMO_SECRET_KEY"
+    optional: true
+  - name: "APP_GATEWAY_2C2P_CREDENTIAL"
+    secretName: "payment-gateway-provider-dev"
+    secretKey: "APP_GATEWAY_2C2P_CREDENTIAL"
     optional: true
 
 replicaCount: 1
