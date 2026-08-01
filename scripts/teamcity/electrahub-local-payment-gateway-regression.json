@@ -1,0 +1,99 @@
+{
+  "pipelines": [
+    {
+      "serviceName": "payment-gateway-sandbox-health-dev",
+      "buildKind": "jmeter",
+      "teamcityProjectName": "Payment Gateway Service",
+      "buildTypeName": "JMeter Sandbox Provider Health (Dev)",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_PaymentGatewayService",
+      "buildTypeId": "ElectraHub_PaymentGatewayService_JMeterSandboxProviderHealthDev",
+      "vcsRootId": "ElectraHub_PaymentGatewayService_JMeterK8sPlatformVcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/k8s-platform.git",
+      "gitBranch": "develop",
+      "gitBranchSpec": "",
+      "agentName": "teamcity-minimal-agent",
+      "addVcsTrigger": false,
+      "finishBuildTriggerSourceId": "ElectraHub_PaymentGatewayService_Build",
+      "jmeterImage": "amolsurjuse/electrahub-jmeter:5.6.3-java17@sha256:a26bb0daca7d5124a6f859ca5de6a0e96a4d470803cd0813b48502b23f121ac7",
+      "jmeterPlan": "scripts/jmeter/10-payment-gateway-sandbox-regression.jmx",
+      "jmeterStepName": "JMeter Payment Gateway Sandbox Health (Dev)",
+      "jmeterCredentialSafeMode": true,
+      "jmeterResponseDataOnError": false,
+      "jmeterRequiredSummaryProviders": [
+        "STRIPE",
+        "RAZORPAY",
+        "TWO_C2P",
+        "MOLLIE",
+        "ADYEN"
+      ],
+      "jmeterEnvironmentVariables": [
+        "PAYMENT_GATEWAY_TEST_ADMIN_EMAIL",
+        "PAYMENT_GATEWAY_TEST_ADMIN_PASSWORD"
+      ],
+      "teamcitySecureParameters": [
+        "env.PAYMENT_GATEWAY_TEST_ADMIN_EMAIL",
+        "env.PAYMENT_GATEWAY_TEST_ADMIN_PASSWORD"
+      ],
+      "regressionBaseUrl": "https://api-dev.electrahub.net",
+      "regressionUsers": "1",
+      "regressionRampSeconds": "1",
+      "regressionHoldSeconds": "0",
+      "regressionSseSeconds": "0",
+      "regressionHostHeader": "",
+      "regressionDynamicConnectorSelection": "false",
+      "regressionConnectorStartAttempts": "1",
+      "regressionRequestTimeoutMs": "30000",
+      "regressionSessionCommandTimeoutMs": "30000",
+      "jmeterLoadStages": "",
+      "jmeterLoadMaxErrorPercent": "0"
+    },
+    {
+      "serviceName": "payment-gateway-sandbox-validation-prod",
+      "buildKind": "jmeter",
+      "teamcityProjectName": "Payment Gateway Service",
+      "buildTypeName": "JMeter Sandbox Provider Validation (Prod)",
+      "parentProjectId": "ElectraHub",
+      "projectId": "ElectraHub_PaymentGatewayService",
+      "buildTypeId": "ElectraHub_PaymentGatewayService_JMeterSandboxProviderValidationProd",
+      "vcsRootId": "ElectraHub_PaymentGatewayService_JMeterK8sPlatformVcsRoot",
+      "gitUrl": "https://github.com/amolsurjuse/k8s-platform.git",
+      "gitBranch": "develop",
+      "gitBranchSpec": "",
+      "agentName": "teamcity-minimal-agent",
+      "addVcsTrigger": false,
+      "jmeterImage": "amolsurjuse/electrahub-jmeter:5.6.3-java17@sha256:a26bb0daca7d5124a6f859ca5de6a0e96a4d470803cd0813b48502b23f121ac7",
+      "jmeterPlan": "scripts/jmeter/10-payment-gateway-sandbox-regression.jmx",
+      "jmeterStepName": "JMeter Payment Gateway Sandbox Validation (Prod)",
+      "jmeterCredentialSafeMode": true,
+      "jmeterResponseDataOnError": false,
+      "jmeterRequiredSummaryProviders": [
+        "STRIPE",
+        "RAZORPAY",
+        "TWO_C2P",
+        "MOLLIE",
+        "ADYEN"
+      ],
+      "jmeterEnvironmentVariables": [
+        "PAYMENT_GATEWAY_TEST_ADMIN_EMAIL",
+        "PAYMENT_GATEWAY_TEST_ADMIN_PASSWORD"
+      ],
+      "teamcitySecureParameters": [
+        "env.PAYMENT_GATEWAY_TEST_ADMIN_EMAIL",
+        "env.PAYMENT_GATEWAY_TEST_ADMIN_PASSWORD"
+      ],
+      "regressionBaseUrl": "https://api.electrahub.net",
+      "regressionUsers": "1",
+      "regressionRampSeconds": "1",
+      "regressionHoldSeconds": "0",
+      "regressionSseSeconds": "0",
+      "regressionHostHeader": "",
+      "regressionDynamicConnectorSelection": "false",
+      "regressionConnectorStartAttempts": "1",
+      "regressionRequestTimeoutMs": "30000",
+      "regressionSessionCommandTimeoutMs": "30000",
+      "jmeterLoadStages": "",
+      "jmeterLoadMaxErrorPercent": "0"
+    }
+  ]
+}

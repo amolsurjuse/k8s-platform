@@ -1,6 +1,7 @@
-<<<<<<< HEAD
 .DS_Store
 .idea/
+__pycache__/
+*.pyc
 
 # Local environment files
 local-k3d/env/local-k3d.env
@@ -10,6 +11,6 @@ prod-release/env/prod-laptop.env.ps1
 # Local Cloudflare credential/config material
 .local/
 *.credentials.json
-=======
-.local/
->>>>>>> 2eaa02e61ff90bedf4137e34d9f93cf3dac95a01
+
+# TeamCity/JMeter runtime artifacts (already-tracked historical fixtures are unaffected)
+outputs/jmeter/teamcity/

@@ -37,6 +37,36 @@ def require(value: Any, name: str) -> str:
     return str(value).strip()
 
 
+def string_tuple(value: Any, name: str) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise SystemExit(f"{name} must be a JSON array of strings")
+    normalized = tuple(str(item).strip() for item in value)
+    if any(not item for item in normalized):
+        raise SystemExit(f"{name} must not contain blank entries")
+    if len(set(normalized)) != len(normalized):
+        raise SystemExit(f"{name} must not contain duplicate entries")
+    return normalized
+
+
+def string_map(value: Any, name: str) -> dict[str, str]:
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise SystemExit(f"{name} must be a JSON object with string values")
+    normalized = {str(key).strip(): str(item).strip() for key, item in value.items()}
+    if any(not key for key in normalized):
+        raise SystemExit(f"{name} must not contain blank parameter names")
+    return normalized
+
+
+def trusted_shell_value(value: str, name: str) -> str:
+    if re.search(r'["`$\\\r\n]', value):
+        raise SystemExit(f"{name} contains characters that are unsafe for credential-bearing shell steps")
+    return value
+
+
 @dataclass(frozen=True)
 class PipelineConfig:
     build_kind: str
@@ -49,6 +79,7 @@ class PipelineConfig:
     vcs_root_id: str
     git_url: str
     git_branch: str
+    git_branch_spec: str
     docker_image: str
     dockerfile_path: str
     docker_context: str
@@ -69,6 +100,7 @@ class PipelineConfig:
     docker_username: str
     agent_name: str
     add_vcs_trigger: bool
+    finish_build_trigger_source_id: str
     jmeter_image: str
     jmeter_plan: str
     regression_base_url: str
@@ -83,6 +115,13 @@ class PipelineConfig:
     regression_session_command_timeout_ms: str
     jmeter_load_stages: str
     jmeter_load_max_error_percent: str
+    jmeter_step_name: str
+    jmeter_response_data_on_error: bool
+    jmeter_environment_variables: tuple[str, ...]
+    teamcity_parameters: dict[str, str]
+    teamcity_secure_parameters: tuple[str, ...]
+    jmeter_credential_safe_mode: bool
+    jmeter_required_summary_providers: tuple[str, ...]
 
     @staticmethod
     def from_json(raw: dict[str, Any]) -> "PipelineConfig":
@@ -111,6 +150,7 @@ class PipelineConfig:
             vcs_root_id=vcs_root_id,
             git_url=require(raw.get("gitUrl"), "gitUrl"),
             git_branch=git_branch,
+            git_branch_spec=str(raw.get("gitBranchSpec", "refs/heads/*")).strip(),
             docker_image=docker_image,
             dockerfile_path=str(raw.get("dockerfilePath") or "Dockerfile").strip(),
             docker_context=str(raw.get("dockerContext") or ".").strip(),
@@ -131,6 +171,7 @@ class PipelineConfig:
             docker_username=str(raw.get("dockerUsername") or "amolsurjuse").strip(),
             agent_name=str(raw["agentName"] if "agentName" in raw else "teamcity-minimal-agent").strip(),
             add_vcs_trigger=bool(raw.get("addVcsTrigger", True)),
+            finish_build_trigger_source_id=str(raw.get("finishBuildTriggerSourceId") or "").strip(),
             jmeter_image=str(raw.get("jmeterImage") or "amolsurjuse/electrahub-jmeter:5.6.3-java17").strip(),
             jmeter_plan=str(raw.get("jmeterPlan") or "scripts/jmeter/03-full-e2e-charging-100-users.jmx").strip(),
             regression_base_url=str(raw.get("regressionBaseUrl") or "https://api.dev.electrahub.net").strip(),
@@ -145,6 +186,19 @@ class PipelineConfig:
             regression_session_command_timeout_ms=str(raw.get("regressionSessionCommandTimeoutMs") or "180000").strip(),
             jmeter_load_stages=str(raw.get("jmeterLoadStages") or "").strip(),
             jmeter_load_max_error_percent=str(raw.get("jmeterLoadMaxErrorPercent") or "5").strip(),
+            jmeter_step_name=str(raw.get("jmeterStepName") or "JMeter Charging Regression").strip(),
+            jmeter_response_data_on_error=bool(raw.get("jmeterResponseDataOnError", True)),
+            jmeter_environment_variables=string_tuple(
+                raw.get("jmeterEnvironmentVariables"), "jmeterEnvironmentVariables"
+            ),
+            teamcity_parameters=string_map(raw.get("teamcityParameters"), "teamcityParameters"),
+            teamcity_secure_parameters=string_tuple(
+                raw.get("teamcitySecureParameters"), "teamcitySecureParameters"
+            ),
+            jmeter_credential_safe_mode=bool(raw.get("jmeterCredentialSafeMode", False)),
+            jmeter_required_summary_providers=string_tuple(
+                raw.get("jmeterRequiredSummaryProviders"), "jmeterRequiredSummaryProviders"
+            ),
         )
 
 
@@ -343,7 +397,6 @@ def ensure_vcs_root(tc: TeamCityClient, cfg: PipelineConfig) -> None:
         )
         for name, value in (
             ("branch", f"refs/heads/{cfg.git_branch}"),
-            ("teamcity:branchSpec", "refs/heads/*"),
             ("url", cfg.git_url),
         ):
             encoded_name = urllib.parse.quote(name, safe="")
@@ -352,26 +405,34 @@ def ensure_vcs_root(tc: TeamCityClient, cfg: PipelineConfig) -> None:
                 f"/app/rest/vcs-roots/{encoded_locator}/properties/{encoded_name}",
                 value,
             )
+        branch_spec_name = urllib.parse.quote("teamcity:branchSpec", safe="")
+        branch_spec_path = f"/app/rest/vcs-roots/{encoded_locator}/properties/{branch_spec_name}"
+        if cfg.git_branch_spec:
+            tc.request_text("PUT", branch_spec_path, cfg.git_branch_spec)
+        elif tc.exists(branch_spec_path):
+            tc.request("DELETE", branch_spec_path)
         print(f"Updated VCS root: {cfg.vcs_root_id}")
         return
+    vcs_properties = [
+        step_property("agentCleanFilesPolicy", "ALL_UNTRACKED"),
+        step_property("agentCleanPolicy", "ON_BRANCH_CHANGE"),
+        step_property("authMethod", "PASSWORD"),
+        step_property("branch", f"refs/heads/{cfg.git_branch}"),
+        step_property("secure:password", "%github.token%"),
+        step_property("submoduleCheckout", "CHECKOUT"),
+        step_property("url", cfg.git_url),
+        step_property("useAlternates", "AUTO"),
+        step_property("username", cfg.docker_username),
+        step_property("usernameStyle", "USERID"),
+    ]
+    if cfg.git_branch_spec:
+        vcs_properties.append(step_property("teamcity:branchSpec", cfg.git_branch_spec))
     tc.request("POST", "/app/rest/vcs-roots", {
         "id": cfg.vcs_root_id,
         "name": f"{cfg.git_url}#refs/heads/{cfg.git_branch}",
         "vcsName": "jetbrains.git",
         "project": {"id": cfg.parent_project_id},
-        "properties": {"property": [
-            step_property("agentCleanFilesPolicy", "ALL_UNTRACKED"),
-            step_property("agentCleanPolicy", "ON_BRANCH_CHANGE"),
-            step_property("authMethod", "PASSWORD"),
-            step_property("branch", f"refs/heads/{cfg.git_branch}"),
-            step_property("secure:password", "%github.token%"),
-            step_property("submoduleCheckout", "CHECKOUT"),
-            step_property("teamcity:branchSpec", "refs/heads/*"),
-            step_property("url", cfg.git_url),
-            step_property("useAlternates", "AUTO"),
-            step_property("username", cfg.docker_username),
-            step_property("usernameStyle", "USERID"),
-        ]},
+        "properties": {"property": vcs_properties},
     })
     print(f"Created VCS root: {cfg.vcs_root_id}")
 
@@ -402,10 +463,30 @@ def attach_vcs_root(tc: TeamCityClient, cfg: PipelineConfig) -> None:
 
 
 def set_parameter(tc: TeamCityClient, build_type_id: str, name: str, value: str) -> None:
-    tc.request("PUT", f"/app/rest/buildTypes/id:{build_type_id}/parameters/{urllib.parse.quote(name)}", {
+    tc.request("PUT", f"/app/rest/buildTypes/id:{build_type_id}/parameters/{urllib.parse.quote(name, safe='')}", {
         "name": name,
         "value": value,
     })
+
+
+def ensure_secure_parameter(tc: TeamCityClient, build_type_id: str, name: str) -> None:
+    path = f"/app/rest/buildTypes/id:{build_type_id}/parameters/{urllib.parse.quote(name, safe='')}"
+    if tc.exists(path):
+        parameter = tc.request("GET", path)
+        raw_type = str(parameter.get("type", {}).get("rawValue", "")).strip().lower()
+        if not raw_type.startswith("password"):
+            raise RuntimeError(
+                f"TeamCity parameter {name!r} already exists but is not Password typed; "
+                "convert it in TeamCity before reconciling this pipeline"
+            )
+        print(f"Secure parameter already configured: {name}")
+        return
+    tc.request("PUT", path, {
+        "name": name,
+        "value": "SET_IN_TEAMCITY",
+        "type": {"rawValue": "password"},
+    })
+    print(f"Created Password-typed parameter placeholder: {name}")
 
 
 def set_parameters(tc: TeamCityClient, cfg: PipelineConfig) -> None:
@@ -427,6 +508,13 @@ def set_parameters(tc: TeamCityClient, cfg: PipelineConfig) -> None:
         set_parameter(tc, cfg.build_type_id, "regression.session.command.timeout.ms", cfg.regression_session_command_timeout_ms)
         set_parameter(tc, cfg.build_type_id, "jmeter.load.stages", cfg.jmeter_load_stages)
         set_parameter(tc, cfg.build_type_id, "jmeter.load.max.error.percent", cfg.jmeter_load_max_error_percent)
+    overlap = set(cfg.teamcity_parameters).intersection(cfg.teamcity_secure_parameters)
+    if overlap:
+        raise RuntimeError(f"TeamCity parameters cannot be both plain and secure: {', '.join(sorted(overlap))}")
+    for name, value in sorted(cfg.teamcity_parameters.items()):
+        set_parameter(tc, cfg.build_type_id, name, value)
+    for name in sorted(cfg.teamcity_secure_parameters):
+        ensure_secure_parameter(tc, cfg.build_type_id, name)
     print("Set build parameters")
 
 
@@ -592,8 +680,90 @@ echo "##teamcity[publishArtifacts 'build/app/outputs/flutter-apk/app-debug.apk =
 
 def create_jmeter_regression_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
     if cfg.jmeter_load_stages:
+        if (
+            cfg.jmeter_environment_variables
+            or cfg.jmeter_credential_safe_mode
+            or cfg.jmeter_required_summary_providers
+            or not cfg.jmeter_response_data_on_error
+        ):
+            raise RuntimeError(
+                "Credential-safe JMeter settings are not supported by the load-ladder runner; "
+                "use a separate non-load build configuration"
+            )
         create_jmeter_load_ladder_step(tc, cfg)
         return
+
+    invalid_environment_names = [
+        name for name in cfg.jmeter_environment_variables
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name)
+    ]
+    if invalid_environment_names:
+        raise RuntimeError(
+            "jmeterEnvironmentVariables contains invalid environment names: "
+            + ", ".join(invalid_environment_names)
+        )
+    docker_environment = "".join(
+        f"  -e {name} \\\n" for name in cfg.jmeter_environment_variables
+    )
+    response_data_on_error = "true" if cfg.jmeter_response_data_on_error else "false"
+    required_summary_gate = ""
+    if cfg.jmeter_required_summary_providers:
+        invalid_provider_names = [
+            provider for provider in cfg.jmeter_required_summary_providers
+            if not re.fullmatch(r"[A-Z][A-Z0-9_]*", provider)
+        ]
+        if invalid_provider_names:
+            raise RuntimeError(
+                "jmeterRequiredSummaryProviders contains invalid provider identifiers: "
+                + ", ".join(invalid_provider_names)
+            )
+        required_providers = ",".join(cfg.jmeter_required_summary_providers)
+        required_summary_gate = f"""
+if ! python3 -c '
+import json
+import sys
+
+path = sys.argv[1]
+expected = set(sys.argv[2].split(","))
+with open(path, encoding="utf-8") as handle:
+    summary = json.load(handle)
+providers = summary.get("providers", [])
+actual = {{item.get("provider") for item in providers}}
+passed = {{item.get("provider") for item in providers if item.get("outcome") == "PASSED"}}
+if (
+    len(providers) != len(expected)
+    or actual != expected
+    or passed != expected
+    or summary.get("configurationStable") is not True
+):
+    print("Payment gateway provider summary is incomplete or failed", file=sys.stderr)
+    raise SystemExit(1)
+' "$RESULT_DIR/payment-gateway-provider-summary.json" "{required_providers}"; then
+  echo "The payment gateway summary did not contain five successful, configuration-stable provider results."
+  exit 1
+fi
+"""
+
+    if cfg.jmeter_credential_safe_mode:
+        if cfg.git_branch_spec:
+            raise RuntimeError("Credential-bearing JMeter builds must disable feature branches")
+        if not cfg.agent_name:
+            raise RuntimeError("Credential-bearing JMeter builds must pin a trusted TeamCity agent")
+        if "@sha256:" not in cfg.jmeter_image:
+            raise RuntimeError("Credential-bearing JMeter builds must pin jmeterImage by sha256 digest")
+        if not cfg.jmeter_environment_variables:
+            raise RuntimeError("Credential-bearing JMeter builds must declare their Docker environment variables")
+        if cfg.jmeter_response_data_on_error:
+            raise RuntimeError("Credential-bearing JMeter builds must disable response data on error")
+        expected_secure_parameters = {
+            f"env.{name}" for name in cfg.jmeter_environment_variables
+        }
+        missing_secure_parameters = expected_secure_parameters.difference(cfg.teamcity_secure_parameters)
+        if missing_secure_parameters:
+            raise RuntimeError(
+                "Credential-bearing JMeter environment variables must be backed by Password-typed "
+                "TeamCity parameters: " + ", ".join(sorted(missing_secure_parameters))
+            )
 
     script = """set -eu
 
@@ -614,6 +784,7 @@ echo "JMeter image=%jmeter.image%"
 
 status=0
 CID=""
+RUN_ID="tc-$(date +%%s)-$$"
 cleanup() {
   if [ -n "$CID" ]; then
     DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker rm -f "$CID" >/dev/null 2>&1 || true
@@ -626,8 +797,8 @@ DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm --entrypoint java "%jmeter.im
 DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker run --rm "%jmeter.image%" --version | head -25
 CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -w /work \
-  -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2" \
-  "%jmeter.image%" \
+  -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2 -Dsun.net.http.allowRestrictedHeaders=true" \
+__JMETER_DOCKER_ENVIRONMENT__  "%jmeter.image%" \
   -n \
   -t "%jmeter.plan%" \
   -l "$JTL" \
@@ -644,10 +815,14 @@ CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -Jconnector_start_attempts="%regression.connector.start.attempts%" \
   -Jrequest_timeout_ms="%regression.request.timeout.ms%" \
   -Jsession_command_timeout_ms="%regression.session.command.timeout.ms%" \
-  -Jrun_id="tc-%build.number%" \
+  -Jrun_id="$RUN_ID" \
   -Jjmeter.save.saveservice.output_format=csv \
   -Jjmeter.save.saveservice.print_field_names=true \
-  -Jjmeter.save.saveservice.response_data.on_error=true)"
+  -Jjmeter.save.saveservice.requestHeaders=false \
+  -Jjmeter.save.saveservice.responseHeaders=false \
+  -Jjmeter.save.saveservice.samplerData=false \
+  -Jjmeter.save.saveservice.response_data=false \
+  -Jjmeter.save.saveservice.response_data.on_error=__RESPONSE_DATA_ON_ERROR__)"
 
 tar --exclude=.git --exclude=outputs -cf - . | DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker cp - "$CID":/work
 DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker start -a "$CID" || status=$?
@@ -661,15 +836,57 @@ if [ "$status" -ne 0 ]; then
   exit "$status"
 fi
 
-if grep -q ',false,' "$JTL"; then
+if ! python3 -c '
+import csv
+import sys
+
+path = sys.argv[1]
+with open(path, newline="", encoding="utf-8") as handle:
+    rows = list(csv.DictReader(handle))
+if not rows:
+    print("JMeter produced no samples", file=sys.stderr)
+    raise SystemExit(1)
+failed = [row.get("label", "unknown") for row in rows if row.get("success", "").lower() != "true"]
+for label in failed[:20]:
+    print(f"FAILED: {label}", file=sys.stderr)
+raise SystemExit(1 if failed else 0)
+' "$JTL"; then
   echo "JMeter assertions failed. See jmeter-results/electrahub-regression.jtl and jmeter-report/index.html."
-  grep ',false,' "$JTL" | head -20 | sed 's/^/FAILED: /' || true
   exit 1
 fi
 
+__REQUIRED_SUMMARY_GATE__
 echo "ElectraHub regression completed successfully."
 """
-    create_script_step(tc, cfg, "JMeter Charging Regression", script)
+    script = script.replace("__JMETER_DOCKER_ENVIRONMENT__", docker_environment)
+    script = script.replace("__RESPONSE_DATA_ON_ERROR__", response_data_on_error)
+    script = script.replace("__REQUIRED_SUMMARY_GATE__", required_summary_gate)
+    if cfg.jmeter_credential_safe_mode:
+        trusted_parameters = {
+            "%jmeter.image%": (cfg.jmeter_image, "jmeterImage"),
+            "%jmeter.plan%": (cfg.jmeter_plan, "jmeterPlan"),
+            "%regression.base.url%": (cfg.regression_base_url, "regressionBaseUrl"),
+            "%regression.users%": (cfg.regression_users, "regressionUsers"),
+            "%regression.ramp.seconds%": (cfg.regression_ramp_seconds, "regressionRampSeconds"),
+            "%regression.hold.seconds%": (cfg.regression_hold_seconds, "regressionHoldSeconds"),
+            "%regression.sse.seconds%": (cfg.regression_sse_seconds, "regressionSseSeconds"),
+            "%regression.host.header%": (cfg.regression_host_header, "regressionHostHeader"),
+            "%regression.dynamic.connector.selection%": (
+                cfg.regression_dynamic_connector_selection, "regressionDynamicConnectorSelection"
+            ),
+            "%regression.connector.start.attempts%": (
+                cfg.regression_connector_start_attempts, "regressionConnectorStartAttempts"
+            ),
+            "%regression.request.timeout.ms%": (
+                cfg.regression_request_timeout_ms, "regressionRequestTimeoutMs"
+            ),
+            "%regression.session.command.timeout.ms%": (
+                cfg.regression_session_command_timeout_ms, "regressionSessionCommandTimeoutMs"
+            ),
+        }
+        for token, (value, name) in trusted_parameters.items():
+            script = script.replace(token, trusted_shell_value(value, name))
+    create_script_step(tc, cfg, cfg.jmeter_step_name, script)
 
 
 def create_jmeter_load_ladder_step(tc: TeamCityClient, cfg: PipelineConfig) -> None:
@@ -945,22 +1162,49 @@ docker buildx imagetools inspect "{cfg.docker_image}:%build.number%"
 
 
 def ensure_trigger(tc: TeamCityClient, cfg: PipelineConfig) -> None:
-    if not cfg.add_vcs_trigger:
+    path = f"/app/rest/buildTypes/id:{cfg.build_type_id}/triggers"
+    response = tc.request("GET", path)
+    triggers = response.get("trigger", [])
+
+    if cfg.add_vcs_trigger:
+        if any(trigger.get("type") == "vcsTrigger" for trigger in triggers):
+            print("VCS trigger already configured")
+        else:
+            tc.request("POST", path, {
+                "type": "vcsTrigger",
+                "properties": {"property": [
+                    step_property("branchFilter", "+:<default>"),
+                    step_property("enableQueueOptimization", "true"),
+                    step_property("quietPeriodMode", "DO_NOT_USE"),
+                ]},
+            })
+            print("Created VCS trigger")
+    else:
         print("Skipped VCS trigger")
+
+    if not cfg.finish_build_trigger_source_id:
         return
-    build_type = tc.request("GET", f"/app/rest/buildTypes/id:{cfg.build_type_id}")
-    if int(build_type.get("triggers", {}).get("count", 0)) > 0:
-        print("VCS trigger already configured")
+
+    def properties(trigger: dict[str, Any]) -> dict[str, str]:
+        values = trigger.get("properties", {}).get("property", [])
+        return {str(value.get("name")): str(value.get("value", "")) for value in values}
+
+    if any(
+        trigger.get("type") == "buildDependencyTrigger"
+        and properties(trigger).get("dependsOn") == cfg.finish_build_trigger_source_id
+        for trigger in triggers
+    ):
+        print("Finish-build trigger already configured")
         return
-    tc.request("POST", f"/app/rest/buildTypes/id:{cfg.build_type_id}/triggers", {
-        "type": "vcsTrigger",
+    tc.request("POST", path, {
+        "type": "buildDependencyTrigger",
         "properties": {"property": [
+            step_property("dependsOn", cfg.finish_build_trigger_source_id),
+            step_property("afterSuccessfulBuildOnly", "true"),
             step_property("branchFilter", "+:<default>"),
-            step_property("enableQueueOptimization", "true"),
-            step_property("quietPeriodMode", "DO_NOT_USE"),
         ]},
     })
-    print("Created VCS trigger")
+    print(f"Created finish-build trigger: {cfg.finish_build_trigger_source_id}")
 
 
 def create_pipeline(

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="ElectraHub - Payment Gateway Sandbox Validation">
+      <stringProp name="TestPlan.comments">Read-only configuration and provider credential probes for Stripe, Razorpay, private 2C2P, Mollie, and Adyen sandbox connections.</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Sequential sandbox provider validation">
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Payment gateway preflight and safe configuration snapshot">
+          <stringProp name="cacheKey">payment-gateway-sandbox-regression</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/payment-gateway-sandbox-regression.groovy</stringProp>
+          <stringProp name="parameters">preflight</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Stripe sandbox configuration and provider probe">
+          <stringProp name="cacheKey">payment-gateway-sandbox-regression</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/payment-gateway-sandbox-regression.groovy</stringProp>
+          <stringProp name="parameters">STRIPE</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Razorpay sandbox configuration and provider probe">
+          <stringProp name="cacheKey">payment-gateway-sandbox-regression</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/payment-gateway-sandbox-regression.groovy</stringProp>
+          <stringProp name="parameters">RAZORPAY</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Private 2C2P sandbox configuration and provider probe">
+          <stringProp name="cacheKey">payment-gateway-sandbox-regression</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/payment-gateway-sandbox-regression.groovy</stringProp>
+          <stringProp name="parameters">TWO_C2P</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Mollie sandbox configuration and provider probe">
+          <stringProp name="cacheKey">payment-gateway-sandbox-regression</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/payment-gateway-sandbox-regression.groovy</stringProp>
+          <stringProp name="parameters">MOLLIE</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Adyen sandbox configuration and provider probe">
+          <stringProp name="cacheKey">payment-gateway-sandbox-regression</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/payment-gateway-sandbox-regression.groovy</stringProp>
+          <stringProp name="parameters">ADYEN</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Verify probes did not change gateway configuration">
+          <stringProp name="cacheKey">payment-gateway-sandbox-regression</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/payment-gateway-sandbox-regression.groovy</stringProp>
+          <stringProp name="parameters">finalize</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

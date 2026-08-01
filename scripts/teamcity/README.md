@@ -47,6 +47,12 @@ Create the ElectraHub charging regression pipeline:
 .\scripts\teamcity\create_pipeline.ps1 -Config .\scripts\teamcity\electrahub-local-regression.json
 ```
 
+Create the read-only payment-gateway sandbox validation pipeline:
+
+```powershell
+.\scripts\teamcity\create_pipeline.ps1 -Config .\scripts\teamcity\electrahub-local-payment-gateway-regression.json
+```
+
 ## macOS/Linux
 
 ```bash
@@ -72,6 +78,12 @@ Create the ElectraHub charging regression pipeline:
 
 ```bash
 python3 scripts/teamcity/create_pipeline.py --config scripts/teamcity/electrahub-local-regression.json
+```
+
+Create the read-only payment-gateway sandbox validation pipeline:
+
+```bash
+python3 scripts/teamcity/create_pipeline.py --config scripts/teamcity/electrahub-local-payment-gateway-regression.json
 ```
 
 Create or repair one service from the catalog:
@@ -115,7 +127,40 @@ The regression pipeline is intentionally different:
 6. Uses dynamic connector selection by default so smoke runs choose a currently available connector
 7. Retries alternate live connectors when a selected connector becomes unavailable during the run
 
-If public dev Cloudflare is unhealthy, queue the build with:
+The payment-gateway file creates two separate build configurations in the Payment Gateway Service
+project. Both check Stripe, Razorpay, private 2C2P, Mollie, and Adyen independently, require each
+sandbox connection, merchant, and route to be active, and call the read-only provider probe. They
+never create a payment and never call the lifecycle-changing connection `validate` action.
+
+- `JMeter Sandbox Provider Health (Dev)` targets `https://api-dev.electrahub.net` and runs after a
+  successful `ElectraHub_PaymentGatewayService_Build`. It is an environment health check, not proof
+  that the just-built image has completed its asynchronous GitOps rollout.
+- `JMeter Sandbox Provider Validation (Prod)` targets `https://api.electrahub.net` and is manual, so
+  production validation is queued only after the intended production promotion/rollout is complete.
+
+Both accept only gateway connections whose provider environment is `SANDBOX`. A temporary external
+provider outage therefore affects the separate health/validation result without rewriting the
+service build result.
+
+Before each configuration's first run, replace these Password-typed build parameter placeholders in
+TeamCity with a dedicated system-administrator test account for that environment:
+
+- `env.PAYMENT_GATEWAY_TEST_ADMIN_EMAIL`
+- `env.PAYMENT_GATEWAY_TEST_ADMIN_PASSWORD`
+
+The bootstrap creates missing placeholders as TeamCity Password parameters. Provider credentials
+remain in the payment-gateway Kubernetes secret and are never passed to JMeter. The build publishes
+a `.jtl`, JMeter log, HTML report, and a redacted per-provider JSON summary. Request headers,
+sampler data, and response bodies are disabled in JMeter result persistence.
+
+Because this build receives a privileged test login, its VCS root exposes only the fixed
+`develop` branch, the runner is pinned to `teamcity-minimal-agent`, its JMeter image is pinned by
+SHA-256 digest, and the generated shell step embeds the reviewed plan/image/origin values instead
+of accepting custom-build overrides. The Groovy workflow independently accepts only the exact dev
+and production ElectraHub API origins, refuses Host overrides and redirects, and revokes its device
+session.
+
+For the separate charging regression only, if public dev Cloudflare is unhealthy, queue the build with:
 
 - `regression.base.url=http://host.docker.internal:8081`
 - `regression.host.header=api.dev.electrahub.net`
