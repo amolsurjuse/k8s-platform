@@ -47,6 +47,7 @@ config:
     APP_GATEWAY_MOLLIE_BASE_URL: "https://api.mollie.com"
     APP_GATEWAY_ADYEN_TEST_BASE_URL: "https://checkout-test.adyen.com/v72"
     APP_GATEWAY_2C2P_BASE_URL: "https://sandbox-pgw.2c2p.com"
+    APP_GATEWAY_2C2P_MAINTENANCE_BASE_URL: "https://demo2.2c2p.com"
     APP_GATEWAY_2C2P_WEBHOOK_BASE_URL: "https://api-dev.electrahub.net/payment-gateway/api/v1/gateway/webhooks"
     APP_GATEWAY_MOLLIE_WEBHOOK_BASE_URL: "https://api-dev.electrahub.net/payment-gateway/api/v1/gateway/webhooks"
 

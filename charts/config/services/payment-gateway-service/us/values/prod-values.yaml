@@ -48,6 +48,10 @@ extraSecretEnv:
     secretName: "payment-gateway-provider-prod"
     secretKey: "APP_GATEWAY_2C2P_CREDENTIAL"
     optional: true
+  - name: "APP_GATEWAY_2C2P_CERTIFICATE"
+    secretName: "payment-gateway-provider-prod"
+    secretKey: "APP_GATEWAY_2C2P_CERTIFICATE"
+    optional: true
   - name: "APP_GATEWAY_TOKEN_ENCRYPTION_KEY"
     secretName: "payment-gateway-provider-prod"
     secretKey: "APP_GATEWAY_TOKEN_ENCRYPTION_KEY"
