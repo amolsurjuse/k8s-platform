@@ -25,7 +25,7 @@ Use prod only when explicitly validating production:
 | `05-card-present-charging-flow.jmx` | Validates simulated terminal card tap, dummy payment authorization, OCPP transaction start, dwell, and stop. |
 | `06-idle-fee-charging-flow.jmx` | Validates idle-fee pricing discovery, active-session idle fields, remote-stop unplug requirement, physical unplug completion, and receipt. |
 | `07-subscription-discount-charging-flow.jmx` | Validates the default new-user 20% charging discount, quota-aware active-session pricing, and discounted receipt fields. |
-| `08-charging-feature-regression-suite.jmx` | Existing full charging flow plus focused regression cases for idle fee, idle-cap wallet reservation, subscription discount, low-balance auto-stop, low-balance wallet decisions, and auto top-up recovery. |
+| `08-charging-feature-regression-suite.jmx` | Existing full charging flow plus focused regression cases for idle fee, negative-balance wallet warning and acknowledgement, subscription discount, low-balance charging continuation, low-balance wallet decisions, and auto top-up recovery. |
 
 ## Recommended Safe Dev Run
 
@@ -151,9 +151,9 @@ jmeter -n -t scripts/jmeter/07-subscription-discount-charging-flow.jmx `
 This is the default plan for `ElectraHub_Regression_JMeterChargingFlow`. It runs the normal driver charging flow and the focused feature checks needed for recent charging changes:
 
 - idle-fee remote stop remains active until unplug and then generates receipt
-- wallet start is rejected when the balance is below the idle-fee cap plus the base reserve
+- wallet start below the idle-fee cap plus the base reserve returns a negative-balance warning and starts after acknowledgement
 - subscription discount appears in active-session pricing and receipt
-- high meter value triggers backend low-balance remote stop
+- an explicitly acknowledged wallet session remains active when a high meter value makes its projected balance negative, until an explicit stop
 - wallet balance check returns `LOW_BALANCE` when auto top-up is disabled
 - wallet balance check applies auto top-up and returns `OK` when a valid card is configured
 
@@ -177,9 +177,10 @@ Useful feature knobs:
 -Jfeature_idle_users=1
 -Jfeature_idle_wallet_reserve_users=1
 -Jfeature_subscription_users=1
--Jfeature_low_balance_auto_stop_users=1
+-Jfeature_low_balance_continue_users=1
 -Jfeature_low_balance_check_users=1
 -Jfeature_auto_topup_users=1
+-Jlow_balance_continue_wallet_balance=55.00
 -Jlow_balance_threshold=10.00
 -Jlow_balance_meter_wh=99999999
 -Jauto_topup_threshold=100.00
@@ -278,6 +279,7 @@ Interpretation:
 | `run_id` | timestamp | Unique test run id used in generated emails. |
 | `test_password` | `LoadTest@12345` | Password for generated users. |
 | `wallet_topup_amount` | `120.00` | Wallet top-up amount per user. |
+| `low_balance_continue_wallet_balance` | `55.00` | Wallet balance used by the high-meter continuation contract; it clears the normal start reserve and remains below the default session cap. |
 | `users_output` | `scripts/jmeter/data/generated-users.csv` | Output CSV from setup suite. |
 
 ## SSE Validation

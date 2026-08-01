@@ -2,6 +2,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 import java.io.IOException
+import java.math.RoundingMode
 import java.net.HttpURLConnection
 import java.net.URLEncoder
 import java.net.SocketTimeoutException
@@ -42,6 +43,7 @@ int sseSeconds = props.getProperty('sse_seconds', String.valueOf(Math.min(holdSe
 int requestTimeoutMs = props.getProperty('request_timeout_ms', '120000') as int
 int sessionCommandTimeoutMs = props.getProperty('session_command_timeout_ms', '180000') as int
 BigDecimal walletTopupAmount = new BigDecimal(props.getProperty('wallet_topup_amount', '120.00'))
+BigDecimal lowBalanceContinueWalletBalance = new BigDecimal(props.getProperty('low_balance_continue_wallet_balance', '55.00'))
 BigDecimal lowBalanceThreshold = new BigDecimal(props.getProperty('low_balance_threshold', '10.00'))
 String usersOutput = props.getProperty('users_output', 'scripts/jmeter/data/generated-users.csv')
 String connectorsCsv = props.getProperty('connectors_csv', 'scripts/jmeter/data/connectors-100.csv')
@@ -331,7 +333,9 @@ def setupPayment = { String token ->
   if (!cardOnlyPayment) {
     BigDecimal setupTopupAmount = action == 'idle-fee-wallet-reserve'
       ? new BigDecimal(props.getProperty('idle_fee_wallet_insufficient_balance', '54.99'))
-      : walletTopupAmount
+      : action == 'low-balance-continue'
+        ? lowBalanceContinueWalletBalance
+        : walletTopupAmount
     def topup = atStep('wallet topup') { request('POST', '/payment/api/v1/payment/wallet/topups', [
       amount: setupTopupAmount,
       source: 'MANUAL',
@@ -479,7 +483,7 @@ def validateAutoTopUpDecisionFlow = { String token ->
 
 def discoverChargers = { String token ->
   String countryArg = props.getProperty('charger_country_code', '').trim()
-  if (!countryArg && ['charging', 'full', 'idle-fee', 'idle-fee-wallet-reserve', 'subscription-discount', 'low-balance-auto-stop'].contains(action)) {
+  if (!countryArg && ['charging', 'full', 'idle-fee', 'idle-fee-wallet-reserve', 'subscription-discount', 'low-balance-continue'].contains(action)) {
     countryArg = 'US'
   }
   String countryFilter = countryArg ? "countryCode: \"${countryArg}\", " : ''
@@ -703,7 +707,8 @@ def startSession = { String token ->
       paymentMethod: sessionPaymentMethod,
       cardId: startCardId,
       currency: 'USD',
-      idempotencyKey: UUID.randomUUID().toString()
+      idempotencyKey: UUID.randomUUID().toString(),
+      acknowledgeNegativeBalanceRisk: action == 'low-balance-continue'
     ]
     def response = atStep("start charging attempt ${attemptNumber}") { request('POST', '/session/api/v1/sessions/start', payload, token, sessionCommandTimeoutMs) }
     lastResponse = response
@@ -741,8 +746,54 @@ def validateIdleFeeWalletReserveStart = { String token ->
   }
 
   String uid = vars.get('userId') ?: ''
-  def response = atStep('idle-fee wallet reserve start rejection') {
-    request('POST', '/session/api/v1/sessions/start', [
+  def connectorAttempts = []
+  String candidatesJson = vars.get('connectorCandidatesJson')
+  if (dynamicConnectorSelection && candidatesJson) {
+    def parsedCandidates = parseJson(candidatesJson) ?: []
+    if (!parsedCandidates.isEmpty()) {
+      int startAt = Math.floorMod(threadIndex - 1, parsedCandidates.size())
+      int maxAttempts = Math.min(
+        parsedCandidates.size(),
+        Math.max(5, props.getProperty('connector_start_attempts', String.valueOf(parsedCandidates.size())) as int)
+      )
+      for (int i = 0; i < maxAttempts; i++) {
+        connectorAttempts << parsedCandidates[(startAt + i) % parsedCandidates.size()]
+      }
+    }
+  }
+  if (connectorAttempts.isEmpty()) {
+    connectorAttempts << [
+      chargerId: chargerId,
+      locationId: locationId,
+      connectorId: connectorId,
+      connectorNumber: connectorNumber,
+      connectorType: connectorType
+    ]
+  }
+
+  def isExpectedConnectorContention = { Map response ->
+    if ((response.status as int) != 409) return false
+    String message = String.valueOf(response.json?.message ?: '').trim()
+    message == 'Connector is not available for charging.' ||
+      message == 'Connector is occupied. Please unplug the vehicle before starting a new session.'
+  }
+
+  int candidateAttempt = 0
+  for (def candidate : connectorAttempts) {
+    candidateAttempt++
+    chargerId = candidate.chargerId as String
+    locationId = candidate.locationId as String
+    connectorId = candidate.connectorId as String
+    connectorType = (candidate.connectorType ?: connectorType) as String
+    connectorNumber = (candidate.connectorNumber ?: connectorNumber ?: 1) as int
+    vars.put('chargerId', chargerId)
+    vars.put('locationId', locationId)
+    vars.put('connectorId', connectorId)
+    vars.put('connectorNumber', String.valueOf(connectorNumber))
+    vars.put('connectorType', connectorType)
+
+    String idempotencyKey = UUID.randomUUID().toString()
+    def startPayload = [
       chargerId: chargerId,
       locationId: locationId,
       connectorId: connectorId,
@@ -751,21 +802,111 @@ def validateIdleFeeWalletReserveStart = { String token ->
       idToken: uid,
       paymentMethod: 'WALLET',
       currency: 'USD',
-      idempotencyKey: UUID.randomUUID().toString()
-    ], token, sessionCommandTimeoutMs)
-  }
-  requireStatus(response, [409], 'idle-fee wallet reserve start rejection')
-  String message = String.valueOf(response.body ?: '').toLowerCase(Locale.ROOT)
-  if (!message.contains('top up') || !message.contains('credit card')) {
-    throw new IllegalStateException("idle-fee reserve rejection must offer top-up and credit-card options: ${response.body}")
+      idempotencyKey: idempotencyKey,
+      acknowledgeNegativeBalanceRisk: false
+    ]
+
+    def warning = atStep("idle-fee wallet negative-balance warning candidate ${candidateAttempt}") {
+      request('POST', '/session/api/v1/sessions/start', startPayload, token, sessionCommandTimeoutMs)
+    }
+    if (isExpectedConnectorContention(warning) && candidateAttempt < connectorAttempts.size()) {
+      logLine("idle-fee warning connector contention charger=${chargerId}/${connectorId}; retrying the warning and acknowledgement contract on another connector")
+      sleep(1000)
+      continue
+    }
+    requireStatus(warning, [200], 'idle-fee wallet negative-balance warning')
+    if (String.valueOf(warning.json?.status ?: '') != 'WARNING') {
+      throw new IllegalStateException("idle-fee reserve warning response has unexpected status: ${warning.body}")
+    }
+    if (String.valueOf(warning.json?.warningCode ?: '') != 'WALLET_BALANCE_MAY_GO_NEGATIVE') {
+      throw new IllegalStateException("idle-fee reserve warning response has unexpected warningCode: ${warning.body}")
+    }
+    if (warning.json?.sessionId != null && String.valueOf(warning.json.sessionId).trim()) {
+      throw new IllegalStateException("idle-fee reserve warning must not create a session: ${warning.body}")
+    }
+    if (warning.json?.walletBalance == null || warning.json?.availableWalletBalance == null || warning.json?.activeAuthorizationHolds == null || warning.json?.requiredWalletBalance == null || warning.json?.projectedBalance == null) {
+      throw new IllegalStateException("idle-fee reserve warning is missing wallet, available, hold, required, or projected balance fields: ${warning.body}")
+    }
+    if (String.valueOf(warning.json?.currency ?: '').toUpperCase(Locale.ROOT) != 'USD') {
+      throw new IllegalStateException("idle-fee reserve warning has unexpected currency: ${warning.body}")
+    }
+
+    BigDecimal warningBalance = new BigDecimal(String.valueOf(warning.json.walletBalance))
+    BigDecimal availableBalance = new BigDecimal(String.valueOf(warning.json.availableWalletBalance))
+    BigDecimal activeAuthorizationHolds = new BigDecimal(String.valueOf(warning.json.activeAuthorizationHolds))
+    BigDecimal requiredBalance = new BigDecimal(String.valueOf(warning.json.requiredWalletBalance))
+    BigDecimal projectedBalance = new BigDecimal(String.valueOf(warning.json.projectedBalance))
+    if (warningBalance.compareTo(balance) != 0) {
+      throw new IllegalStateException("idle-fee reserve warning wallet balance mismatch: expected=${balance} actual=${warningBalance}")
+    }
+    BigDecimal expectedAvailableBalance = warningBalance.subtract(activeAuthorizationHolds).setScale(2, RoundingMode.HALF_UP)
+    if (availableBalance.compareTo(expectedAvailableBalance) != 0) {
+      throw new IllegalStateException("idle-fee reserve warning available balance mismatch: expected=${expectedAvailableBalance} actual=${availableBalance}")
+    }
+    if (requiredBalance.compareTo(availableBalance) <= 0) {
+      throw new IllegalStateException("idle-fee reserve warning must report required balance above available balance: available=${availableBalance} required=${requiredBalance}")
+    }
+    BigDecimal expectedProjectedBalance = availableBalance.subtract(requiredBalance).setScale(2, RoundingMode.HALF_UP)
+    if (projectedBalance.compareTo(expectedProjectedBalance) != 0 || projectedBalance.signum() >= 0) {
+      throw new IllegalStateException("idle-fee reserve warning projected balance mismatch: expected=${expectedProjectedBalance} actual=${projectedBalance}")
+    }
+
+    def beforeAcknowledgement = activeSession(token)
+    def sessionsBeforeAcknowledgement = beforeAcknowledgement.json instanceof List ? beforeAcknowledgement.json : []
+    if (!sessionsBeforeAcknowledgement.isEmpty()) {
+      throw new IllegalStateException("idle-fee reserve warning created an active session before acknowledgement: ${beforeAcknowledgement.body}")
+    }
+
+    def acknowledgedPayload = new LinkedHashMap(startPayload)
+    acknowledgedPayload.acknowledgeNegativeBalanceRisk = true
+    def accepted = atStep("acknowledge idle-fee wallet negative-balance risk candidate ${candidateAttempt}") {
+      request('POST', '/session/api/v1/sessions/start', acknowledgedPayload, token, sessionCommandTimeoutMs)
+    }
+    if (isExpectedConnectorContention(accepted)) {
+      def afterContention = activeSession(token)
+      def sessionsAfterContention = afterContention.json instanceof List ? afterContention.json : []
+      if (!sessionsAfterContention.isEmpty()) {
+        throw new IllegalStateException("connector contention response created an active session during acknowledged retry: ${afterContention.body}")
+      }
+      if (candidateAttempt < connectorAttempts.size()) {
+        logLine("idle-fee acknowledgement connector contention charger=${chargerId}/${connectorId}; retrying the complete contract on another connector")
+        sleep(1000)
+        continue
+      }
+    }
+    requireStatus(accepted, [200, 201], 'acknowledge idle-fee wallet negative-balance risk')
+    String sessionId = String.valueOf(accepted.json?.sessionId ?: '').trim()
+    if (!sessionId) {
+      throw new IllegalStateException("acknowledged idle-fee wallet start did not create a session: ${accepted.body}")
+    }
+    if (String.valueOf(accepted.json?.status ?: '').equalsIgnoreCase('WARNING') || accepted.json?.warningCode != null) {
+      throw new IllegalStateException("acknowledged idle-fee wallet start returned another warning: ${accepted.body}")
+    }
+    vars.put('sessionId', sessionId)
+
+    long activeDeadline = System.currentTimeMillis() + 60000L
+    def activeAfterAcknowledgement = null
+    def sessionsAfterAcknowledgement = []
+    while (System.currentTimeMillis() < activeDeadline) {
+      activeAfterAcknowledgement = activeSession(token)
+      sessionsAfterAcknowledgement = activeAfterAcknowledgement.json instanceof List ? activeAfterAcknowledgement.json : []
+      if (sessionsAfterAcknowledgement.size() == 1 && String.valueOf(sessionsAfterAcknowledgement[0].id ?: '') == sessionId) {
+        break
+      }
+      if (sessionsAfterAcknowledgement.size() > 1) {
+        throw new IllegalStateException("acknowledged idle-fee wallet start created more than one active session: ${activeAfterAcknowledgement.body}")
+      }
+      sleep(3000)
+    }
+    if (sessionsAfterAcknowledgement.size() != 1 || String.valueOf(sessionsAfterAcknowledgement[0].id ?: '') != sessionId) {
+      throw new IllegalStateException("acknowledged idle-fee wallet start did not expose exactly one active session ${sessionId}: ${activeAfterAcknowledgement?.body}")
+    }
+
+    logLine("idle-fee wallet warning acknowledged session=${sessionId} balance=${warningBalance} holds=${activeAuthorizationHolds} available=${availableBalance} required=${requiredBalance} projected=${projectedBalance} charger=${chargerId}/${connectorId} candidate=${candidateAttempt}/${connectorAttempts.size()}")
+    return sessionId
   }
 
-  def active = activeSession(token)
-  def sessions = active.json instanceof List ? active.json : []
-  if (!sessions.isEmpty()) {
-    throw new IllegalStateException("idle-fee reserve rejection created an active session: ${active.body}")
-  }
-  logLine("idle-fee wallet reserve correctly rejected start balance=${balance} charger=${chargerId}/${connectorId}")
+  throw new IllegalStateException("idle-fee wallet warning acknowledgement exhausted ${connectorAttempts.size()} connector candidate(s)")
 }
 
 def findActiveSession = { String token, String sessionId ->
@@ -1082,19 +1223,42 @@ def validateIdleFeeFlow = { String token, String sessionId ->
   validateStoppedAndReceipt(token, sessionId)
 }
 
-def validateLowBalanceAutoStopFlow = { String token, String sessionId ->
-  waitForActiveSessionPredicate(token, sessionId, 'charging active before low balance meter', 60) { session ->
+def validateLowBalanceContinueFlow = { String token, String sessionId ->
+  def beforeMeter = waitForActiveSessionPredicate(token, sessionId, 'charging active before high meter value', 60) { session ->
     ['CHARGING', 'ACTIVE', 'STARTED'].contains(String.valueOf(session.status ?: '').toUpperCase(Locale.ROOT))
   }
+  BigDecimal startingWalletBalance = walletBalance(paymentState(token, 'payment state before high meter value'))
+  if (startingWalletBalance.compareTo(lowBalanceContinueWalletBalance) != 0) {
+    throw new IllegalStateException("low-balance continue wallet mismatch: expected=${lowBalanceContinueWalletBalance} actual=${startingWalletBalance}")
+  }
+  BigDecimal energyBefore = new BigDecimal(String.valueOf(beforeMeter.energyDeliveredKwh ?: beforeMeter.energyKwh ?: 0))
+  BigDecimal costBefore = new BigDecimal(String.valueOf(beforeMeter.estimatedCost ?: 0))
 
   long meterWh = props.getProperty('low_balance_meter_wh', '99999999') as long
   sendSimulatorMeterValue(meterWh)
-  def stopRequested = waitForActiveSessionPredicate(token, sessionId, 'low balance remote stop request', 120) { session ->
-    String status = String.valueOf(session.status ?: '').toUpperCase(Locale.ROOT)
-    status in ['SUSPENDED', 'COMPLETED', 'STOPPED']
+  def updated = waitForActiveSessionPredicate(token, sessionId, 'high meter energy or cost update while charging continues', 120) { session ->
+    BigDecimal energyNow = new BigDecimal(String.valueOf(session.energyDeliveredKwh ?: session.energyKwh ?: 0))
+    BigDecimal costNow = new BigDecimal(String.valueOf(session.estimatedCost ?: 0))
+    energyNow.compareTo(energyBefore) > 0 || costNow.compareTo(costBefore) > 0
   }
-  logLine("low-balance auto-stop observed session=${sessionId} status=${stopRequested.status} stopReason=${stopRequested.stopReason} remoteStopRequestedAt=${stopRequested.remoteStopRequestedAt} estimatedCost=${stopRequested.estimatedCost}")
+  String status = String.valueOf(updated.status ?: '').toUpperCase(Locale.ROOT)
+  if (!['PENDING', 'PREPARING', 'ACTIVE', 'SUSPENDED', 'CHARGING', 'STARTED'].contains(status)) {
+    throw new IllegalStateException("high meter value did not leave session ${sessionId} active and nonterminal: ${json(updated)}")
+  }
+  if (String.valueOf(updated.stopReason ?: '').equalsIgnoreCase('LOW_BALANCE')) {
+    throw new IllegalStateException("high meter value assigned LOW_BALANCE stop reason to continuing session ${sessionId}: ${json(updated)}")
+  }
+  if (updated.remoteStopRequestedAt != null && String.valueOf(updated.remoteStopRequestedAt).trim()) {
+    throw new IllegalStateException("high meter value requested a remote stop for continuing session ${sessionId}: ${json(updated)}")
+  }
+  BigDecimal costAfter = new BigDecimal(String.valueOf(updated.estimatedCost ?: 0))
+  BigDecimal projectedBalance = startingWalletBalance.subtract(costAfter)
+  if (costAfter.compareTo(startingWalletBalance) <= 0 || projectedBalance.signum() >= 0) {
+    throw new IllegalStateException("high meter value did not create exposure above the starting wallet for ${sessionId}: wallet=${startingWalletBalance} cost=${costAfter} session=${json(updated)}")
+  }
+  logLine("low-balance continue observed session=${sessionId} status=${updated.status} wallet=${startingWalletBalance} projectedBalance=${projectedBalance} energyBefore=${energyBefore} energyAfter=${updated.energyDeliveredKwh ?: updated.energyKwh} costBefore=${costBefore} costAfter=${costAfter}")
 
+  stopSession(token, sessionId)
   validateStoppedAndReceipt(token, sessionId)
 }
 
@@ -1106,14 +1270,14 @@ try {
     throw new IllegalStateException('card-burst requires a protected cleanup_admin_token so generated accounts are removed')
   }
 
-  if (action == 'setup' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'idle-fee-wallet-reserve' || action == 'subscription-discount' || action == 'low-balance-auto-stop' || action == 'low-balance-check' || action == 'auto-top-up-check') {
+  if (action == 'setup' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'idle-fee-wallet-reserve' || action == 'subscription-discount' || action == 'low-balance-continue' || action == 'low-balance-check' || action == 'auto-top-up-check') {
     token = registerOrLogin()
     appendGeneratedUser()
     token = setupPayment(token)
   } else if (action == 'charging') {
     token = login()
   } else {
-    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, card-burst, idle-fee, idle-fee-wallet-reserve, subscription-discount, low-balance-auto-stop, low-balance-check, or auto-top-up-check.")
+    throw new IllegalArgumentException("Unsupported action '${action}'. Use setup, charging, full, card-burst, idle-fee, idle-fee-wallet-reserve, subscription-discount, low-balance-continue, low-balance-check, or auto-top-up-check.")
   }
 
   if (action == 'low-balance-check') {
@@ -1122,10 +1286,12 @@ try {
     validateAutoTopUpDecisionFlow(token)
   } else if (action == 'idle-fee-wallet-reserve') {
     discoverChargers(token)
-    validateIdleFeeWalletReserveStart(token)
+    String warnedSessionId = validateIdleFeeWalletReserveStart(token)
+    stopSession(token, warnedSessionId)
+    validateStoppedAndReceipt(token, warnedSessionId)
   }
 
-  if (action == 'charging' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-auto-stop') {
+  if (action == 'charging' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-continue') {
     if (action != 'card-burst') {
       discoverChargers(token)
     } else {
@@ -1140,8 +1306,8 @@ try {
       validateIdleFeeFlow(token, sessionId)
     } else if (action == 'subscription-discount') {
       validateSubscriptionDiscountFlow(token, sessionId)
-    } else if (action == 'low-balance-auto-stop') {
-      validateLowBalanceAutoStopFlow(token, sessionId)
+    } else if (action == 'low-balance-continue') {
+      validateLowBalanceContinueFlow(token, sessionId)
     } else {
 
       long elapsedSeconds = (System.currentTimeMillis() - startedAt) / 1000L
