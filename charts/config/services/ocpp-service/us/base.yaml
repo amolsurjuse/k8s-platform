@@ -15,6 +15,10 @@ secrets:
     DB_USERNAME: "POSTGRES_USER"
     DB_PASSWORD: "POSTGRES_PASSWORD"
 
+extraFieldRefEnv:
+  - name: "NODE_ID"
+    fieldPath: "metadata.name"
+
 config:
   data:
     SERVER_PORT: "8082"

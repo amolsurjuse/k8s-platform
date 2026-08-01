@@ -8,6 +8,9 @@ extraSecretEnv:
   - name: "APP_SECURITY_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+  - name: "APP_SECURITY_ID_TAG_FINGERPRINT_KEY"
+    secretName: "ocpp-command-fingerprint-secret"
+    secretKey: "APP_SECURITY_ID_TAG_FINGERPRINT_KEY"
 
 replicaCount: 1
 
