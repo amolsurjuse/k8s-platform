@@ -14,6 +14,7 @@ config:
     # saved-card enrollment. Stripe-only scopes belong in these two values.
     PAYMENT_GATEWAY_CARD_ENROLLMENT_PILOT_NETWORK_IDS: ""
     PAYMENT_GATEWAY_CARD_ENROLLMENT_PILOT_SCOPES: ""
+    PAYMENT_GATEWAY_TOPUP_HOSTED_CHECKOUT_SCOPES: "IN|INR|ENT-IN-DEMO|NW-EH-IND-DEMO"
 
 replicaCount: 1
 
