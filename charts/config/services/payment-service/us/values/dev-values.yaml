@@ -10,6 +10,7 @@ config:
   data:
     PAYMENT_GATEWAY_CARD_ENROLLMENT_ENABLED: "true"
     PAYMENT_GATEWAY_EXECUTION_PILOT_NETWORK_IDS: "NW-EH-IND-DEMO"
+    PAYMENT_GATEWAY_HOSTED_CHECKOUT_PAYER_SCOPES: "IN|ENT-IN-DEMO|NW-EH-IND-DEMO"
     # Razorpay uses hosted checkout and must not be advertised as reusable
     # saved-card enrollment. Stripe-only scopes belong in these two values.
     PAYMENT_GATEWAY_CARD_ENROLLMENT_PILOT_NETWORK_IDS: ""
