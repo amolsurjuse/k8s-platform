@@ -400,6 +400,15 @@ def acceptTerms = { String token ->
   login()
 }
 
+def ensureTermsAccepted = { String token ->
+  def state = atStep('terms acceptance probe') { request('GET', '/payment/api/v1/payment/state', null, token) }
+  if ((state.status as int) == 451) {
+    return acceptTerms(token)
+  }
+  requireStatus(state, [200], 'terms acceptance probe')
+  token
+}
+
 def setupPayment = { String token ->
   def initialState = atStep('payment state before setup') { request('GET', '/payment/api/v1/payment/state', null, token) }
   if ((initialState.status as int) == 451) {
@@ -419,7 +428,9 @@ def setupPayment = { String token ->
     String.valueOf(option.countryCode ?: '').equalsIgnoreCase(journeyCountryCode) &&
       String.valueOf(option.currency ?: '').equalsIgnoreCase(journeyCurrency)
   }
-  String discoveredNetworkId = String.valueOf(vars.get('journeyNetworkId') ?: '').trim()
+  String discoveredNetworkId = String.valueOf(
+    vars.get('journeyNetworkId') ?: props.getProperty('journey_network_id', '')
+  ).trim()
   def enrollmentOption = discoveredNetworkId
     ? regionalOptions.find { String.valueOf(it.networkId ?: '').equalsIgnoreCase(discoveredNetworkId) }
     : regionalOptions.sort { left, right ->
@@ -1678,6 +1689,9 @@ try {
   if (action == 'setup' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'idle-fee-wallet-reserve' || action == 'subscription-discount' || action == 'low-balance-continue' || action == 'low-balance-check' || action == 'auto-top-up-check') {
     token = registerOrLogin()
     appendGeneratedUser()
+    // Newly registered users must accept the current terms before charger
+    // discovery. The payment-state probe is idempotent for returning users.
+    token = ensureTermsAccepted(token)
     if (action != 'card-burst' &&
         ['full', 'idle-fee', 'idle-fee-wallet-reserve', 'subscription-discount', 'low-balance-continue'].contains(action)) {
       discoverChargers(token)
