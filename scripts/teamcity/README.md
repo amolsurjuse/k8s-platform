@@ -47,6 +47,12 @@ Create the ElectraHub charging regression pipeline:
 .\scripts\teamcity\create_pipeline.ps1 -Config .\scripts\teamcity\electrahub-local-regression.json
 ```
 
+Create the concurrent US/India/Netherlands wallet and saved-card E2E pipeline:
+
+```powershell
+.\scripts\teamcity\create_pipeline.ps1 -Config .\scripts\teamcity\electrahub-local-three-region-charging-e2e.json
+```
+
 Create the read-only payment-gateway sandbox validation pipeline:
 
 ```powershell
@@ -78,6 +84,12 @@ Create the ElectraHub charging regression pipeline:
 
 ```bash
 python3 scripts/teamcity/create_pipeline.py --config scripts/teamcity/electrahub-local-regression.json
+```
+
+Create the concurrent US/India/Netherlands wallet and saved-card E2E pipeline:
+
+```bash
+python3 scripts/teamcity/create_pipeline.py --config scripts/teamcity/electrahub-local-three-region-charging-e2e.json
 ```
 
 Create the read-only payment-gateway sandbox validation pipeline:
@@ -117,15 +129,23 @@ The generated pipelines follow the existing ElectraHub service patterns:
 4. Update the k8s-platform dev image tag
 5. VCS trigger on the default branch
 
-The regression pipeline is intentionally different:
+The five-user steady-load pipeline is intentionally different:
 
 1. Checks out `k8s-platform`
-2. Runs `scripts/jmeter/08-charging-feature-regression-suite.jmx` through Dockerized JMeter
+2. Runs `scripts/jmeter/11-five-user-steady-charging-load.jmx` once through Dockerized JMeter (no ladder/burst loop)
 3. Fails the build if any JMeter assertion fails
 4. Publishes the raw `.jtl`, JMeter log, and HTML dashboard as TeamCity artifacts
-5. Uses safe smoke defaults of 5 users, no VCS trigger, and `https://api.dev.electrahub.net`
+5. Uses five users ramped over 60 seconds, no VCS trigger, and an explicit production target
 6. Uses dynamic connector selection by default so smoke runs choose a currently available connector
 7. Retries alternate live connectors when a selected connector becomes unavailable during the run
+8. Requires a Password-typed `env.ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN` containing a `SYSTEM_ADMIN` JWT with at least 10 minutes remaining, pins the runner and image, and removes generated test accounts
+
+The separate three-region pipeline invokes only `12-three-region-wallet-card-e2e.jmx`. Its three
+thread groups run concurrently: one US/USD user, one India/INR user, and one Netherlands/EUR user,
+each pinned to a distinct regional network. Each user completes wallet charging and saved-card
+charging sequentially before cleanup. The run fails on missing regional inventory/routing, stale
+`PREPARING`, absent target-session SSE state, missing meter/cost progress, stop failure, incomplete
+payment settlement, or an invalid receipt.
 
 The payment-gateway file creates two separate build configurations in the Payment Gateway Service
 project. Both check Stripe, Razorpay, private 2C2P, Mollie, and Adyen independently, require each
@@ -160,12 +180,13 @@ of accepting custom-build overrides. The Groovy workflow independently accepts o
 and production ElectraHub API origins, refuses Host overrides and redirects, and revokes its device
 session.
 
-For the separate charging regression only, if public dev Cloudflare is unhealthy, queue the build with:
+For a local/dev charging run only, use a copied non-production configuration with:
 
 - `regression.base.url=http://host.docker.internal:8081`
 - `regression.host.header=api.dev.electrahub.net`
 
-For a full manual 100-user run, edit the build parameters before queueing:
+For a full manual 100-user run, use `03-full-e2e-charging-100-users.jmx` in a separate reviewed build
+configuration. Do not override the five-user steady plan into a burst run. Typical 100-user values are:
 
 - `regression.users=100`
 - `regression.ramp.seconds=300`

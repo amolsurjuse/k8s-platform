@@ -26,11 +26,23 @@ if (!runId) {
 int userOffset = props.getProperty('user_offset', '0') as int
 int threadIndex = ctx.getThreadNum() + 1 + userOffset
 String userNumber = String.format('%03d', threadIndex)
+String explicitJourneyCountry = String.valueOf(vars.get('journeyCountryCode') ?: '').trim().toUpperCase(Locale.ROOT)
+String journeyCountryCode = String.valueOf(
+  explicitJourneyCountry ?: props.getProperty('journey_country_code', props.getProperty('charger_country_code', 'US'))
+).trim().toUpperCase(Locale.ROOT)
+if (!journeyCountryCode) journeyCountryCode = 'US'
+String defaultJourneyCurrency = [US: 'USD', IN: 'INR', NL: 'EUR', SG: 'SGD'][journeyCountryCode] ?: 'USD'
+String journeyCurrency = String.valueOf(
+  vars.get('journeyCurrency') ?: props.getProperty('session_currency', defaultJourneyCurrency)
+).trim().toUpperCase(Locale.ROOT)
+String journeyRegionKey = explicitJourneyCountry ? "-${explicitJourneyCountry.toLowerCase(Locale.ROOT)}" : ''
 String actionUserKey = action.replaceAll('[^A-Za-z0-9]+', '-').toLowerCase(Locale.ROOT)
-int actionPhoneBucket = Math.abs(action.hashCode() % 1000)
+int phoneRunSeed = Math.floorMod("${runId}:${action}:${journeyCountryCode}".hashCode(), 1_000_000_000)
 String defaultPassword = props.getProperty('test_password', 'LoadTest@12345')
-String email = (vars.get('userEmail') ?: "jmeter+${runId}-${actionUserKey}-${userNumber}@electrahub.test").trim()
+String email = (vars.get('userEmail') ?: "jmeter+${runId}${journeyRegionKey}-${actionUserKey}-${userNumber}@electrahub.test").trim()
 String password = (vars.get('userPassword') ?: defaultPassword).trim()
+vars.put('userEmail', email)
+vars.put('userPassword', password)
 
 String connectorId = vars.get('connectorId')
 String chargerId = vars.get('chargerId')
@@ -42,17 +54,34 @@ int holdSeconds = props.getProperty('hold_seconds', '900') as int
 int sseSeconds = props.getProperty('sse_seconds', String.valueOf(Math.min(holdSeconds, 120))) as int
 int requestTimeoutMs = props.getProperty('request_timeout_ms', '120000') as int
 int sessionCommandTimeoutMs = props.getProperty('session_command_timeout_ms', '180000') as int
-BigDecimal walletTopupAmount = new BigDecimal(props.getProperty('wallet_topup_amount', '120.00'))
+BigDecimal walletTopupAmount = new BigDecimal(String.valueOf(
+  vars.get('journeyWalletTopupAmount') ?: props.getProperty('wallet_topup_amount', '120.00')
+))
 BigDecimal lowBalanceContinueWalletBalance = new BigDecimal(props.getProperty('low_balance_continue_wallet_balance', '55.00'))
 BigDecimal lowBalanceThreshold = new BigDecimal(props.getProperty('low_balance_threshold', '10.00'))
 String usersOutput = props.getProperty('users_output', 'scripts/jmeter/data/generated-users.csv')
 String connectorsCsv = props.getProperty('connectors_csv', 'scripts/jmeter/data/connectors-100.csv')
 boolean dynamicConnectorSelection = props.getProperty('dynamic_connector_selection', 'false').toBoolean()
-String sessionPaymentMethod = props.getProperty('session_payment_method', action == 'card-burst' ? 'CARD' : 'WALLET').trim().toUpperCase(Locale.ROOT)
+String sessionPaymentMethod = String.valueOf(
+  vars.get('journeyPaymentMethod') ?: props.getProperty('session_payment_method', action == 'card-burst' ? 'CARD' : 'WALLET')
+).trim().toUpperCase(Locale.ROOT)
 boolean cardOnlyPayment = sessionPaymentMethod in ['CARD', 'CREDIT_CARD']
 boolean exclusiveConnectorAllocation = props.getProperty('exclusive_connector_allocation', action == 'card-burst' ? 'true' : 'false').toBoolean()
-boolean cleanupTestAccount = props.getProperty('cleanup_test_account', action == 'card-burst' ? 'true' : 'false').toBoolean()
-boolean persistGeneratedUser = props.getProperty('persist_generated_user', action == 'card-burst' ? 'false' : 'true').toBoolean()
+boolean cleanupTestAccount = String.valueOf(
+  vars.get('journeyCleanup') ?: props.getProperty('cleanup_test_account', action == 'card-burst' ? 'true' : 'false')
+).toBoolean()
+boolean requireCleanupCredential = String.valueOf(
+  vars.get('journeyRequireCleanupCredential') ?: cleanupTestAccount
+).toBoolean()
+boolean cleanupUnexpectedSessions = String.valueOf(
+  vars.get('journeyCleanupUnexpectedSessions') ?: 'false'
+).toBoolean()
+boolean validateChargingProgress = String.valueOf(
+  vars.get('journeyValidateChargingProgress') ?: props.getProperty('validate_charging_progress', 'false')
+).toBoolean()
+boolean persistGeneratedUser = String.valueOf(
+  vars.get('journeyPersistGeneratedUser') ?: props.getProperty('persist_generated_user', action == 'card-burst' ? 'false' : 'true')
+).toBoolean()
 String cleanupAdminToken = props.getProperty(
   'cleanup_admin_token',
   System.getenv('ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN') ?: ''
@@ -222,6 +251,55 @@ def simulatorRequest = { String method, String path, Object body = null, int tim
   throw lastError
 }
 
+/// Confirms the sandbox SetupIntent without handling raw card data. The
+/// publishable key and client secret are short-lived values returned to this
+/// test user's authenticated enrollment request; neither value is logged or
+/// persisted in JMeter result data.
+def stripeFormRequest = { String setupIntentId, String publishableKey, String clientSecret ->
+  if (!(setupIntentId ==~ /^seti_[A-Za-z0-9_]+$/)) {
+    throw new IllegalStateException('secure card enrollment returned an invalid Stripe SetupIntent id')
+  }
+  if (!publishableKey.startsWith('pk_test_')) {
+    throw new IllegalStateException('regional card E2E requires a Stripe sandbox publishable key')
+  }
+  if (!clientSecret.startsWith("${setupIntentId}_secret_")) {
+    throw new IllegalStateException('secure card enrollment returned a mismatched Stripe client secret')
+  }
+
+  URL url = new URL("https://api.stripe.com/v1/setup_intents/${setupIntentId}/confirm")
+  HttpURLConnection conn = (HttpURLConnection) url.openConnection()
+  conn.setRequestMethod('POST')
+  conn.setConnectTimeout(requestTimeoutMs)
+  conn.setReadTimeout(requestTimeoutMs)
+  conn.setDoOutput(true)
+  conn.setRequestProperty('Accept', 'application/json')
+  conn.setRequestProperty('Content-Type', 'application/x-www-form-urlencoded')
+  conn.setRequestProperty('Authorization', "Bearer ${publishableKey}")
+  conn.setRequestProperty('User-Agent', 'ElectraHubRegression/1.0')
+  String form = [
+    payment_method: 'pm_card_visa',
+    client_secret: clientSecret,
+    return_url: 'https://electrahub.net/payment/card-setup-test',
+    use_stripe_sdk: 'false'
+  ].collect { key, value ->
+    "${URLEncoder.encode(String.valueOf(key), 'UTF-8')}=${URLEncoder.encode(String.valueOf(value), 'UTF-8')}"
+  }.join('&')
+  byte[] bytes = form.getBytes(StandardCharsets.UTF_8)
+  conn.setRequestProperty('Content-Length', String.valueOf(bytes.length))
+
+  try {
+    long started = System.currentTimeMillis()
+    conn.outputStream.withCloseable { it.write(bytes) }
+    int status = conn.responseCode
+    InputStream stream = status >= 400 ? conn.errorStream : conn.inputStream
+    String responseBody = stream == null ? '' : stream.getText('UTF-8')
+    logLine("stripe setup confirmation status=${status} elapsedMs=${System.currentTimeMillis() - started}")
+    return [status: status, body: responseBody, json: parseJson(responseBody)]
+  } finally {
+    conn.disconnect()
+  }
+}
+
 def requireStatus = { Map response, List<Integer> statuses, String step ->
   if (!statuses.contains(response.status as int)) {
     throw new IllegalStateException("${step} failed with HTTP ${response.status}: ${response.body}")
@@ -246,19 +324,30 @@ def login = {
 }
 
 def registerOrLogin = {
+  Map regionalAddress = [
+    US: [line1: '100 Load Test Way', city: 'Test City', state: 'CA', postalCode: '94016', phonePrefix: '+1555', phoneDigits: 7],
+    IN: [line1: '100 Load Test Marg', city: 'Bengaluru', state: 'KA', postalCode: '560001', phonePrefix: '+919', phoneDigits: 9],
+    NL: [line1: '100 Laadteststraat', city: 'Amsterdam', state: 'NH', postalCode: '1011AB', phonePrefix: '+316', phoneDigits: 8]
+  ][journeyCountryCode] ?: [line1: '100 Load Test Way', city: 'Test City', state: 'NA', postalCode: '00000', phonePrefix: '+1999', phoneDigits: 7]
+  String phonePrefix = String.valueOf(vars.get('journeyPhonePrefix') ?: regionalAddress.phonePrefix)
+  int phoneDigits = (regionalAddress.phoneDigits ?: 8) as int
+  long phoneModulo = (long) Math.pow(10, phoneDigits)
+  long phoneSuffix = Math.floorMod((long) phoneRunSeed + threadIndex, phoneModulo)
+  String phoneFormat = "%0${phoneDigits}d"
+  String generatedPhone = "${phonePrefix}${String.format(phoneFormat, phoneSuffix)}"
   def payload = [
     email: email,
     password: password,
     firstName: 'JMeter',
-    lastName: "User${userNumber}",
-    phoneNumber: "+1555${String.format('%03d%05d', actionPhoneBucket, threadIndex % 100000)}",
+    lastName: "${journeyCountryCode}User${userNumber}",
+    phoneNumber: String.valueOf(vars.get('journeyPhoneNumber') ?: generatedPhone),
     address: [
-      line1: '100 Load Test Way',
+      line1: String.valueOf(vars.get('journeyAddressLine1') ?: regionalAddress.line1),
       line2: null,
-      city: 'Test City',
-      state: 'CA',
-      postalCode: '94016',
-      country: 'US'
+      city: String.valueOf(vars.get('journeyCity') ?: regionalAddress.city),
+      state: String.valueOf(vars.get('journeyState') ?: regionalAddress.state),
+      postalCode: String.valueOf(vars.get('journeyPostalCode') ?: regionalAddress.postalCode),
+      country: journeyCountryCode
     ]
   ]
   def response = atStep('register') { request('POST', '/auth/api/auth/register', payload) }
@@ -297,7 +386,7 @@ def acceptTerms = { String token ->
     platform: 'Web',
     deviceModel: 'TeamCity',
     appVersion: '1.0',
-    deviceId: "jmeter-${runId}-${userNumber}",
+    deviceId: "jmeter-${runId}-${journeyCountryCode}-${userNumber}",
     osVersion: 'load-test'
   ], token) }
   requireStatus(response, [200, 201, 204], 'accept terms')
@@ -319,16 +408,92 @@ def setupPayment = { String token ->
   }
   requireStatus(initialState, [200], 'payment state before setup')
 
-  def card = atStep('add card') { request('POST', '/payment/api/v1/payment/cards', [
-    brand: 'Visa',
-    nickname: "JMeter ${userNumber}",
-    cardNumber: props.getProperty('test_card_number', '4242424242424242'),
-    expiry: '12/30'
-  ], token) }
-  requireStatus(card, [201, 200, 409], 'add card')
-  if (card.json?.id) {
-    vars.put('paymentCardId', String.valueOf(card.json.id))
+  def options = requireStatus(
+    atStep('secure card enrollment options') {
+      request('GET', '/payment/api/v1/payment/cards/enrollment-options', null, token)
+    },
+    [200],
+    'secure card enrollment options'
+  )
+  def regionalOptions = (options.json instanceof List ? options.json : []).findAll { option ->
+    String.valueOf(option.countryCode ?: '').equalsIgnoreCase(journeyCountryCode) &&
+      String.valueOf(option.currency ?: '').equalsIgnoreCase(journeyCurrency)
   }
+  String discoveredNetworkId = String.valueOf(vars.get('journeyNetworkId') ?: '').trim()
+  def enrollmentOption = discoveredNetworkId
+    ? regionalOptions.find { String.valueOf(it.networkId ?: '').equalsIgnoreCase(discoveredNetworkId) }
+    : regionalOptions.sort { left, right ->
+        String.valueOf(left.networkId ?: '') <=> String.valueOf(right.networkId ?: '')
+      }.find()
+  if (enrollmentOption == null) {
+    throw new IllegalStateException(
+      "no unambiguous secure card enrollment route for ${journeyCountryCode}/${journeyCurrency}" +
+        (discoveredNetworkId ? " network=${discoveredNetworkId}" : '')
+    )
+  }
+
+  def enrollment = requireStatus(
+    atStep('start secure card enrollment') {
+      request('POST', '/payment/api/v1/payment/cards/enrollments', [
+        enterpriseId: enrollmentOption.enterpriseId,
+        networkId: enrollmentOption.networkId,
+        chargingCountry: enrollmentOption.countryCode,
+        currency: enrollmentOption.currency,
+        returnUrl: 'https://electrahub.net/payment/card-setup-test'
+      ], token)
+    },
+    [200, 201],
+    'start secure card enrollment'
+  )
+  String enrollmentId = String.valueOf(enrollment.json?.enrollmentId ?: '').trim()
+  String provider = String.valueOf(enrollment.json?.provider ?: '').trim().toUpperCase(Locale.ROOT)
+  String environment = String.valueOf(enrollment.json?.environment ?: '').trim().toUpperCase(Locale.ROOT)
+  String clientSecret = String.valueOf(enrollment.json?.clientSecret ?: '').trim()
+  String publishableKey = String.valueOf(enrollment.json?.publishableKey ?: '').trim()
+  if (!enrollmentId || provider != 'STRIPE' || environment != 'SANDBOX') {
+    throw new IllegalStateException(
+      "secure card enrollment must use Stripe SANDBOX for this saved-card E2E; provider=${provider} environment=${environment}"
+    )
+  }
+  def setupIntentMatcher = clientSecret =~ /^(seti_[A-Za-z0-9_]+)_secret_[A-Za-z0-9_]+$/
+  if (!setupIntentMatcher.matches()) {
+    throw new IllegalStateException('secure card enrollment returned an invalid Stripe client secret')
+  }
+  String setupIntentId = setupIntentMatcher.group(1)
+  def stripeConfirmation = atStep('confirm Stripe sandbox SetupIntent') {
+    stripeFormRequest(setupIntentId, publishableKey, clientSecret)
+  }
+  if ((stripeConfirmation.status as int) != 200) {
+    // Stripe error payloads can echo the SetupIntent client secret. Keep the
+    // failure status-only so neither TeamCity logs nor JMeter results expose it.
+    throw new IllegalStateException(
+      "confirm Stripe sandbox SetupIntent failed with HTTP ${stripeConfirmation.status}; response body redacted"
+    )
+  }
+  if (stripeConfirmation.json?.livemode != false ||
+      !String.valueOf(stripeConfirmation.json?.status ?: '').equalsIgnoreCase('succeeded') ||
+      !String.valueOf(stripeConfirmation.json?.payment_method ?: '').startsWith('pm_')) {
+    throw new IllegalStateException('Stripe sandbox SetupIntent did not produce a reusable test payment method')
+  }
+
+  def card = requireStatus(
+    atStep('complete secure card enrollment') {
+      request(
+        'POST',
+        "/payment/api/v1/payment/cards/enrollments/${URLEncoder.encode(enrollmentId, 'UTF-8')}/complete",
+        [nickname: "JMeter ${journeyCountryCode} ${userNumber}"],
+        token
+      )
+    },
+    [200, 201],
+    'complete secure card enrollment'
+  )
+  if (!card.json?.id || card.json?.providerReady != true ||
+      !String.valueOf(card.json?.gatewayProvider ?: '').equalsIgnoreCase('STRIPE')) {
+    throw new IllegalStateException("secure card enrollment did not return a provider-backed Stripe card: ${card.body}")
+  }
+  vars.put('paymentCardId', String.valueOf(card.json.id))
+  vars.put('paymentGatewayProvider', 'STRIPE')
 
   if (!cardOnlyPayment) {
     BigDecimal setupTopupAmount = action == 'idle-fee-wallet-reserve'
@@ -336,12 +501,50 @@ def setupPayment = { String token ->
       : action == 'low-balance-continue'
         ? lowBalanceContinueWalletBalance
         : walletTopupAmount
-    def topup = atStep('wallet topup') { request('POST', '/payment/api/v1/payment/wallet/topups', [
+    BigDecimal walletBefore = new BigDecimal(String.valueOf(initialState.json?.wallet?.balance ?: 0))
+    String topUpIdempotencyKey = UUID.randomUUID().toString()
+    def topup = atStep('provider-backed wallet topup') { request('POST', '/payment/api/v1/payment/wallet/topups', [
       amount: setupTopupAmount,
       source: 'MANUAL',
-      note: "JMeter ${runId}"
+      note: "JMeter ${runId}",
+      cardId: vars.get('paymentCardId'),
+      idempotencyKey: topUpIdempotencyKey,
+      returnUrl: 'https://electrahub.net/payment/topup-test'
     ], token) }
-    requireStatus(topup, [201, 200], 'wallet topup')
+    requireStatus(topup, [201, 200], 'provider-backed wallet topup')
+    String topUpId = String.valueOf(topup.json?.topUp?.id ?: '').trim()
+    int topUpPolls = 0
+    while (!String.valueOf(topup.json?.status ?: '').equalsIgnoreCase('COMPLETED') && topUpPolls < 30) {
+      if (topup.json?.customerAction != null) {
+        throw new IllegalStateException('pm_card_visa sandbox top-up unexpectedly requires customer action')
+      }
+      if (!topUpId) {
+        throw new IllegalStateException('provider-backed wallet top-up returned no top-up id')
+      }
+      sleep(1000)
+      topup = requireStatus(
+        atStep('complete provider-backed wallet topup') {
+          request(
+            'POST',
+            "/payment/api/v1/payment/wallet/topups/${URLEncoder.encode(topUpId, 'UTF-8')}/customer-action-completions",
+            null,
+            token
+          )
+        },
+        [200],
+        'complete provider-backed wallet topup'
+      )
+      topUpPolls++
+    }
+    if (!String.valueOf(topup.json?.status ?: '').equalsIgnoreCase('COMPLETED')) {
+      throw new IllegalStateException("provider-backed wallet top-up did not complete: ${topup.body}")
+    }
+    BigDecimal walletAfter = new BigDecimal(String.valueOf(topup.json?.walletBalance ?: 0))
+    if (walletAfter.compareTo(walletBefore.add(setupTopupAmount)) < 0) {
+      throw new IllegalStateException(
+        "provider-backed wallet top-up balance mismatch: before=${walletBefore} amount=${setupTopupAmount} after=${walletAfter}"
+      )
+    }
   } else {
     logLine('card-only payment selected; wallet top-up is intentionally skipped')
   }
@@ -354,7 +557,16 @@ def setupPayment = { String token ->
     }
   }
   def state = requireStatus(atStep('payment state after setup') { request('GET', '/payment/api/v1/payment/state', null, token) }, [200], 'payment state after setup')
-  logLine("payment ready method=${sessionPaymentMethod} wallet=${state.json?.wallet?.balance} card=${vars.get('paymentCardId') ?: 'unknown'}")
+  if (validateChargingProgress) {
+    String walletCountry = String.valueOf(state.json?.wallet?.countryCode ?: '').toUpperCase(Locale.ROOT)
+    String walletCurrency = String.valueOf(state.json?.wallet?.currency ?: '').toUpperCase(Locale.ROOT)
+    if (walletCountry != journeyCountryCode || walletCurrency != journeyCurrency) {
+      throw new IllegalStateException(
+        "wallet geography mismatch: expected=${journeyCountryCode}/${journeyCurrency} actual=${walletCountry}/${walletCurrency}"
+      )
+    }
+  }
+  logLine("payment ready method=${sessionPaymentMethod} provider=${vars.get('paymentGatewayProvider')} country=${journeyCountryCode} currency=${journeyCurrency} wallet=${state.json?.wallet?.balance} card=${vars.get('paymentCardId') ?: 'unknown'}")
   token
 }
 
@@ -445,7 +657,7 @@ def runSessionBalanceCheck = { String token, BigDecimal projectedCharge, String 
       sessionId: "jmeter-${runId}-${userNumber}-${idempotencySuffix}",
       projectedCharge: projectedCharge,
       lowBalanceThreshold: lowBalanceThreshold,
-      currency: 'USD',
+      currency: journeyCurrency,
       idempotencyKey: UUID.randomUUID().toString()
     ], token)
   }, [200], 'session balance check')
@@ -482,7 +694,7 @@ def validateAutoTopUpDecisionFlow = { String token ->
 }
 
 def discoverChargers = { String token ->
-  String countryArg = props.getProperty('charger_country_code', '').trim()
+  String countryArg = explicitJourneyCountry ?: props.getProperty('charger_country_code', '').trim()
   if (!countryArg && ['charging', 'full', 'idle-fee', 'idle-fee-wallet-reserve', 'subscription-discount', 'low-balance-continue'].contains(action)) {
     countryArg = 'US'
   }
@@ -494,7 +706,12 @@ def discoverChargers = { String token ->
       status
       availablePorts
       busyPorts
-      location { ocpiLocationId name }
+      location {
+        ocpiLocationId
+        name
+        network { id }
+        enterprise { id }
+      }
       pricing { idleFee { enabled pricePerMinute currency sourceTariffId } }
       evses { uid status connectors { id status available standard powerType tariffIds tariffs { tariffId energyPrice parkingPrice currency } } }
     }
@@ -505,7 +722,18 @@ def discoverChargers = { String token ->
   }
 
   if (dynamicConnectorSelection) {
-    def chargers = list.json?.data?.ocpiChargers ?: []
+    String preferredJourneyNetworkId = String.valueOf(
+      vars.get('journeyPreferredNetworkId') ?: props.getProperty('journey_network_id', '')
+    ).trim()
+    def chargers = (list.json?.data?.ocpiChargers ?: []).findAll { charger ->
+      !preferredJourneyNetworkId ||
+        String.valueOf(charger.location?.network?.id ?: '').equalsIgnoreCase(preferredJourneyNetworkId)
+    }
+    if (preferredJourneyNetworkId && chargers.isEmpty()) {
+      throw new IllegalStateException(
+        "no ${journeyCountryCode} chargers were found for required network ${preferredJourneyNetworkId}"
+      )
+    }
     def activePairs = [] as Set
     def simulatorAvailablePairs = [] as Set
     def simulatorConnectorNumbers = [:]
@@ -574,6 +802,8 @@ def discoverChargers = { String token ->
       [
         chargerId: item.charger.chargerId as String,
         locationId: item.charger.location?.ocpiLocationId as String,
+        networkId: item.charger.location?.network?.id as String,
+        enterpriseId: item.charger.location?.enterprise?.id as String,
         connectorId: item.connector.id as String,
         connectorNumber: (item.simulatorConnectorNumber ?: connectorNumberFromId(item.connector.id as String, 1)) as int,
         connectorType: (item.connector.standard ?: connectorType) as String
@@ -592,7 +822,14 @@ def discoverChargers = { String token ->
       vars.put('connectorId', connectorId)
       vars.put('connectorNumber', String.valueOf(connectorNumber))
       vars.put('connectorType', connectorType)
-      logLine("selected available connector ${chargerId}/${connectorId} simulatorConnectorNumber=${connectorNumber} location=${locationId} candidate=${Math.floorMod(threadIndex - 1, candidates.size()) + 1}/${candidates.size()}")
+      String journeyNetworkId = String.valueOf(selected.charger.location?.network?.id ?: '').trim()
+      String journeyEnterpriseId = String.valueOf(selected.charger.location?.enterprise?.id ?: '').trim()
+      if (!journeyNetworkId || !journeyEnterpriseId) {
+        throw new IllegalStateException("selected charger ${chargerId}/${connectorId} is missing network/enterprise ownership")
+      }
+      vars.put('journeyNetworkId', journeyNetworkId)
+      vars.put('journeyEnterpriseId', journeyEnterpriseId)
+      logLine("selected available connector ${chargerId}/${connectorId} simulatorConnectorNumber=${connectorNumber} location=${locationId} network=${journeyNetworkId} candidate=${Math.floorMod(threadIndex - 1, candidates.size()) + 1}/${candidates.size()}")
     } else if (['idle-fee', 'idle-fee-wallet-reserve'].contains(action)) {
       throw new IllegalStateException('dynamic connector selection found no available idle-fee connector')
     } else if (dynamicConnectorSelection) {
@@ -609,7 +846,12 @@ def discoverChargers = { String token ->
       status
       availablePorts
       busyPorts
-      location { ocpiLocationId name }
+      location {
+        ocpiLocationId
+        name
+        network { id }
+        enterprise { id }
+      }
       pricing { tariffs { tariffId energyPrice parkingPrice currency } idleFee { enabled pricePerMinute currency sourceTariffId } }
       evses { uid status connectors { id status available standard powerType tariffIds tariffs { tariffId energyPrice parkingPrice currency } } }
     }
@@ -706,7 +948,7 @@ def startSession = { String token ->
       idToken: uid,
       paymentMethod: sessionPaymentMethod,
       cardId: startCardId,
-      currency: 'USD',
+      currency: journeyCurrency,
       idempotencyKey: UUID.randomUUID().toString(),
       acknowledgeNegativeBalanceRisk: action == 'low-balance-continue'
     ]
@@ -929,6 +1171,22 @@ def waitForActiveSessionPredicate = { String token, String sessionId, String des
   throw new IllegalStateException("session ${sessionId} did not satisfy ${description}; last=${json(lastSession)}")
 }
 
+def validateSessionChargingProgress = { String token, String sessionId ->
+  int timeoutSeconds = props.getProperty('charging_progress_timeout_seconds', '120') as int
+  def progressing = waitForActiveSessionPredicate(token, sessionId, 'charging state with meter and cost progress', timeoutSeconds) { session ->
+    String status = String.valueOf(session.status ?: '').toUpperCase(Locale.ROOT)
+    BigDecimal energy = new BigDecimal(String.valueOf(session.energyDeliveredKwh ?: 0))
+    BigDecimal cost = new BigDecimal(String.valueOf(session.estimatedCost ?: 0))
+    String currency = String.valueOf(session.currency ?: '').toUpperCase(Locale.ROOT)
+    ['CHARGING', 'ACTIVE', 'STARTED'].contains(status) && energy > 0 && cost > 0 && currency == journeyCurrency
+  }
+  logLine(
+    "charging progress ok session=${sessionId} status=${progressing.status} energyKwh=${progressing.energyDeliveredKwh} " +
+      "powerKw=${progressing.currentPowerKw} cost=${progressing.estimatedCost} currency=${progressing.currency}"
+  )
+  progressing
+}
+
 def sendSimulatorStatus = { String status, String errorCode = 'NoError' ->
   int number = (vars.get('connectorNumber') ?: String.valueOf(connectorNumber ?: 1)) as int
   def response = atStep("simulator status ${status}") {
@@ -1064,25 +1322,57 @@ def monitorSse = { String token, String sessionId ->
   int connected = 0
   int snapshots = 0
   int updates = 0
+  int chargingStateEvents = 0
   int receipts = 0
   int heartbeats = 0
+  String currentEventName = ''
+  List<String> currentDataLines = []
   String lastData = ''
+  String lastEventName = ''
+  def processEvent = {
+    if (!currentEventName && currentDataLines.isEmpty()) return
+
+    String eventName = currentEventName
+    String data = currentDataLines.join('\n')
+    lastEventName = eventName
+    lastData = data.length() > 512 ? data.substring(0, 512) : data
+    def payload = parseJson(data)
+    String payloadType = String.valueOf(payload?.type ?: '').trim().toUpperCase(Locale.ROOT)
+    String normalizedEventName = eventName.trim().toLowerCase(Locale.ROOT)
+
+    if (normalizedEventName == 'connected' || payloadType == 'CONNECTED') connected++
+    if (normalizedEventName == 'heartbeat' || payloadType == 'HEARTBEAT') heartbeats++
+
+    def targetSessionPayload = String.valueOf(payload?.session?.id ?: '') == sessionId ? payload.session : null
+    def targetSnapshotPayload = payload?.sessions instanceof Collection
+      ? payload.sessions.find { String.valueOf(it?.id ?: '') == sessionId }
+      : null
+    boolean targetSession = targetSessionPayload != null
+    boolean targetInSnapshot = targetSnapshotPayload != null
+    boolean targetReceipt = String.valueOf(payload?.receipt?.sessionId ?: payload?.receipt?.session?.id ?: '') == sessionId
+
+    if ((normalizedEventName == 'snapshot' || payloadType == 'SNAPSHOT') && targetInSnapshot) snapshots++
+    if ((normalizedEventName == 'session' || payloadType == 'SESSION_UPDATED') && targetSession) updates++
+    if ((normalizedEventName == 'receipt' || payloadType == 'RECEIPT') && targetReceipt) receipts++
+    def targetStatePayload = targetSessionPayload ?: targetSnapshotPayload
+    String targetStatus = String.valueOf(targetStatePayload?.status ?: '').toUpperCase(Locale.ROOT)
+    if (['CHARGING', 'ACTIVE', 'STARTED'].contains(targetStatus)) chargingStateEvents++
+
+    currentEventName = ''
+    currentDataLines.clear()
+  }
   BufferedReader reader = new BufferedReader(new InputStreamReader(conn.inputStream, StandardCharsets.UTF_8))
   while (System.currentTimeMillis() < deadline) {
     try {
       String line = reader.readLine()
       if (line == null) break
-      if (line.startsWith('event:')) {
-        String eventName = line.substring(6).trim()
-        if (eventName == 'connected') connected++
-        if (eventName == 'snapshot') snapshots++
-        if (eventName == 'session') updates++
-        if (eventName == 'receipt') receipts++
-        if (eventName == 'heartbeat') heartbeats++
+      if (line.isEmpty()) {
+        processEvent()
+      } else if (line.startsWith('event:')) {
+        currentEventName = line.substring(6).trim()
       } else if (line.startsWith('data:')) {
-        lastData = line.substring(5).trim()
-        if (lastData.contains(sessionId) && lastData.contains('SESSION_UPDATED')) updates++
-        if (lastData.contains(sessionId) && lastData.contains('SNAPSHOT')) snapshots++
+        String dataLine = line.substring(5)
+        currentDataLines.add(dataLine.startsWith(' ') ? dataLine.substring(1) : dataLine)
       }
     } catch (SocketTimeoutException ignored) {
       // Keep the SSE connection open until the monitoring window expires.
@@ -1091,24 +1381,25 @@ def monitorSse = { String token, String sessionId ->
       break
     }
   }
+  processEvent()
   try { reader.close() } catch (Exception ignored) {}
   conn.disconnect()
 
   vars.put('sseConnectedEvents', String.valueOf(connected))
   vars.put('sseSnapshotEvents', String.valueOf(snapshots))
   vars.put('sseSessionEvents', String.valueOf(updates))
+  vars.put('sseChargingStateEvents', String.valueOf(chargingStateEvents))
   vars.put('sseReceiptEvents', String.valueOf(receipts))
   vars.put('sseHeartbeatEvents', String.valueOf(heartbeats))
 
-  if ((snapshots + updates) <= 0) {
-    def fallbackActive = findActiveSession(token, sessionId)
-    if (fallbackActive != null) {
-      logLine("sse produced no updates before close; active-session fallback confirmed session=${sessionId} status=${fallbackActive.status}")
-      return
-    }
-    throw new IllegalStateException("SSE produced no snapshot/session updates for ${sessionId}; heartbeats=${heartbeats}, last=${lastData}")
+  if (chargingStateEvents <= 0) {
+    throw new IllegalStateException(
+      "SSE produced no target charging-state snapshot/session update for ${sessionId}; " +
+        "snapshots=${snapshots}, updates=${updates}, connected=${connected}, heartbeats=${heartbeats}, " +
+        "lastEvent=${lastEventName}, last=${lastData}"
+    )
   }
-  logLine("sse ok connected=${connected} snapshot=${snapshots} updates=${updates} receipts=${receipts} heartbeats=${heartbeats}")
+  logLine("sse target charging state ok session=${sessionId} connected=${connected} snapshot=${snapshots} updates=${updates} chargingState=${chargingStateEvents} receipts=${receipts} heartbeats=${heartbeats}")
 }
 
 def stopSession = { String token, String sessionId ->
@@ -1120,7 +1411,7 @@ def stopSession = { String token, String sessionId ->
   logLine("stop requested session=${sessionId}")
 }
 
-def validateStoppedAndReceipt = { String token, String sessionId, boolean expectSubscriptionDiscount = false ->
+def validateStoppedAndReceipt = { String token, String sessionId, boolean expectSubscriptionDiscount = false, boolean enforceFlowContract = true ->
   long deadline = System.currentTimeMillis() + 120000L
   boolean goneFromActive = false
   boolean unplugRequested = false
@@ -1164,6 +1455,71 @@ def validateStoppedAndReceipt = { String token, String sessionId, boolean expect
   if (receipt == null) {
     throw new IllegalStateException("receipt not available for session ${sessionId}")
   }
+  if (validateChargingProgress && enforceFlowContract) {
+    BigDecimal receiptEnergy = new BigDecimal(String.valueOf(receipt.json?.energyKwh ?: 0))
+    BigDecimal receiptCost = new BigDecimal(String.valueOf(receipt.json?.totalCost ?: receipt.json?.costUsd ?: 0))
+    String receiptCurrency = String.valueOf(receipt.json?.currency ?: '').toUpperCase(Locale.ROOT)
+    String receiptPaymentMethod = String.valueOf(receipt.json?.paymentMethod ?: '').toUpperCase(Locale.ROOT)
+    boolean paymentMethodMatches = cardOnlyPayment
+      ? receiptPaymentMethod in ['CARD', 'CREDIT_CARD']
+      : receiptPaymentMethod == 'WALLET'
+    if (receiptEnergy <= 0 || receiptCost <= 0 || receiptCurrency != journeyCurrency || !paymentMethodMatches) {
+      throw new IllegalStateException(
+        "receipt flow mismatch for ${sessionId}: energy=${receiptEnergy} cost=${receiptCost} " +
+          "currency=${receiptCurrency} paymentMethod=${receiptPaymentMethod} expected=${journeyCurrency}/${sessionPaymentMethod}"
+      )
+    }
+
+    def completedTransaction = null
+    deadline = System.currentTimeMillis() + 120000L
+    while (System.currentTimeMillis() < deadline) {
+      def transactionsResponse = requireStatus(
+        atStep('session payment settlement') {
+          request('GET', '/payment/api/v1/payment/session-transactions?limit=50', null, token, requestTimeoutMs)
+        },
+        [200],
+        'session payment settlement'
+      )
+      def transactions = transactionsResponse.json instanceof List ? transactionsResponse.json : []
+      def transaction = transactions.find { String.valueOf(it?.sessionId ?: '') == sessionId }
+      if (transaction != null) {
+        String transactionStatus = String.valueOf(transaction.status ?: '').trim().toUpperCase(Locale.ROOT)
+        if (transactionStatus == 'FAILED') {
+          throw new IllegalStateException("payment settlement failed for session ${sessionId}: ${json(transaction)}")
+        }
+        if (transactionStatus == 'COMPLETED') {
+          completedTransaction = transaction
+          break
+        }
+      }
+      sleep(2000)
+    }
+    if (completedTransaction == null) {
+      throw new IllegalStateException("payment settlement did not complete for session ${sessionId}")
+    }
+
+    String transactionPaymentMethod = String.valueOf(completedTransaction.paymentMethod ?: '').toUpperCase(Locale.ROOT)
+    String transactionCurrency = String.valueOf(completedTransaction.currency ?: '').toUpperCase(Locale.ROOT)
+    BigDecimal transactionAmount = new BigDecimal(String.valueOf(completedTransaction.amount ?: 0))
+    boolean transactionPaymentMethodMatches = cardOnlyPayment
+      ? transactionPaymentMethod in ['CARD', 'CREDIT_CARD']
+      : transactionPaymentMethod == 'WALLET'
+    BigDecimal settlementDifference = transactionAmount.subtract(receiptCost).abs()
+    if (transactionAmount <= 0 || transactionCurrency != journeyCurrency ||
+        !transactionPaymentMethodMatches || settlementDifference > new BigDecimal('0.01')) {
+      throw new IllegalStateException(
+        "payment settlement mismatch for ${sessionId}: amount=${transactionAmount} receiptCost=${receiptCost} " +
+          "currency=${transactionCurrency} paymentMethod=${transactionPaymentMethod} " +
+          "expected=${journeyCurrency}/${sessionPaymentMethod}"
+      )
+    }
+    vars.put('paymentTransactionId', String.valueOf(completedTransaction.transactionId ?: ''))
+    vars.put('paymentTransactionStatus', 'COMPLETED')
+    logLine(
+      "payment settlement ok session=${sessionId} transaction=${completedTransaction.transactionId} " +
+        "amount=${transactionAmount} currency=${transactionCurrency} paymentMethod=${transactionPaymentMethod}"
+    )
+  }
   if (expectSubscriptionDiscount) {
     BigDecimal regularCost = ((receipt.json?.regularCost ?: 0) as BigDecimal)
     BigDecimal totalCost = ((receipt.json?.totalCost ?: receipt.json?.costUsd ?: 0) as BigDecimal)
@@ -1174,7 +1530,7 @@ def validateStoppedAndReceipt = { String token, String sessionId, boolean expect
   }
   requireStatus(atStep('session history') { request('GET', '/session/api/v1/sessions/history?page=0&size=10', null, token) }, [200], 'session history')
   requireStatus(atStep('dashboard stats') { request('GET', '/session/api/v1/sessions/dashboard-stats', null, token) }, [200], 'dashboard stats')
-  logLine("receipt ok session=${sessionId} status=${receipt.json?.status} total=${receipt.json?.totalCost ?: receipt.json?.costUsd}")
+  logLine("receipt ok session=${sessionId} status=${receipt.json?.status} energyKwh=${receipt.json?.energyKwh} total=${receipt.json?.totalCost ?: receipt.json?.costUsd} currency=${receipt.json?.currency} paymentMethod=${receipt.json?.paymentMethod}")
 }
 
 def validateSubscriptionDiscountFlow = { String token, String sessionId ->
@@ -1262,17 +1618,70 @@ def validateLowBalanceContinueFlow = { String token, String sessionId ->
   validateStoppedAndReceipt(token, sessionId)
 }
 
+def cleanupActiveTestSessionsOnFailure = { String token ->
+  def before = activeSession(token)
+  def sessions = before.json instanceof List ? before.json : []
+  for (def session : sessions) {
+    String activeSessionId = String.valueOf(session.id ?: '').trim()
+    if (!activeSessionId) continue
+    logLine("failure cleanup stopping active session=${activeSessionId} status=${session.status}")
+    stopSession(token, activeSessionId)
+    validateStoppedAndReceipt(token, activeSessionId, false, false)
+  }
+  def after = activeSession(token)
+  def remaining = after.json instanceof List ? after.json : []
+  if (!remaining.isEmpty()) {
+    throw new IllegalStateException("failure cleanup left active sessions: ${after.body}")
+  }
+  true
+}
+
 try {
-  long startedAt = System.currentTimeMillis()
   String token
 
-  if (action == 'card-burst' && cleanupTestAccount && (!cleanupAdminToken || cleanupAdminToken.startsWith('%'))) {
-    throw new IllegalStateException('card-burst requires a protected cleanup_admin_token so generated accounts are removed')
+  if (requireCleanupCredential && (!cleanupAdminToken || cleanupAdminToken.startsWith('%') || cleanupAdminToken == 'SET_IN_TEAMCITY')) {
+    throw new IllegalStateException('this test plan requires the protected cleanup_admin_token so generated accounts are removed')
+  }
+  if (requireCleanupCredential) {
+    def cleanupClaims
+    try {
+      cleanupClaims = decodeJwtPayload(cleanupAdminToken)
+    } catch (Exception ignored) {
+      throw new IllegalStateException('protected cleanup_admin_token is not a valid JWT')
+    }
+    if (!(cleanupClaims?.exp instanceof Number)) {
+      throw new IllegalStateException('protected cleanup_admin_token is missing a numeric expiry')
+    }
+    def cleanupRoles = cleanupClaims.roles instanceof Collection
+      ? cleanupClaims.roles.collect { String.valueOf(it).toUpperCase(Locale.ROOT).replaceFirst('^ROLE_', '') }
+      : [String.valueOf(cleanupClaims.roles ?: '').toUpperCase(Locale.ROOT).replaceFirst('^ROLE_', '')]
+    if (!cleanupRoles.contains('SYSTEM_ADMIN')) {
+      throw new IllegalStateException('protected cleanup_admin_token must carry the SYSTEM_ADMIN role')
+    }
+    long cleanupExpiresAt = (cleanupClaims.exp as Number).longValue()
+    long minimumRemainingSeconds = props.getProperty('cleanup_admin_min_ttl_seconds', '600') as long
+    long remainingSeconds = cleanupExpiresAt - Instant.now().epochSecond
+    if (remainingSeconds < minimumRemainingSeconds) {
+      throw new IllegalStateException(
+        "protected cleanup_admin_token expires too soon: remaining=${remainingSeconds}s required=${minimumRemainingSeconds}s"
+      )
+    }
+    requireStatus(
+      atStep('validate cleanup admin authorization') {
+        request('GET', '/user/api/v1/admin/users?limit=1&offset=0', null, cleanupAdminToken, requestTimeoutMs)
+      },
+      [200],
+      'validate cleanup admin authorization'
+    )
   }
 
   if (action == 'setup' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'idle-fee-wallet-reserve' || action == 'subscription-discount' || action == 'low-balance-continue' || action == 'low-balance-check' || action == 'auto-top-up-check') {
     token = registerOrLogin()
     appendGeneratedUser()
+    if (action != 'card-burst' &&
+        ['full', 'idle-fee', 'idle-fee-wallet-reserve', 'subscription-discount', 'low-balance-continue'].contains(action)) {
+      discoverChargers(token)
+    }
     token = setupPayment(token)
   } else if (action == 'charging') {
     token = login()
@@ -1292,7 +1701,7 @@ try {
   }
 
   if (action == 'charging' || action == 'full' || action == 'card-burst' || action == 'idle-fee' || action == 'subscription-discount' || action == 'low-balance-continue') {
-    if (action != 'card-burst') {
+    if (action != 'card-burst' && (!chargerId || !connectorId || !locationId)) {
       discoverChargers(token)
     } else {
       logLine("using connector allocated by burst preflight ${chargerId}/${connectorId}")
@@ -1301,6 +1710,9 @@ try {
     String sessionId = startSession(token)
     activeSession(token)
     monitorSse(token, sessionId)
+    if (validateChargingProgress) {
+      validateSessionChargingProgress(token, sessionId)
+    }
 
     if (action == 'idle-fee') {
       validateIdleFeeFlow(token, sessionId)
@@ -1309,12 +1721,12 @@ try {
     } else if (action == 'low-balance-continue') {
       validateLowBalanceContinueFlow(token, sessionId)
     } else {
-
-      long elapsedSeconds = (System.currentTimeMillis() - startedAt) / 1000L
-      long remaining = Math.max(0L, holdSeconds - elapsedSeconds)
-      if (remaining > 0L) {
-        logLine("holding session for ${remaining}s before stop")
-        sleep(remaining * 1000L)
+      if (holdSeconds > 0) {
+        // The load dwell starts only after this exact session has proven
+        // metered charging progress. Registration, provider setup, SSE, and
+        // readiness polling must not consume the configured steady-load hold.
+        logLine("holding confirmed charging session for ${holdSeconds}s before stop")
+        sleep(holdSeconds * 1000L)
       }
 
       stopSession(token, sessionId)
@@ -1335,24 +1747,29 @@ try {
     connectorId: connectorId,
     sessionId: vars.get('sessionId'),
     paymentMethod: sessionPaymentMethod,
+    countryCode: journeyCountryCode,
+    currency: journeyCurrency,
     paymentCardDeleted: vars.get('paymentCardDeleted'),
     testUserDeleted: vars.get('testUserDeleted'),
     sseSessionEvents: vars.get('sseSessionEvents'),
     sseSnapshotEvents: vars.get('sseSnapshotEvents'),
+    sseChargingStateEvents: vars.get('sseChargingStateEvents'),
     completedAt: Instant.now().toString()
   ])), 'UTF-8')
 } catch (Throwable t) {
   try {
     String cleanupToken = vars.get('accessToken')
     String cleanupSessionId = vars.get('sessionId')
-    boolean terminalReceiptConfirmed = false
-    if (cleanupToken && cleanupSessionId) {
+    boolean testSessionsClean = false
+    if (cleanupToken && cleanupUnexpectedSessions) {
+      testSessionsClean = cleanupActiveTestSessionsOnFailure(cleanupToken)
+    } else if (cleanupToken && cleanupSessionId) {
       logLine("cleanup after failed sample for session=${cleanupSessionId}")
       stopSession(cleanupToken, cleanupSessionId)
-      validateStoppedAndReceipt(cleanupToken, cleanupSessionId)
-      terminalReceiptConfirmed = true
+      validateStoppedAndReceipt(cleanupToken, cleanupSessionId, false, false)
+      testSessionsClean = true
     }
-    if (cleanupToken && terminalReceiptConfirmed) {
+    if (cleanupToken && cleanupTestAccount && testSessionsClean) {
       cleanupGeneratedTestArtifacts(cleanupToken)
     }
   } catch (Throwable cleanupError) {

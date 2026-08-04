@@ -26,6 +26,8 @@ Use prod only when explicitly validating production:
 | `06-idle-fee-charging-flow.jmx` | Validates idle-fee pricing discovery, active-session idle fields, remote-stop unplug requirement, physical unplug completion, and receipt. |
 | `07-subscription-discount-charging-flow.jmx` | Validates the default new-user 20% charging discount, quota-aware active-session pricing, and discounted receipt fields. |
 | `08-charging-feature-regression-suite.jmx` | Existing full charging flow plus focused regression cases for idle fee, negative-balance wallet warning and acknowledgement, subscription discount, low-balance charging continuation, low-balance wallet decisions, and auto top-up recovery. |
+| `11-five-user-steady-charging-load.jmx` | One non-burst invocation with five slowly ramped US wallet users; validates secure Stripe sandbox enrollment, provider-backed wallet funding, CHARGING progress, target-session SSE, a full post-confirmation hold, stop, receipt, completed settlement, and cleanup. |
+| `12-three-region-wallet-card-e2e.jmx` | Exactly three concurrent regional users (US, India, Netherlands), with secure Stripe sandbox enrollment plus sequential wallet and saved-card journeys per user and cleanup after the second journey. |
 
 ## Recommended Safe Dev Run
 
@@ -148,7 +150,7 @@ jmeter -n -t scripts/jmeter/07-subscription-discount-charging-flow.jmx `
 
 ## Charging Feature Regression Suite
 
-This is the default plan for `ElectraHub_Regression_JMeterChargingFlow`. It runs the normal driver charging flow and the focused feature checks needed for recent charging changes:
+This focused feature suite runs the normal driver charging flow and the regression checks needed for recent charging changes:
 
 - idle-fee remote stop remains active until unplug and then generates receipt
 - wallet start below the idle-fee cap plus the base reserve returns a negative-balance warning and starts after acknowledgement
@@ -187,6 +189,45 @@ Useful feature knobs:
 -Jauto_topup_amount=50.00
 -Jidle_fee_wallet_insufficient_balance=54.99
 ```
+
+## Five-User Steady Load
+
+`ElectraHub_Regression_JMeterChargingFlow` runs `11-five-user-steady-charging-load.jmx` exactly once. It is deliberately not a burst or ladder: five users ramp over 60 seconds, prove metered charging and target-session SSE, remain charging for the full configured hold measured after confirmation, validate completed settlement, and clean up their generated accounts.
+
+```powershell
+jmeter -n -t scripts/jmeter/11-five-user-steady-charging-load.jmx `
+  -l outputs/jmeter/five-user-steady/results.jtl `
+  -j outputs/jmeter/five-user-steady/jmeter.log `
+  -Jbase_url=https://api.dev.electrahub.net `
+  -Jdynamic_connector_selection=true `
+  -Jusers=5 `
+  -Jramp_seconds=60 `
+  -Jhold_seconds=120 `
+  -Jsse_seconds=60
+```
+
+The plan fails before account creation unless `ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN` is supplied. TeamCity stores it as a Password parameter and passes it only to the pinned JMeter container. It must be a `SYSTEM_ADMIN` JWT with at least 10 minutes remaining when each user begins; a read-only admin request verifies its live signature and authorization before any test user is registered. Enter a freshly issued protected value immediately before the one requested run.
+
+## Three-Region Wallet and Saved-Card E2E
+
+`12-three-region-wallet-card-e2e.jmx` has three concurrent one-user groups on distinct regional networks. Each group creates one geographically correct account and runs two isolated journeys sequentially in this order:
+
+1. Discover the required regional network, securely enroll `pm_card_visa` through a Stripe sandbox SetupIntent, fund the country wallet through that provider-backed card, start with wallet, confirm SSE plus metered `CHARGING` and positive cost, stop, and validate the receipt.
+2. Reuse the saved card, start with `CARD_ON_FILE`, repeat the charging/SSE/meter/cost/receipt assertions, then remove the card and generated account.
+
+Regions and currencies are US/USD, India/INR, and Netherlands/EUR. A missing regional charger, wallet currency, payment route, saved-card authorization, target-session SSE transition, meter update, completed payment settlement, or receipt fails that specific journey. The three regional users run concurrently, while wallet and card sessions stay sequential within each user; their pinned networks prevent cross-region connector contention and keep the run within the lifetime of a freshly issued cleanup token.
+
+```powershell
+jmeter -n -t scripts/jmeter/12-three-region-wallet-card-e2e.jmx `
+  -l outputs/jmeter/three-region/results.jtl `
+  -j outputs/jmeter/three-region/jmeter.log `
+  -Jbase_url=https://api.dev.electrahub.net `
+  -Jdynamic_connector_selection=true `
+  -Jhold_seconds=120 `
+  -Jsse_seconds=60
+```
+
+Use TeamCity configuration `electrahub-local-three-region-charging-e2e.json` for the credential-safe production build. Supply a freshly issued `SYSTEM_ADMIN` cleanup JWT with at least 10 minutes remaining as the Password parameter immediately before the run. The pipeline generator rejects plan lists, globs, subdirectories, and shell syntax, and the runtime guard verifies that one direct `scripts/jmeter/*.jmx` path exists before JMeter starts.
 
 TeamCity uses the ElectraHub-owned Java 17 image below. Keep this image on Java 17+ because the legacy
 `justb4/jmeter:latest` image currently runs Java 8 and can fail Cloudflare TLS with `handshake_failure`.

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="ElectraHub - Three Region Wallet and Saved Card E2E">
+      <stringProp name="TestPlan.comments">Creates exactly three concurrent isolated users (US, India, Netherlands) on distinct regional demo networks. Each user securely enrolls a provider-backed Stripe sandbox card, then runs wallet and saved-card journeys sequentially; both must reach metered charging, publish target-session SSE state, stop cleanly, settle payment, and produce a priced receipt before account cleanup.</stringProp>
+      <boolProp name="TestPlan.functional_mode">true</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="01 - US user: wallet then saved card">
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="US journey geography">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="journeyCountryCode" elementType="Argument"><stringProp name="Argument.name">journeyCountryCode</stringProp><stringProp name="Argument.value">US</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyCurrency" elementType="Argument"><stringProp name="Argument.name">journeyCurrency</stringProp><stringProp name="Argument.value">USD</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyPreferredNetworkId" elementType="Argument"><stringProp name="Argument.name">journeyPreferredNetworkId</stringProp><stringProp name="Argument.value">NW-EH-USA-DEMO</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyWalletTopupAmount" elementType="Argument"><stringProp name="Argument.name">journeyWalletTopupAmount</stringProp><stringProp name="Argument.value">120.00</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyPersistGeneratedUser" elementType="Argument"><stringProp name="Argument.name">journeyPersistGeneratedUser</stringProp><stringProp name="Argument.value">false</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="US wallet: add card, fund wallet, charge, SSE, meter/cost, stop, receipt">
+          <stringProp name="cacheKey">electrahub-flow-regional-wallet</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/electrahub-flow.groovy</stringProp>
+          <stringProp name="parameters">full</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Configure isolated wallet journey">
+            <stringProp name="cacheKey">regional-wallet-configuration</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="script">vars.put('journeyPaymentMethod', 'WALLET')
+vars.put('journeyCleanup', 'false')
+vars.put('journeyRequireCleanupCredential', 'true')
+vars.put('journeyCleanupUnexpectedSessions', 'true')
+vars.put('journeyValidateChargingProgress', 'true')
+vars.remove('sessionId')</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+        </hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="US saved card: charge, SSE, meter/cost, stop, receipt, cleanup">
+          <stringProp name="cacheKey">electrahub-flow-regional-card</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/electrahub-flow.groovy</stringProp>
+          <stringProp name="parameters">charging</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Configure isolated saved-card journey and cleanup">
+            <stringProp name="cacheKey">regional-card-configuration</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="script">vars.put('journeyPaymentMethod', 'CARD')
+vars.put('journeyCleanup', 'true')
+vars.put('journeyRequireCleanupCredential', 'true')
+vars.put('journeyCleanupUnexpectedSessions', 'true')
+vars.put('journeyValidateChargingProgress', 'true')
+vars.remove('sessionId')</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="02 - India user: wallet then saved card">
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="India journey geography">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="journeyCountryCode" elementType="Argument"><stringProp name="Argument.name">journeyCountryCode</stringProp><stringProp name="Argument.value">IN</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyCurrency" elementType="Argument"><stringProp name="Argument.name">journeyCurrency</stringProp><stringProp name="Argument.value">INR</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyPreferredNetworkId" elementType="Argument"><stringProp name="Argument.name">journeyPreferredNetworkId</stringProp><stringProp name="Argument.value">NW-EH-IND-DEMO</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyWalletTopupAmount" elementType="Argument"><stringProp name="Argument.name">journeyWalletTopupAmount</stringProp><stringProp name="Argument.value">5000.00</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyPersistGeneratedUser" elementType="Argument"><stringProp name="Argument.name">journeyPersistGeneratedUser</stringProp><stringProp name="Argument.value">false</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="India wallet: add card, fund wallet, charge, SSE, meter/cost, stop, receipt">
+          <stringProp name="cacheKey">electrahub-flow-regional-wallet</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/electrahub-flow.groovy</stringProp>
+          <stringProp name="parameters">full</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Configure isolated wallet journey">
+            <stringProp name="cacheKey">regional-wallet-configuration</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="script">vars.put('journeyPaymentMethod', 'WALLET')
+vars.put('journeyCleanup', 'false')
+vars.put('journeyRequireCleanupCredential', 'true')
+vars.put('journeyCleanupUnexpectedSessions', 'true')
+vars.put('journeyValidateChargingProgress', 'true')
+vars.remove('sessionId')</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+        </hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="India saved card: charge, SSE, meter/cost, stop, receipt, cleanup">
+          <stringProp name="cacheKey">electrahub-flow-regional-card</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/electrahub-flow.groovy</stringProp>
+          <stringProp name="parameters">charging</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Configure isolated saved-card journey and cleanup">
+            <stringProp name="cacheKey">regional-card-configuration</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="script">vars.put('journeyPaymentMethod', 'CARD')
+vars.put('journeyCleanup', 'true')
+vars.put('journeyRequireCleanupCredential', 'true')
+vars.put('journeyCleanupUnexpectedSessions', 'true')
+vars.put('journeyValidateChargingProgress', 'true')
+vars.remove('sessionId')</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="03 - Netherlands user: wallet then saved card">
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="Netherlands journey geography">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="journeyCountryCode" elementType="Argument"><stringProp name="Argument.name">journeyCountryCode</stringProp><stringProp name="Argument.value">NL</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyCurrency" elementType="Argument"><stringProp name="Argument.name">journeyCurrency</stringProp><stringProp name="Argument.value">EUR</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyPreferredNetworkId" elementType="Argument"><stringProp name="Argument.name">journeyPreferredNetworkId</stringProp><stringProp name="Argument.value">NW-EH-EUR-DEMO</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyWalletTopupAmount" elementType="Argument"><stringProp name="Argument.name">journeyWalletTopupAmount</stringProp><stringProp name="Argument.value">120.00</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+            <elementProp name="journeyPersistGeneratedUser" elementType="Argument"><stringProp name="Argument.name">journeyPersistGeneratedUser</stringProp><stringProp name="Argument.value">false</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Netherlands wallet: add card, fund wallet, charge, SSE, meter/cost, stop, receipt">
+          <stringProp name="cacheKey">electrahub-flow-regional-wallet</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/electrahub-flow.groovy</stringProp>
+          <stringProp name="parameters">full</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Configure isolated wallet journey">
+            <stringProp name="cacheKey">regional-wallet-configuration</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="script">vars.put('journeyPaymentMethod', 'WALLET')
+vars.put('journeyCleanup', 'false')
+vars.put('journeyRequireCleanupCredential', 'true')
+vars.put('journeyCleanupUnexpectedSessions', 'true')
+vars.put('journeyValidateChargingProgress', 'true')
+vars.remove('sessionId')</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+        </hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Netherlands saved card: charge, SSE, meter/cost, stop, receipt, cleanup">
+          <stringProp name="cacheKey">electrahub-flow-regional-card</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/electrahub-flow.groovy</stringProp>
+          <stringProp name="parameters">charging</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Configure isolated saved-card journey and cleanup">
+            <stringProp name="cacheKey">regional-card-configuration</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="script">vars.put('journeyPaymentMethod', 'CARD')
+vars.put('journeyCleanup', 'true')
+vars.put('journeyRequireCleanupCredential', 'true')
+vars.put('journeyCleanupUnexpectedSessions', 'true')
+vars.put('journeyValidateChargingProgress', 'true')
+vars.remove('sessionId')</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

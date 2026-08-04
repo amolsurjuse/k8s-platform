@@ -67,6 +67,17 @@ def trusted_shell_value(value: str, name: str) -> str:
     return value
 
 
+def single_jmeter_plan(value: Any) -> str:
+    """Accept one checked-in JMX path and reject lists, globs, or shell syntax."""
+    plan = str(value or "scripts/jmeter/03-full-e2e-charging-100-users.jmx").strip()
+    if not re.fullmatch(r"scripts/jmeter/[A-Za-z0-9._-]+\.jmx", plan):
+        raise SystemExit(
+            "jmeterPlan must name exactly one file directly under scripts/jmeter "
+            "(lists, globs, subdirectories, and shell syntax are not allowed)"
+        )
+    return plan
+
+
 @dataclass(frozen=True)
 class PipelineConfig:
     build_kind: str
@@ -138,6 +149,9 @@ class PipelineConfig:
         if build_kind not in ("jmeter", "flutter"):
             docker_image = require(docker_image, "dockerImage")
             deploy_version_file = require(deploy_version_file, "deployVersionFile")
+        jmeter_plan = single_jmeter_plan(raw.get("jmeterPlan")) if build_kind == "jmeter" else str(
+            raw.get("jmeterPlan") or "scripts/jmeter/03-full-e2e-charging-100-users.jmx"
+        ).strip()
 
         return PipelineConfig(
             build_kind=build_kind,
@@ -173,7 +187,7 @@ class PipelineConfig:
             add_vcs_trigger=bool(raw.get("addVcsTrigger", True)),
             finish_build_trigger_source_id=str(raw.get("finishBuildTriggerSourceId") or "").strip(),
             jmeter_image=str(raw.get("jmeterImage") or "amolsurjuse/electrahub-jmeter:5.6.3-java17").strip(),
-            jmeter_plan=str(raw.get("jmeterPlan") or "scripts/jmeter/03-full-e2e-charging-100-users.jmx").strip(),
+            jmeter_plan=jmeter_plan,
             regression_base_url=str(raw.get("regressionBaseUrl") or "https://api.dev.electrahub.net").strip(),
             regression_users=str(raw.get("regressionUsers") or "5").strip(),
             regression_ramp_seconds=str(raw.get("regressionRampSeconds") or "30").strip(),
@@ -772,6 +786,16 @@ REPORT_DIR="outputs/jmeter/teamcity/report"
 JTL="$RESULT_DIR/electrahub-regression.jtl"
 LOG="$RESULT_DIR/jmeter.log"
 DOCKER_CONFIG_DIR="$RESULT_DIR/docker-config"
+PLAN="%jmeter.plan%"
+
+if ! printf '%%s\n' "$PLAN" | grep -Eq '^scripts/jmeter/[A-Za-z0-9._-]+\\.jmx$'; then
+  echo "Refusing to run: jmeter.plan must resolve to exactly one checked-in JMX file."
+  exit 2
+fi
+if [ ! -f "$PLAN" ]; then
+  echo "Refusing to run missing JMeter plan: $PLAN"
+  exit 2
+fi
 
 rm -rf "$RESULT_DIR" "$REPORT_DIR"
 mkdir -p "$RESULT_DIR" "$REPORT_DIR" "$DOCKER_CONFIG_DIR"
@@ -781,6 +805,7 @@ echo "Running ElectraHub regression against %regression.base.url%"
 echo "Users=%regression.users% Ramp=%regression.ramp.seconds%s Hold=%regression.hold.seconds%s SSE=%regression.sse.seconds%s"
 echo "DynamicConnectorSelection=%regression.dynamic.connector.selection% ConnectorStartAttempts=%regression.connector.start.attempts%"
 echo "JMeter image=%jmeter.image%"
+echo "JMeter plan=$PLAN (single invocation)"
 
 status=0
 CID=""
@@ -800,7 +825,7 @@ CID="$(DOCKER_CONFIG="$DOCKER_CONFIG_DIR" docker create \
   -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2 -Dsun.net.http.allowRestrictedHeaders=true" \
 __JMETER_DOCKER_ENVIRONMENT__  "%jmeter.image%" \
   -n \
-  -t "%jmeter.plan%" \
+  -t "$PLAN" \
   -l "$JTL" \
   -j "$LOG" \
   -e \
@@ -897,6 +922,16 @@ DOCKER_CONFIG_DIR="$RESULT_ROOT/docker-config"
 SUMMARY="$RESULT_ROOT/load-summary.csv"
 STAGES="%jmeter.load.stages%"
 MAX_ERROR_PERCENT="%jmeter.load.max.error.percent%"
+PLAN="%jmeter.plan%"
+
+if ! printf '%%s\n' "$PLAN" | grep -Eq '^scripts/jmeter/[A-Za-z0-9._-]+\\.jmx$'; then
+  echo "Refusing to run: jmeter.plan must resolve to exactly one checked-in JMX file."
+  exit 2
+fi
+if [ ! -f "$PLAN" ]; then
+  echo "Refusing to run missing JMeter plan: $PLAN"
+  exit 2
+fi
 
 rm -rf "$RESULT_ROOT"
 mkdir -p "$RESULT_ROOT" "$DOCKER_CONFIG_DIR"
@@ -908,6 +943,7 @@ echo "Stages=$STAGES"
 echo "MaxErrorPercent=$MAX_ERROR_PERCENT"
 echo "DynamicConnectorSelection=%regression.dynamic.connector.selection% ConnectorStartAttempts=%regression.connector.start.attempts%"
 echo "JMeter image=%jmeter.image%"
+echo "JMeter plan=$PLAN (one plan reused per declared ladder stage)"
 
 if [ -z "${ELECTRAHUB_LOAD_CLEANUP_ADMIN_TOKEN:-}" ] && { [ -z "${ELECTRAHUB_LOAD_CLEANUP_ADMIN_EMAIL:-}" ] || [ -z "${ELECTRAHUB_LOAD_CLEANUP_ADMIN_PASSWORD:-}" ]; }; then
   echo "The card-burst cleanup flow requires a protected cleanup admin token or protected cleanup admin email/password parameters."
@@ -945,7 +981,7 @@ EOF_STAGE
     -e JVM_ARGS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2" \
     "%jmeter.image%" \
     -n \
-    -t "%jmeter.plan%" \
+    -t "$PLAN" \
     -l "$JTL" \
     -j "$LOG" \
     -e \

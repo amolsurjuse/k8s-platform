@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="ElectraHub - Five User Steady Charging Load">
+      <stringProp name="TestPlan.comments">Runs one slowly ramped, five-user wallet charging load on the USA demo network. Each generated user securely enrolls a provider-backed Stripe sandbox card, funds the wallet through that card, reaches metered CHARGING, receives SSE state, stops, validates the priced receipt, and is removed.</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="journeyCountryCode" elementType="Argument">
+            <stringProp name="Argument.name">journeyCountryCode</stringProp>
+            <stringProp name="Argument.value">US</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyPreferredNetworkId" elementType="Argument">
+            <stringProp name="Argument.name">journeyPreferredNetworkId</stringProp>
+            <stringProp name="Argument.value">NW-EH-USA-DEMO</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyCurrency" elementType="Argument">
+            <stringProp name="Argument.name">journeyCurrency</stringProp>
+            <stringProp name="Argument.value">USD</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyWalletTopupAmount" elementType="Argument">
+            <stringProp name="Argument.name">journeyWalletTopupAmount</stringProp>
+            <stringProp name="Argument.value">120.00</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyPaymentMethod" elementType="Argument">
+            <stringProp name="Argument.name">journeyPaymentMethod</stringProp>
+            <stringProp name="Argument.value">WALLET</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyValidateChargingProgress" elementType="Argument">
+            <stringProp name="Argument.name">journeyValidateChargingProgress</stringProp>
+            <stringProp name="Argument.value">true</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyCleanupUnexpectedSessions" elementType="Argument">
+            <stringProp name="Argument.name">journeyCleanupUnexpectedSessions</stringProp>
+            <stringProp name="Argument.value">true</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyRequireCleanupCredential" elementType="Argument">
+            <stringProp name="Argument.name">journeyRequireCleanupCredential</stringProp>
+            <stringProp name="Argument.value">true</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyCleanup" elementType="Argument">
+            <stringProp name="Argument.name">journeyCleanup</stringProp>
+            <stringProp name="Argument.value">true</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="journeyPersistGeneratedUser" elementType="Argument">
+            <stringProp name="Argument.name">journeyPersistGeneratedUser</stringProp>
+            <stringProp name="Argument.value">false</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Five steady wallet charging users">
+        <stringProp name="ThreadGroup.num_threads">${__P(users,5)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(ramp_seconds,60)}</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="US wallet charging journey with SSE, meter, cost, stop, receipt, and cleanup">
+          <stringProp name="cacheKey">electrahub-flow-five-user-steady</stringProp>
+          <stringProp name="filename">scripts/jmeter/groovy/electrahub-flow.groovy</stringProp>
+          <stringProp name="parameters">full</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="script"></stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

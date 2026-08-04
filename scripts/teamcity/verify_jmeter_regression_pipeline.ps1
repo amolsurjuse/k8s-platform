@@ -71,6 +71,7 @@ function Assert-BuildParameter {
 }
 
 Assert-BuildParameter -Name "jmeter.image" -Expected $expectedImage
+Assert-BuildParameter -Name "jmeter.plan" -Expected ([string]$configJson.jmeterPlan)
 Assert-BuildParameter -Name "regression.base.url" -Expected ([string]$configJson.regressionBaseUrl)
 Assert-BuildParameter -Name "regression.users" -Expected ([string]$configJson.regressionUsers)
 Assert-BuildParameter -Name "regression.ramp.seconds" -Expected ([string]$configJson.regressionRampSeconds)
@@ -84,7 +85,17 @@ Assert-BuildParameter -Name "jmeter.load.max.error.percent" -Expected ([string]$
 
 $stepsUrl = "$($TeamCityUrl.TrimEnd('/'))/app/rest/buildTypes/id:$buildTypeId/steps"
 $steps = Invoke-RestMethod -Method Get -Uri $stepsUrl -Headers $headers
-$expectedStepName = if ([string]$configJson.jmeterLoadStages) { "JMeter Load Ladder" } else { "JMeter Charging Regression" }
+$expectedStepName = if ([string]$configJson.jmeterStepName) {
+    [string]$configJson.jmeterStepName
+} elseif ([string]$configJson.jmeterLoadStages) {
+    "JMeter Load Ladder"
+} else {
+    "JMeter Charging Regression"
+}
+$jmeterSteps = @($steps.step) | Where-Object { $_.name -like "JMeter*" }
+if ($jmeterSteps.Count -ne 1) {
+    throw "Expected exactly one JMeter step, but found $($jmeterSteps.Count)."
+}
 $step = @($steps.step) | Where-Object { $_.name -eq $expectedStepName } | Select-Object -First 1
 if (-not $step) {
     throw "$expectedStepName step was not found."
@@ -94,8 +105,14 @@ $stepUrl = "$($TeamCityUrl.TrimEnd('/'))/app/rest/buildTypes/id:$buildTypeId/ste
 $stepDetails = Invoke-RestMethod -Method Get -Uri $stepUrl -Headers $headers
 $scriptContent = @($stepDetails.properties.property | Where-Object { $_.name -eq "script.content" } | Select-Object -First 1).value
 
-if ($scriptContent -notlike "*JMeter image=%jmeter.image%*" -or $scriptContent -notlike "*java `"%jmeter.image%`" -version*") {
+if (($scriptContent -notlike "*JMeter image=%jmeter.image%*" -and $scriptContent -notlike "*JMeter image=$expectedImage*") -or
+    ($scriptContent -notlike "*java `"%jmeter.image%`" -version*" -and $scriptContent -notlike "*java `"$expectedImage`" -version*")) {
     throw "TeamCity step is missing the Java/JMeter preflight diagnostics. Re-run create_pipeline.ps1."
+}
+
+if ($scriptContent -notlike "*jmeter.plan must resolve to exactly one checked-in JMX file*" -or
+    $scriptContent -notlike '*-t "$PLAN"*') {
+    throw "TeamCity step is missing the single-plan runtime guard. Re-run create_pipeline.ps1."
 }
 
 if ([string]$configJson.jmeterLoadStages -and $scriptContent -notlike "*Load ladder stopped at stage*") {
