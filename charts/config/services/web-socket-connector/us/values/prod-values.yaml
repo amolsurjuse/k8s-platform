@@ -1,5 +1,10 @@
 replicaCount: 1
 
+extraSecretEnv:
+  - name: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
+    secretName: "ocpp-simulator-handshake-secret"
+    secretKey: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
+
 # Connection ownership is held in this pod's in-memory socket registry.
 deploymentStrategy:
   type: Recreate
