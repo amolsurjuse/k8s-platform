@@ -24,10 +24,14 @@ spec:
         - name: prepare-index-retention
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
           command:
             - /bin/sh
             - -c
-            - cp /config/indexes.conf /work/indexes.conf
+            - cp /config/indexes.conf /work/indexes.conf && chmod 0644 /work/indexes.conf
           volumeMounts:
             - name: splunk-index-retention-source
               mountPath: /config
