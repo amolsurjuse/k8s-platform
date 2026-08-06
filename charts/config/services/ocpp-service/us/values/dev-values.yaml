@@ -18,7 +18,7 @@ extraSecretEnv:
 replicaCount: 2
 
 podAnnotations:
-  electrahub.io/config-revision: "ocpp-kafka-producer-v1"
+  electrahub.io/config-revision: "ocpp-handshake-enforce-v1"
 
 env:
   JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m"
