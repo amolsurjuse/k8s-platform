@@ -55,7 +55,7 @@ startupProbe:
 readinessProbe:
   enabled: true
   timeoutSeconds: 5
-  failureThreshold: 12
+  failureThreshold: 1
 
 livenessProbe:
   enabled: true
