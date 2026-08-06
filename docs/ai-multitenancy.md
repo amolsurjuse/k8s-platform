@@ -42,6 +42,8 @@ Development and production use the environment-specific Redis service and secret
 
 The keys share a Redis Cluster hash tag for atomic execution. Production is fail-closed: if Redis usage controls are unavailable, new AI work returns `503`; an exceeded limit returns `429`. Quota decisions are written to the `AI_AUDIT` logger without prompt content.
 
+Every 15 minutes the service also performs a read-only scheduled evaluation of the configured tenant policies and Redis quota connectivity. It emits `event=ai_tenant_evaluation ... outcome=PASS|FAIL`; it does not invoke a model or access customer records.
+
 Current platform defaults:
 
 | Setting | Value |
