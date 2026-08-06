@@ -27,3 +27,8 @@ metrics:
 config:
   data:
     SUPPORT_EMAIL: "support@electrahub.com"
+    AI_PROVIDER: "ollama"
+    AI_PROVIDER_CHAIN: "ollama"
+    AI_MODEL: "electrahub-sparky:4b"
+    OLLAMA_BASE_URL: "http://host.docker.internal:11434"
+    AI_LOCAL_WARMUP_ENABLED: "true"
