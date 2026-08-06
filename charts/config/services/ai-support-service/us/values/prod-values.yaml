@@ -3,6 +3,11 @@ replicaCount: 1
 env:
   SPRING_PROFILES_ACTIVE: "prod"
 
+extraSecretEnv:
+  - name: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
+    secretName: "access-context-prod-secret"
+    secretKey: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
+
 image:
   pullPolicy: Always
 
