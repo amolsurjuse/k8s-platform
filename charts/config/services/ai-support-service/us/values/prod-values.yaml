@@ -7,6 +7,9 @@ extraSecretEnv:
   - name: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
     secretName: "access-context-prod-secret"
     secretKey: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-prod-secret"
+    secretKey: "redis-password"
 
 image:
   pullPolicy: Always
@@ -35,6 +38,13 @@ metrics:
 config:
   data:
     SUPPORT_EMAIL: "support@electrahub.com"
+    SPRING_DATA_REDIS_HOST: "redis"
+    SPRING_DATA_REDIS_PORT: "6379"
+    AI_MULTITENANCY_ENABLED: "true"
+    AI_TENANT_QUOTA_ENABLED: "true"
+    AI_TENANT_QUOTA_FAIL_CLOSED: "true"
+    AI_TENANT_DEFAULT_REQUESTS_PER_MINUTE: "60"
+    AI_TENANT_DEFAULT_REQUESTS_PER_DAY: "5000"
     AI_STREAM_TOKEN_DELAY_MS: "0"
     AI_PROVIDER: "ollama"
     AI_PROVIDER_CHAIN: "ovms,vllm,ollama,gemini"
