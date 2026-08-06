@@ -8,6 +8,10 @@ extraSecretEnv:
 
 config:
   data:
+    APP_REFUNDS_ENABLED: "true"
+    # Dev auth-service currently uses this configured HS256 key. Production
+    # injects its independent key from a Kubernetes Secret below.
+    APP_SECURITY_JWT_SECRET: "CHANGE_ME_TO_A_LONG_RANDOM_64+_CHAR_SECRET_CHANGE_ME"
     PAYMENT_GATEWAY_CARD_ENROLLMENT_ENABLED: "true"
     PAYMENT_GATEWAY_EXECUTION_PILOT_NETWORK_IDS: "NW-EH-IND-DEMO"
     PAYMENT_GATEWAY_HOSTED_CHECKOUT_PAYER_SCOPES: "IN|ENT-IN-DEMO|NW-EH-IND-DEMO"

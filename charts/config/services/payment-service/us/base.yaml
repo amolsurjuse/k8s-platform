@@ -31,6 +31,8 @@ config:
     APP_NOTIFICATION_EXCHANGE: "notifications.events"
     APP_NOTIFICATION_DOMAIN_ROUTING_KEY: "notifications.domain"
     APP_NOTIFICATION_TENANT_ID: "electrahub"
+    APP_SECURITY_JWT_ISSUER: "auth-service"
+    APP_REFUNDS_ENABLED: "false"
     PAYMENT_GATEWAY_SERVICE_URL: "http://payment-gateway-service:8098"
     PAYMENT_GATEWAY_ROUTING_ENABLED: "false"
     PAYMENT_GATEWAY_ROUTING_ENFORCEMENT_ENABLED: "false"

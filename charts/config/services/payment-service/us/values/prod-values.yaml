@@ -5,12 +5,16 @@ extraSecretEnv:
   - name: "PAYMENT_GATEWAY_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+  - name: "APP_SECURITY_JWT_SECRET"
+    secretName: "auth-jwt-prod-secret"
+    secretKey: "APP_SECURITY_JWT_SECRET"
 
 env:
   SPRING_PROFILES_ACTIVE: "prod"
 
 config:
   data:
+    APP_REFUNDS_ENABLED: "true"
     PAYMENT_GATEWAY_CARD_ENROLLMENT_ENABLED: "true"
     PAYMENT_GATEWAY_EXECUTION_PILOT_NETWORK_IDS: "NW-US-EAST-01,NW-EH-IND-DEMO"
     PAYMENT_GATEWAY_HOSTED_CHECKOUT_PAYER_SCOPES: "IN|ENT-IN-DEMO|NW-EH-IND-DEMO"
