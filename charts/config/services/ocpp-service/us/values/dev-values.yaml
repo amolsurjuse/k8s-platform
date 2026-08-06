@@ -35,8 +35,8 @@ config:
     OCPP_EVENT_PUBLISH_TIMEOUT: "3s"
     OCPP_CLUSTER_ROUTING_ENABLED: "true"
     OCPP_CONNECTION_MARKER_TTL_SECONDS: "120"
-    # Observe legacy clients before enforcing protocol and credential checks.
-    OCPP_HANDSHAKE_SECURITY_MODE: "AUDIT"
+    # The synthetic fleet has completed a credentialed reconnect cycle.
+    OCPP_HANDSHAKE_SECURITY_MODE: "ENFORCE"
 
 terminationGracePeriodSeconds: 60
 
