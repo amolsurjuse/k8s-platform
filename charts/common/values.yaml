@@ -94,6 +94,9 @@ pdb:
 podAnnotations: {}
 podLabels: {}
 
+lifecycle: {}
+terminationGracePeriodSeconds: null
+
 securityContext:
   enabled: true
   runAsNonRoot: true

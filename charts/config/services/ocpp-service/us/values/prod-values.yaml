@@ -54,6 +54,21 @@ config:
     OCPP_DEVICE_EVENT_TOPIC: "ocpp.device-events.v2"
     OCPP_EVENT_TENANT_ID: "electrahub"
     OCPP_EVENT_PUBLISH_TIMEOUT: "3s"
+    OCPP_CLUSTER_ROUTING_ENABLED: "false"
+    OCPP_CONNECTION_MARKER_TTL_SECONDS: "120"
+
+terminationGracePeriodSeconds: 60
+
+lifecycle:
+  preStop:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - >-
+          wget -qO- --post-data='' --header="X-ElectraHub-Internal-Token: ${APP_SECURITY_INTERNAL_TOKEN}"
+          http://127.0.0.1:8082/api/v1/ocpp/internal/drain || true;
+          sleep 20
 
 startupProbe:
   enabled: true
