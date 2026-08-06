@@ -1,0 +1,25 @@
+replicaCount: 1
+
+env:
+  IDENTITY_BASE_URL: https://identity-dev.electrahub.net
+  IDENTITY_GATEWAY_BASE_URL: https://identity-gateway-dev.electrahub.net/auth
+  IDENTITY_CLIENT_ID: identity-admin-ui
+  IDENTITY_AUDIENCE: electrahub-identity-admin
+  IDENTITY_SCOPES: openid profile email identity.admin
+  IDENTITY_DEMO_MODE: "true"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: identity-admin-dev.electrahub.net
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: true
+    secretName: electrahub-dev-tls
+
+pdb:
+  enabled: false

@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: identity-admin-ui-prod
+  namespace: argocd
+spec:
+  project: electrahub-prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: agent/identity-admin-ui-gitops
+    path: charts/common
+    helm:
+      releaseName: identity-admin-ui
+      valueFiles:
+        - identity-admin-ui/values.yaml
+        - ../config/services/identity-admin-ui/us/base.yaml
+        - ../config/services/identity-admin-ui/us/values/prod-values.yaml
+        - ../config/services/identity-admin-ui/us/version/prod-version.yaml
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

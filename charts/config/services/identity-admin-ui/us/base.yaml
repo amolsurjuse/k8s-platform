@@ -1,0 +1,54 @@
+fullnameOverride: identity-admin-ui
+
+image:
+  repository: amolsurjuse/identity-admin-ui
+  pullPolicy: IfNotPresent
+
+service:
+  port: 80
+
+containerPort: 8080
+
+readinessProbe:
+  enabled: true
+  path: /
+  initialDelaySeconds: 3
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+livenessProbe:
+  enabled: true
+  path: /
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  timeoutSeconds: 2
+  failureThreshold: 6
+
+startupProbe:
+  enabled: true
+  path: /
+  failureThreshold: 20
+  periodSeconds: 3
+
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 101
+  runAsGroup: 101
+  fsGroup: 101
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+hpa:
+  enabled: false
+
+metrics:
+  servicemonitor:
+    enabled: false

@@ -1,0 +1,7 @@
+image:
+  repository: amolsurjuse/identity-admin-ui
+
+service:
+  port: 80
+
+containerPort: 8080
