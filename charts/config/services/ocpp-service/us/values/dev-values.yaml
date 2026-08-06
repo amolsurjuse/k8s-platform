@@ -11,6 +11,9 @@ extraSecretEnv:
   - name: "APP_SECURITY_ID_TAG_FINGERPRINT_KEY"
     secretName: "ocpp-command-fingerprint-secret"
     secretKey: "APP_SECURITY_ID_TAG_FINGERPRINT_KEY"
+  - name: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
+    secretName: "ocpp-simulator-handshake-secret"
+    secretKey: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
 
 replicaCount: 2
 
@@ -32,6 +35,8 @@ config:
     OCPP_EVENT_PUBLISH_TIMEOUT: "3s"
     OCPP_CLUSTER_ROUTING_ENABLED: "true"
     OCPP_CONNECTION_MARKER_TTL_SECONDS: "120"
+    # Observe legacy clients before enforcing protocol and credential checks.
+    OCPP_HANDSHAKE_SECURITY_MODE: "AUDIT"
 
 terminationGracePeriodSeconds: 60
 
