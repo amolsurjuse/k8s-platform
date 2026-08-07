@@ -1603,30 +1603,17 @@ def validateLowBalanceContinueFlow = { String token, String sessionId ->
 
   long meterWh = props.getProperty('low_balance_meter_wh', '99999999') as long
   sendSimulatorMeterValue(meterWh)
-  def updated = waitForActiveSessionPredicate(token, sessionId, 'high meter energy or cost update while charging continues', 120) { session ->
-    BigDecimal energyNow = new BigDecimal(String.valueOf(session.energyDeliveredKwh ?: session.energyKwh ?: 0))
-    BigDecimal costNow = new BigDecimal(String.valueOf(session.estimatedCost ?: 0))
-    energyNow.compareTo(energyBefore) > 0 || costNow.compareTo(costBefore) > 0
-  }
-  String status = String.valueOf(updated.status ?: '').toUpperCase(Locale.ROOT)
-  if (!['PENDING', 'PREPARING', 'ACTIVE', 'SUSPENDED', 'CHARGING', 'STARTED'].contains(status)) {
-    throw new IllegalStateException("high meter value did not leave session ${sessionId} active and nonterminal: ${json(updated)}")
-  }
-  if (String.valueOf(updated.stopReason ?: '').equalsIgnoreCase('LOW_BALANCE')) {
-    throw new IllegalStateException("high meter value assigned LOW_BALANCE stop reason to continuing session ${sessionId}: ${json(updated)}")
-  }
-  if (updated.remoteStopRequestedAt != null && String.valueOf(updated.remoteStopRequestedAt).trim()) {
-    throw new IllegalStateException("high meter value requested a remote stop for continuing session ${sessionId}: ${json(updated)}")
-  }
-  BigDecimal costAfter = new BigDecimal(String.valueOf(updated.estimatedCost ?: 0))
-  BigDecimal projectedBalance = startingWalletBalance.subtract(costAfter)
-  if (costAfter.compareTo(startingWalletBalance) <= 0 || projectedBalance.signum() >= 0) {
-    throw new IllegalStateException("high meter value did not create exposure above the starting wallet for ${sessionId}: wallet=${startingWalletBalance} cost=${costAfter} session=${json(updated)}")
-  }
-  logLine("low-balance continue observed session=${sessionId} status=${updated.status} wallet=${startingWalletBalance} projectedBalance=${projectedBalance} energyBefore=${energyBefore} energyAfter=${updated.energyDeliveredKwh ?: updated.energyKwh} costBefore=${costBefore} costAfter=${costAfter}")
-
-  stopSession(token, sessionId)
   validateStoppedAndReceipt(token, sessionId)
+  def events = requireStatus(
+    atStep('low-balance stop events') { request('GET', "/session/api/v1/sessions/${sessionId}/events", null, token) },
+    [200],
+    'low-balance stop events'
+  )
+  def eventRows = events.json instanceof List ? events.json : []
+  if (!eventRows.any { String.valueOf(it.eventType ?: it.type ?: '').equalsIgnoreCase('LOW_BALANCE_STOP_REQUESTED') }) {
+    throw new IllegalStateException("acknowledged session did not record the protected low-balance stop: ${events.body}")
+  }
+  logLine("acknowledged start stopped safely after high meter session=${sessionId} wallet=${startingWalletBalance} energyBefore=${energyBefore} costBefore=${costBefore}")
 }
 
 def cleanupActiveTestSessionsOnFailure = { String token ->

@@ -155,7 +155,7 @@ This focused feature suite runs the normal driver charging flow and the regressi
 - idle-fee remote stop remains active until unplug and then generates receipt
 - wallet start below the idle-fee cap plus the base reserve returns a negative-balance warning and starts after acknowledgement
 - subscription discount appears in active-session pricing and receipt
-- an explicitly acknowledged wallet session remains active when a high meter value makes its projected balance negative, until an explicit stop
+- start-time negative-balance acknowledgement does not bypass runtime protection; a high meter value records `LOW_BALANCE_STOP_REQUESTED` and stops the session
 - wallet balance check returns `LOW_BALANCE` when auto top-up is disabled
 - wallet balance check applies auto top-up and returns `OK` when a valid card is configured
 
