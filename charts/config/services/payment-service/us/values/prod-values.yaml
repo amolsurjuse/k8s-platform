@@ -1,3 +1,6 @@
+image:
+  pullPolicy: Always
+
 secrets:
   existingSecretName: "postgresql-prod-secret"
 
