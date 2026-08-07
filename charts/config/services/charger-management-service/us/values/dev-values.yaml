@@ -17,6 +17,17 @@ extraSecretEnv:
 
 replicaCount: 1
 
+# Gate 7C3-E step 5: development-only fallback activation for two synthetic
+# sites. Events, automation, safety, and production remain disabled.
+config:
+  data:
+    SMART_CHARGING_ACTUATION_ENABLED: "true"
+    SMART_CHARGING_ENFORCEMENT_ALLOWLIST: "smart-charge-canary/SC-CANARY-16,smart-charge-canary/SC-CANARY-201"
+    SMART_CHARGING_FALLBACK_ENABLED: "true"
+
+podAnnotations:
+  electrahub.net/config-revision: "gate7c3e-fallback-canary-v1"
+
 resources:
   requests:
     cpu: "100m"
