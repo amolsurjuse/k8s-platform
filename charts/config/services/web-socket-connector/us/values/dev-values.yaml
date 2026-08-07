@@ -16,6 +16,12 @@ config:
     SMART_CHARGING_CONFORMANCE_ENABLED: "true"
     SMART_CHARGING_CONFORMANCE_CHARGERS: "SC-CANARY-16-CP1,SC-CANARY-201-CP1"
 
+# The shared chart does not hash ConfigMap content into the pod template.
+# This reviewed revision forces only this development connector pod to reload
+# the exact conformance configuration above.
+podAnnotations:
+  electrahub.net/config-revision: "gate7c3e-conformance-v1"
+
 resources:
   requests:
     cpu: "100m"
