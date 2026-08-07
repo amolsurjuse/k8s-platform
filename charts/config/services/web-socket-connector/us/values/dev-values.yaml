@@ -8,6 +8,14 @@ extraSecretEnv:
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
 
+# Gate 7C3-E development-only fault-control boundary. Matching is exact; no
+# production charger or wildcard is permitted. Rules remain inert until the
+# authenticated conformance runner creates a one-shot rule.
+config:
+  data:
+    SMART_CHARGING_CONFORMANCE_ENABLED: "true"
+    SMART_CHARGING_CONFORMANCE_CHARGERS: "SC-CANARY-16-CP1,SC-CANARY-201-CP1"
+
 resources:
   requests:
     cpu: "100m"
