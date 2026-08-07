@@ -2,6 +2,12 @@ secrets:
   existingSecretName: "postgresql-dev-secret"
 
 extraSecretEnv:
+  - name: "ENV_CHARGER_DATASOURCE_USERNAME"
+    secretName: "charger-runtime-db-secret"
+    secretKey: "username"
+  - name: "ENV_CHARGER_DATASOURCE_PASSWORD"
+    secretName: "charger-runtime-db-secret"
+    secretKey: "password"
   - name: "SPRING_DATA_REDIS_PASSWORD"
     secretName: "redis-dev-secret"
     secretKey: "redis-password"

@@ -2,6 +2,12 @@ secrets:
   existingSecretName: "postgresql-prod-secret"
 
 extraSecretEnv:
+  - name: "ENV_CHARGER_DATASOURCE_USERNAME"
+    secretName: "charger-runtime-db-secret"
+    secretKey: "username"
+  - name: "ENV_CHARGER_DATASOURCE_PASSWORD"
+    secretName: "charger-runtime-db-secret"
+    secretKey: "password"
   - name: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
     secretName: "access-context-prod-secret"
     secretKey: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
