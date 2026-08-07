@@ -15,7 +15,7 @@ image:
   pullPolicy: Always
 
 podAnnotations:
-  electrahub.io/config-revision: "ocpp-lifecycle-reliability-v2"
+  electrahub.io/config-revision: "gate7c3e-lifecycle-outbox-v1"
 
 config:
   data:
@@ -28,6 +28,9 @@ config:
     SESSION_OCPP_EVENT_DEAD_LETTER_TOPIC: "dead-letter.v2"
     SESSION_OCPP_EVENT_CONCURRENCY: "4"
     SESSION_OCPP_EVENT_INBOX_RETENTION_DAYS: "14"
+    # Gate 7C3-E development dependency: publish only the existing,
+    # transactional session.lifecycle.v2 outbox. Production stays false.
+    SESSION_LIFECYCLE_OUTBOX_ENABLED: "true"
     SPRING_KAFKA_CONSUMER_MAX_POLL_RECORDS: "50"
     SESSION_ANALYTICS_KAFKA_ENABLED: "false"
     SESSION_ANALYTICS_RECEIPT_TOPIC: "eh.charging.receipt.generated.v1"
