@@ -1,4 +1,4 @@
 image:
   # Gate 7C3-E runs only against the reviewed, commit-specific runner build.
   # Do not replace this with a mutable CI sequence tag during the canary.
-  tag: "gate7c3e-f81db5b"
+  tag: "gate7c3e-ff4d9e7"
