@@ -12,6 +12,11 @@ extraSecretEnv:
   - name: "ENVIRONMENT_SYNC_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+  # Present for inert preflight parity only. Production conformance remains
+  # disabled and has an empty charger allowlist.
+  - name: "APP_SECURITY_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
   - name: "REDIS_PASSWORD"
     secretName: "redis-prod-secret"
     secretKey: "redis-password"
