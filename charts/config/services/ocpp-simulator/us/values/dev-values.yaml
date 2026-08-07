@@ -4,6 +4,12 @@ extraSecretEnv:
   - name: "ENVIRONMENT_SYNC_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+  # The versioned Gate 7C3-E runner calls the connector's protected
+  # conformance API. Keep the explicit name that the runner consumes instead
+  # of implicitly reusing the environment-sync credential name.
+  - name: "APP_SECURITY_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
 
 resources:
   requests:
