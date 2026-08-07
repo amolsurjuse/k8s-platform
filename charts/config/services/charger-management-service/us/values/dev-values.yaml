@@ -26,12 +26,12 @@ config:
     SMART_CHARGING_ENFORCEMENT_ALLOWLIST: "smart-charge-canary/SC-CANARY-16,smart-charge-canary/SC-CANARY-201"
     SMART_CHARGING_FALLBACK_ENABLED: "true"
     SMART_CHARGING_SAFETY_ENABLED: "true"
-    SMART_CHARGING_EVENTS_ENABLED: "true"
-    SMART_CHARGING_AUTOMATION_ENABLED: "true"
+    SMART_CHARGING_EVENTS_ENABLED: "false"
+    SMART_CHARGING_AUTOMATION_ENABLED: "false"
     SMART_CHARGING_AUTHORITATIVE_METER_SOURCES: "smart-charge-canary/SC-CANARY-16/SIM-SITE-METER-16,smart-charge-canary/SC-CANARY-201/SIM-SITE-METER-201"
 
 podAnnotations:
-  electrahub.net/config-revision: "gate7c3e-observe-events-v1"
+  electrahub.net/config-revision: "gate7c3e-observe-events-paused-v1"
 
 resources:
   requests:
