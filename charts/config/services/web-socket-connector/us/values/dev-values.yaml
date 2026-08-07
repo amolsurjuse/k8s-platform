@@ -4,6 +4,9 @@ extraSecretEnv:
   - name: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
     secretName: "ocpp-simulator-handshake-secret"
     secretKey: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
+  - name: "APP_SECURITY_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
 
 resources:
   requests:
