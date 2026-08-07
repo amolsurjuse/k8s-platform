@@ -54,6 +54,7 @@ config:
     # Gate 7C3-B is shipped inert. The lifecycle consumer is activated only
     # after the fallback and safety controls in Gates 7C3-C/D are validated.
     SMART_CHARGING_EVENTS_ENABLED: "false"
+    SMART_CHARGING_EVENT_ALLOWLIST: ""
     SMART_CHARGING_LIFECYCLE_TOPIC: "session.lifecycle.v2"
     SMART_CHARGING_EVENT_CONSUMER_GROUP: "charger-smart-charging-v1"
     SMART_CHARGING_EVENT_MAXIMUM_AGE_HOURS: "168"
