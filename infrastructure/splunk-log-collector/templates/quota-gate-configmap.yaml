@@ -58,8 +58,8 @@ data:
               return ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
             end
             if result ~= 1 then
-              # A quota rejection is intentional. Return a valid HEC success
-              # response so Vector does not retry the same payload forever.
+              -- A quota rejection is intentional. Return a valid HEC success
+              -- response so Vector does not retry the same payload forever.
               ngx.log(ngx.WARN, "Splunk daily ingest quota reached; dropping request bytes=", bytes)
               ngx.status = ngx.HTTP_OK
               ngx.header.content_type = "application/json"
