@@ -1,5 +1,10 @@
 fullnameOverride: splunk
 
+ingress:
+  enabled: true
+  className: nginx
+  host: splunk.electrahub.net
+
 persistence:
   size: 50Gi
 

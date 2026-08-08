@@ -34,6 +34,11 @@ service:
   hecPort: 8088
   managementPort: 8089
 
+ingress:
+  enabled: false
+  className: nginx
+  host: splunk.electrahub.net
+
 persistence:
   enabled: true
   size: 20Gi

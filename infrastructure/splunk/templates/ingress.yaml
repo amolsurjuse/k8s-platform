@@ -1,0 +1,26 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "splunk.name" . }}
+  labels:
+    {{- include "splunk.labels" . | nindent 4 }}
+  annotations:
+    # Public TLS terminates at the Cloudflare tunnel before traffic reaches nginx.
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "splunk.name" . }}
+                port:
+                  name: web
+{{- end }}
