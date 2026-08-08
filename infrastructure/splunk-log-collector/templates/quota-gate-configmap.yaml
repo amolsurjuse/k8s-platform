@@ -18,10 +18,17 @@ data:
 
       server {
         listen 8088;
+        client_body_buffer_size 2m;
+        client_max_body_size 5m;
 
-        location = /healthz { return 200; }
+        location = /healthz {
+          access_log off;
+          return 200;
+        }
 
         location / {
+          # Do not re-ingest one access-log event for every HEC batch.
+          access_log off;
           access_by_lua_block {
             local bytes = tonumber(ngx.req.get_headers()["content-length"] or "0") or 0
             local redis = require "resty.redis"

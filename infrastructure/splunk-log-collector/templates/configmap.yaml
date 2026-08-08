@@ -57,8 +57,9 @@ data:
         type: filter
         inputs: [enrich]
         # Raw meter telemetry remains searchable in ELK but does not consume
-        # Splunk's daily ingest allowance.
-        condition: "!match!(string!(.message), r'(?i)meter[ _-]?values?')"
+        # Splunk's daily ingest allowance. Collector and quota-gate logs also
+        # remain in ELK, avoiding a recursive Splunk ingestion feedback loop.
+        condition: "!match!(string!(.message), r'(?i)meter[ _-]?values?') && !match!(string!(.service), r'^splunk-log-collector(?:-quota-gate)?$')"
     sinks:
       splunk_hec:
         type: splunk_hec_logs
