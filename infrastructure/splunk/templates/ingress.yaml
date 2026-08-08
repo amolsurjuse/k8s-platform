@@ -10,6 +10,8 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-redirect-from: "http://{{ .Values.ingress.host }}"
+    nginx.ingress.kubernetes.io/proxy-redirect-to: "https://{{ .Values.ingress.host }}"
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
