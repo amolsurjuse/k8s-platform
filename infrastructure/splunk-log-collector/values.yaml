@@ -21,6 +21,7 @@ splunk:
     redis:
       host: redis
       port: 6379
+      dnsResolver: 10.43.0.10
       existingSecretName: redis-prod-secret
       passwordKey: redis-password
 

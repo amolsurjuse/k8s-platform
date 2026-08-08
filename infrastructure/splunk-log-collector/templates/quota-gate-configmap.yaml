@@ -12,6 +12,10 @@ data:
     error_log /dev/stderr warn;
     events { worker_connections 1024; }
     http {
+      # Lua cosockets do not automatically use the pod's /etc/resolv.conf.
+      # Configure CoreDNS explicitly so the quota gate can resolve Redis.
+      resolver {{ .Values.splunk.quotaGate.redis.dnsResolver }} valid=30s ipv6=off;
+
       server {
         listen 8088;
 
@@ -26,23 +30,42 @@ data:
             local ok, err = client:connect("{{ .Values.splunk.quotaGate.redis.host }}", {{ .Values.splunk.quotaGate.redis.port }})
             if not ok then
               ngx.log(ngx.ERR, "Splunk quota gate cannot reach Redis: ", err)
-              return ngx.exit(204)
+              ngx.status = ngx.HTTP_SERVICE_UNAVAILABLE
+              ngx.header.content_type = "application/json"
+              ngx.say('{"text":"Quota service unavailable","code":9}')
+              return ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
             end
             local password = os.getenv("REDIS_PASSWORD")
             if password and password ~= "" then
               local authed, auth_err = client:auth(password)
               if not authed then
                 ngx.log(ngx.ERR, "Splunk quota gate Redis authentication failed: ", auth_err)
-                return ngx.exit(204)
+                ngx.status = ngx.HTTP_SERVICE_UNAVAILABLE
+                ngx.header.content_type = "application/json"
+                ngx.say('{"text":"Quota service unavailable","code":9}')
+                return ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
               end
             end
             local key = "observability:splunk-ingest-bytes:" .. os.date("!%Y-%m-%d")
             local seconds_to_reset = 86400 - (os.date("!*t").hour * 3600 + os.date("!*t").min * 60 + os.date("!*t").sec) + 3600
             local result, eval_err = client:eval([[local current=tonumber(redis.call('GET', KEYS[1]) or '0'); local increment=tonumber(ARGV[1]); local maximum=tonumber(ARGV[2]); if current+increment>maximum then return 0 end; redis.call('INCRBY', KEYS[1], increment); redis.call('EXPIRE', KEYS[1], ARGV[3]); return 1]], 1, key, bytes, {{ .Values.splunk.quotaGate.maxDailyBytes }}, seconds_to_reset)
             client:set_keepalive(10000, 50)
+            if result == nil then
+              ngx.log(ngx.ERR, "Splunk quota gate Redis operation failed: ", eval_err or "unknown error")
+              ngx.status = ngx.HTTP_SERVICE_UNAVAILABLE
+              ngx.header.content_type = "application/json"
+              ngx.say('{"text":"Quota service unavailable","code":9}')
+              return ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
+            end
             if result ~= 1 then
-              ngx.log(ngx.WARN, "Splunk daily ingest quota reached or unavailable: ", eval_err or "limit")
-              return ngx.exit(204)
+              # A quota rejection is intentional. Return a valid HEC success
+              # response so Vector does not retry the same payload forever.
+              ngx.log(ngx.WARN, "Splunk daily ingest quota reached; dropping request bytes=", bytes)
+              ngx.status = ngx.HTTP_OK
+              ngx.header.content_type = "application/json"
+              ngx.header["X-Splunk-Quota-Dropped"] = "true"
+              ngx.say('{"text":"Daily ingestion quota reached","code":0}')
+              return ngx.exit(ngx.HTTP_OK)
             end
           }
           proxy_ssl_verify off;

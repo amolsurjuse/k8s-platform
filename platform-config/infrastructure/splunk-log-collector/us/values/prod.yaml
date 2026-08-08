@@ -10,6 +10,8 @@ splunk:
     enabled: true
     # Stay below the 500 MB/day Splunk Free ingestion allowance.
     maxDailyBytes: 419430400
+    redis:
+      host: redis.prod.svc.cluster.local
 
 elasticsearch:
   enabled: true
