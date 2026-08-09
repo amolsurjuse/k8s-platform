@@ -1,0 +1,26 @@
+{{- if .Values.pki.pkcs11.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-pkcs11
+data:
+  softhsm2.conf: |
+    directories.tokendir = /var/lib/softhsm/tokens
+    objectstore.backend = file
+    log.level = WARNING
+    slots.removable = false
+  sunpkcs11.cfg: |
+    name = ElectraHubPnC
+    library = {{ .Values.pki.pkcs11.library }}
+    tokenLabel = {{ .Values.pki.pkcs11.tokenLabel }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-pkcs11
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.pki.pkcs11.storageSize }}
+{{- end }}

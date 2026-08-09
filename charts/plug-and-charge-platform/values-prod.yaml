@@ -13,6 +13,8 @@ features:
 
 pki:
   keyCustodyProvider: unavailable
+  pkcs11:
+    enabled: false
 
 gatewayIdentitySecret:
   existingSecret: access-context-prod-secret

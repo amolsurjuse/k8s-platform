@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  tag: ed5d6ee
-  digest: sha256:85f83dca2daf4c597454ca01cbd1b11fabed81e1aa111273d22e8cceae0bd005
+  tag: 4fadb9a
+  digest: sha256:27458138c231462197d6b7aacee0d8397b95ab48abbdd62803ce2fb665016174
 
 features:
   enabled: true
@@ -11,5 +11,8 @@ features:
   userEventsEnabled: true
 
 pki:
-  # Development-only provider. The key is process-local and is never exported.
-  keyCustodyProvider: in-memory-dev
+  # SoftHSM2 validates persistent PKCS#11 behavior in development only; it is not a production HSM.
+  keyCustodyProvider: pkcs11
+  pkcs11:
+    enabled: true
+    existingSecret: plug-and-charge-platform-pkcs11

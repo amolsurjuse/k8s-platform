@@ -17,8 +17,41 @@ spec:
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
+      {{- if .Values.pki.pkcs11.enabled }}
+      initContainers:
+        - name: initialize-pkcs11-token
+          {{- if .Values.image.digest }}
+          image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- end }}
+          command: ["/bin/sh", "-ec"]
+          args:
+            - >-
+              if softhsm2-util --show-slots | grep -q 'Label: *{{ .Values.pki.pkcs11.tokenLabel }}'; then
+                exit 0;
+              fi;
+              softhsm2-util --init-token --free --label '{{ .Values.pki.pkcs11.tokenLabel }}' --so-pin "$PKCS11_SO_PIN" --pin "$PKCS11_PIN"
+          env:
+            - name: SOFTHSM2_CONF
+              value: {{ .Values.pki.pkcs11.configFile | quote }}
+            - name: PKCS11_PIN
+              valueFrom:
+                secretKeyRef: { name: {{ .Values.pki.pkcs11.existingSecret }}, key: {{ .Values.pki.pkcs11.pinKey }} }
+            - name: PKCS11_SO_PIN
+              valueFrom:
+                secretKeyRef: { name: {{ .Values.pki.pkcs11.existingSecret }}, key: {{ .Values.pki.pkcs11.soPinKey }} }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: pkcs11-config, mountPath: /etc/softhsm2, readOnly: true }
+            - { name: pkcs11-token, mountPath: /var/lib/softhsm/tokens }
+      {{- end }}
       containers:
         - name: pnc-service
           {{- if .Values.image.digest }}
@@ -35,6 +68,10 @@ spec:
           volumeMounts:
             - name: temporary-files
               mountPath: /tmp
+            {{- if .Values.pki.pkcs11.enabled }}
+            - { name: pkcs11-config, mountPath: /etc/softhsm2, readOnly: true }
+            - { name: pkcs11-token, mountPath: /var/lib/softhsm/tokens }
+            {{- end }}
           ports:
             - name: http
               containerPort: 8098
@@ -75,6 +112,15 @@ spec:
               value: {{ .Values.pki.keyCustodyProvider | quote }}
             - name: PNC_PKI_CERTIFICATE_POLICY_OID
               value: {{ .Values.pki.certificatePolicyOid | quote }}
+            {{- if .Values.pki.pkcs11.enabled }}
+            - name: SOFTHSM2_CONF
+              value: {{ .Values.pki.pkcs11.configFile | quote }}
+            - name: PNC_PKI_PKCS11_CONFIG_FILE
+              value: /etc/softhsm2/sunpkcs11.cfg
+            - name: PNC_PKI_PKCS11_PIN
+              valueFrom:
+                secretKeyRef: { name: {{ .Values.pki.pkcs11.existingSecret }}, key: {{ .Values.pki.pkcs11.pinKey }} }
+            {{- end }}
             - name: PNC_USER_EVENTS_ENABLED
               value: {{ .Values.features.userEventsEnabled | quote }}
             - name: PNC_OCPP_ENABLED
@@ -100,6 +146,14 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 64Mi
+        {{- if .Values.pki.pkcs11.enabled }}
+        - name: pkcs11-config
+          configMap:
+            name: {{ .Release.Name }}-pkcs11
+        - name: pkcs11-token
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-pkcs11
+        {{- end }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
