@@ -3,7 +3,12 @@ replicaCount: 2
 features:
   enabled: true
   adminApiEnabled: true
+  # Remains dark until a production HSM adapter and credentials are provisioned.
+  pkiAdminEnabled: false
   userEventsEnabled: true
+
+pki:
+  keyCustodyProvider: unavailable
 
 gatewayIdentitySecret:
   existingSecret: access-context-prod-secret

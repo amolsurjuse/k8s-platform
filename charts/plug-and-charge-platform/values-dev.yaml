@@ -3,4 +3,9 @@ replicaCount: 1
 features:
   enabled: true
   adminApiEnabled: true
+  pkiAdminEnabled: true
   userEventsEnabled: true
+
+pki:
+  # Development-only provider. The key is process-local and is never exported.
+  keyCustodyProvider: in-memory-dev

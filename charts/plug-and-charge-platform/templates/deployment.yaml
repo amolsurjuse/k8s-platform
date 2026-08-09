@@ -69,6 +69,12 @@ spec:
               value: {{ .Values.features.enabled | quote }}
             - name: PNC_ADMIN_API_ENABLED
               value: {{ .Values.features.adminApiEnabled | quote }}
+            - name: PNC_PKI_ADMIN_ENABLED
+              value: {{ .Values.features.pkiAdminEnabled | quote }}
+            - name: PNC_PKI_KEY_CUSTODY_PROVIDER
+              value: {{ .Values.pki.keyCustodyProvider | quote }}
+            - name: PNC_PKI_CERTIFICATE_POLICY_OID
+              value: {{ .Values.pki.certificatePolicyOid | quote }}
             - name: PNC_USER_EVENTS_ENABLED
               value: {{ .Values.features.userEventsEnabled | quote }}
             - name: PNC_OCPP_ENABLED

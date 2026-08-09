@@ -26,10 +26,15 @@ gatewayIdentitySecret:
 features:
   enabled: false
   adminApiEnabled: false
+  pkiAdminEnabled: false
   userEventsEnabled: false
   ocppEnabled: false
   ocpiEnabled: false
   outboxPublisherEnabled: false
+
+pki:
+  keyCustodyProvider: unavailable
+  certificatePolicyOid: "1.3.6.1.4.1.55555.15118.1"
 
 resources:
   requests:
