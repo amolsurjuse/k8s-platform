@@ -13,6 +13,10 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: {{ .Chart.Name }}
+      {{- if .Values.pki.pkcs11.enabled }}
+      annotations:
+        checksum/pkcs11-config: {{ printf "%s|%s|slotListIndex=0" .Values.pki.pkcs11.library .Values.pki.pkcs11.tokenLabel | sha256sum }}
+      {{- end }}
     spec:
       automountServiceAccountToken: false
       securityContext:
