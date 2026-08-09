@@ -7,7 +7,14 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ .Chart.Name }}
   policyTypes: ["Ingress", "Egress"]
-  ingress: []
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+      ports:
+        - protocol: TCP
+          port: 8098
   egress:
     - to:
         - namespaceSelector:
@@ -28,3 +35,5 @@ spec:
       ports:
         - protocol: TCP
           port: 5432
+        - protocol: TCP
+          port: 5672

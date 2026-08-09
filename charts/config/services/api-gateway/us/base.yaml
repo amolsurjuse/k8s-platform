@@ -58,6 +58,7 @@ config:
     GATEWAY_IDENTITY_DEFAULT_TENANT: "electrahub"
     GATEWAY_ROUTE_AI: "http://ai-support-service:8094"
     GATEWAY_ROUTES_AI: "http://ai-support-service:8094"
+    GATEWAY_ROUTE_PNC: "http://plug-and-charge-platform:8098"
     # Local 8B inference is deliberately allowed more time than ordinary APIs.
     GATEWAY_HTTP_CLIENT_AI_READ_TIMEOUT: "55s"
 

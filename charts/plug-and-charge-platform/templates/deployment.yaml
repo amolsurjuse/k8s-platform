@@ -54,6 +54,17 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.database.existingSecret }}
                   key: {{ .Values.database.passwordKey }}
+            - name: SPRING_RABBITMQ_HOST
+              value: {{ .Values.rabbitmq.host | quote }}
+            - name: SPRING_RABBITMQ_PORT
+              value: {{ .Values.rabbitmq.port | quote }}
+            {{- if .Values.gatewayIdentitySecret.existingSecret }}
+            - name: APP_INTERNAL_ACCESS_CONTEXT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gatewayIdentitySecret.existingSecret }}
+                  key: {{ .Values.gatewayIdentitySecret.key }}
+            {{- end }}
             - name: PNC_ENABLED
               value: {{ .Values.features.enabled | quote }}
             - name: PNC_ADMIN_API_ENABLED

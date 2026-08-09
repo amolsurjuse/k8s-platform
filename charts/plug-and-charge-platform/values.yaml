@@ -2,8 +2,8 @@ replicaCount: 1
 
 image:
   repository: amolsurjuse/plug-and-charge-platform
-  tag: stage-1
-  digest: sha256:1aa63d38fdc23a3b10df3864c4d9d5c64481d9a9d601ee578b45cd01f8dce8e2
+  tag: 7f88563
+  digest: sha256:208033db697376577f320558193a1749832ad77484ef5127e6a135a86f8f432e
   pullPolicy: IfNotPresent
 
 service:
@@ -14,6 +14,14 @@ database:
   urlKey: url
   usernameKey: username
   passwordKey: password
+
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+
+gatewayIdentitySecret:
+  existingSecret: ""
+  key: APP_INTERNAL_ACCESS_CONTEXT_SECRET
 
 features:
   enabled: false

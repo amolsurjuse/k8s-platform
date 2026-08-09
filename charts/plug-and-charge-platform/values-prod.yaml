@@ -1,7 +1,12 @@
 replicaCount: 2
 
 features:
-  enabled: false
+  enabled: true
+  adminApiEnabled: true
+  userEventsEnabled: true
+
+gatewayIdentitySecret:
+  existingSecret: access-context-prod-secret
 
 resources:
   requests:

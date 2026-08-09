@@ -1,4 +1,6 @@
 replicaCount: 1
 
 features:
-  enabled: false
+  enabled: true
+  adminApiEnabled: true
+  userEventsEnabled: true
