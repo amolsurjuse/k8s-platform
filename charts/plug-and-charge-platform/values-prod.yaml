@@ -1,9 +1,8 @@
 replicaCount: 2
 
 image:
-  # Stage 2 production baseline; promoted only after Stage 3 dev validation.
-  tag: 7f88563
-  digest: sha256:208033db697376577f320558193a1749832ad77484ef5127e6a135a86f8f432e
+  tag: ed5d6ee
+  digest: sha256:85f83dca2daf4c597454ca01cbd1b11fabed81e1aa111273d22e8cceae0bd005
 
 features:
   enabled: true
