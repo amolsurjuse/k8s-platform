@@ -12,7 +12,7 @@ data:
   sunpkcs11.cfg: |
     name = ElectraHubPnC
     library = {{ .Values.pki.pkcs11.library }}
-    tokenLabel = {{ .Values.pki.pkcs11.tokenLabel }}
+    slotListIndex = 0
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
