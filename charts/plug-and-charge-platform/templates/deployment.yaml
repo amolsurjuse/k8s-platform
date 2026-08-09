@@ -32,6 +32,7 @@ spec:
           command: ["/bin/sh", "-ec"]
           args:
             - >-
+              mkdir -p /var/lib/softhsm/tokens;
               if softhsm2-util --show-slots | grep -q 'Label: *{{ .Values.pki.pkcs11.tokenLabel }}'; then
                 exit 0;
               fi;
@@ -50,7 +51,7 @@ spec:
             capabilities: { drop: ["ALL"] }
           volumeMounts:
             - { name: pkcs11-config, mountPath: /etc/softhsm2, readOnly: true }
-            - { name: pkcs11-token, mountPath: /var/lib/softhsm/tokens }
+            - { name: pkcs11-token, mountPath: /var/lib/softhsm }
       {{- end }}
       containers:
         - name: pnc-service
@@ -70,7 +71,7 @@ spec:
               mountPath: /tmp
             {{- if .Values.pki.pkcs11.enabled }}
             - { name: pkcs11-config, mountPath: /etc/softhsm2, readOnly: true }
-            - { name: pkcs11-token, mountPath: /var/lib/softhsm/tokens }
+            - { name: pkcs11-token, mountPath: /var/lib/softhsm }
             {{- end }}
           ports:
             - name: http
