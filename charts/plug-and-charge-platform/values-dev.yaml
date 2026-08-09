@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  tag: 967de15
-  digest: sha256:b4ca4c9608e74c352ed02e8a3d04ddcf719b8039deaf0315708a78024f073284
+  tag: ed5d6ee
+  digest: sha256:85f83dca2daf4c597454ca01cbd1b11fabed81e1aa111273d22e8cceae0bd005
 
 features:
   enabled: true
