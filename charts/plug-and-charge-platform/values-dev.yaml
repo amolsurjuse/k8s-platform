@@ -1,5 +1,9 @@
 replicaCount: 1
 
+image:
+  tag: 967de15
+  digest: sha256:b4ca4c9608e74c352ed02e8a3d04ddcf719b8039deaf0315708a78024f073284
+
 features:
   enabled: true
   adminApiEnabled: true
