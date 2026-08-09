@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: plug-and-charge-platform
+  namespace: argocd
+spec:
+  project: electrahub-dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/plug-and-charge-platform
+    helm:
+      releaseName: plug-and-charge-platform
+      valueFiles:
+        - values.yaml
+        - values-dev.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

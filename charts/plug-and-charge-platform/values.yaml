@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  repository: amolsurjuse/plug-and-charge-platform
+  tag: stage-1
+  digest: sha256:1aa63d38fdc23a3b10df3864c4d9d5c64481d9a9d601ee578b45cd01f8dce8e2
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8098
+
+database:
+  existingSecret: plug-and-charge-platform-db
+  urlKey: url
+  usernameKey: username
+  passwordKey: password
+
+features:
+  enabled: false
+  adminApiEnabled: false
+  userEventsEnabled: false
+  ocppEnabled: false
+  ocpiEnabled: false
+  outboxPublisherEnabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

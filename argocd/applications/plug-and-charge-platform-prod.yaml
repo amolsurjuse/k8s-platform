@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: plug-and-charge-platform-prod
+  namespace: argocd
+spec:
+  project: electrahub-prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  source:
+    repoURL: https://github.com/amolsurjuse/k8s-platform.git
+    targetRevision: develop
+    path: charts/plug-and-charge-platform
+    helm:
+      releaseName: plug-and-charge-platform
+      valueFiles:
+        - values.yaml
+        - values-prod.yaml
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
