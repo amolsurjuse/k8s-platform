@@ -135,6 +135,12 @@ spec:
               value: {{ .Values.features.cpsOnboardingAdminEnabled | quote }}
             - name: PNC_ISO15118_PROVIDER
               value: {{ .Values.iso15118.provider | quote }}
+            - name: PNC_ISO15118_CPS_PROVIDER_PROFILE_ID
+              value: {{ .Values.iso15118.externalCps.providerProfileId | quote }}
+            - name: PNC_ISO15118_CPS_PROVIDER_ID
+              value: {{ .Values.iso15118.externalCps.providerId | quote }}
+            - name: PNC_ISO15118_CPS_ENVIRONMENT
+              value: {{ .Values.iso15118.externalCps.environment | quote }}
             - name: PNC_ISO15118_RESPONSE_RETENTION_MINUTES
               value: {{ .Values.iso15118.responseRetentionMinutes | quote }}
             - name: PNC_ISO15118_CLEANUP_INTERVAL_MS

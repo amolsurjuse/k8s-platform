@@ -2,8 +2,8 @@ replicaCount: 1
 
 image:
   repository: amolsurjuse/plug-and-charge-platform
-  tag: 3a4ce9f
-  digest: sha256:afdfcc3440d3319813b4303ff2501e0d2af917e9403e2d56ff7bd0b4227215b3
+  tag: 590534a
+  digest: sha256:766b40de48c2166ad5dc76083b987777f12fb6419269bf5f4e7330aa000434c6
   pullPolicy: IfNotPresent
 
 service:
@@ -61,6 +61,9 @@ iso15118:
   responseRetentionMinutes: 15
   cleanupIntervalMs: 60000
   externalCps:
+    providerProfileId: ""
+    providerId: ""
+    environment: ""
     endpoint: ""
     connectTimeoutMs: 1500
     requestTimeoutMs: 4000

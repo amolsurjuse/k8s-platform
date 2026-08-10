@@ -1,8 +1,8 @@
 replicaCount: 2
 
 image:
-  tag: 3a4ce9f
-  digest: sha256:afdfcc3440d3319813b4303ff2501e0d2af917e9403e2d56ff7bd0b4227215b3
+  tag: 590534a
+  digest: sha256:766b40de48c2166ad5dc76083b987777f12fb6419269bf5f4e7330aa000434c6
 
 features:
   enabled: true
@@ -30,6 +30,10 @@ pki:
 iso15118:
   provider: unavailable
   externalCps:
+    # Exact target identity remains unset until a separately approved CPS onboarding change.
+    providerProfileId: ""
+    providerId: ""
+    environment: ""
     minimumClientCertificateValidityHours: 168
 
 # An operator must supply an approved suite, CPS/signing credentials, output
