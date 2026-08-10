@@ -10,6 +10,8 @@ features:
   # Remains dark until a production HSM adapter and credentials are provisioned.
   pkiAdminEnabled: false
   contractCertificateEnabled: false
+  # Migration is deployed dark; exchange endpoints remain unavailable in production.
+  installationPackageEnabled: false
   userEventsEnabled: true
 
 pki:

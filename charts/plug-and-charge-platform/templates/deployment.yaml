@@ -118,6 +118,8 @@ spec:
               value: {{ .Values.features.pkiAdminEnabled | quote }}
             - name: PNC_CONTRACT_CERTIFICATE_ENABLED
               value: {{ .Values.features.contractCertificateEnabled | quote }}
+            - name: PNC_INSTALLATION_PACKAGE_ENABLED
+              value: {{ .Values.features.installationPackageEnabled | quote }}
             - name: PNC_PKI_KEY_CUSTODY_PROVIDER
               value: {{ .Values.pki.keyCustodyProvider | quote }}
             - name: PNC_PKI_CERTIFICATE_POLICY_OID

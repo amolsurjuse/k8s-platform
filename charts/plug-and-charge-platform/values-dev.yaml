@@ -9,6 +9,7 @@ features:
   adminApiEnabled: true
   pkiAdminEnabled: true
   contractCertificateEnabled: true
+  installationPackageEnabled: true
   userEventsEnabled: true
 
 pki:

@@ -28,6 +28,7 @@ features:
   adminApiEnabled: false
   pkiAdminEnabled: false
   contractCertificateEnabled: false
+  installationPackageEnabled: false
   userEventsEnabled: false
   ocppEnabled: false
   ocpiEnabled: false
