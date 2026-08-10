@@ -33,6 +33,41 @@ data:
 {{- range .targets }}
               - {{ . | quote }}
 {{- end }}
+            labels:
+              service: {{ .name | quote }}
+              namespace: {{ default $.Release.Namespace .namespace | quote }}
+              environment: {{ default "prod" .environment | quote }}
+{{- end }}
+{{- range .Values.podEndpointTargets }}
+      - job_name: {{ .name | quote }}
+        metrics_path: {{ default "/actuator/prometheus" .metricsPath | quote }}
+        scheme: {{ default "http" .scheme | quote }}
+        scrape_interval: {{ default $.Values.scrapeInterval .scrapeInterval }}
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names: [{{ .namespace | default $.Values.targetNamespace | default $.Release.Namespace | quote }}]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: {{ required "podEndpointTargets[].serviceName is required" .serviceName | quote }}
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: {{ default "http" .portName | quote }}
+          - source_labels: [__meta_kubernetes_endpoint_ready]
+            action: keep
+            regex: "true"
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            target_label: node
+          - target_label: service
+            replacement: {{ .serviceName | quote }}
+          - target_label: namespace
+            replacement: {{ .namespace | default $.Values.targetNamespace | default $.Release.Namespace | quote }}
+          - target_label: environment
+            replacement: {{ default "prod" .environment | quote }}
+{{- end }}
   pnc-alerts.yml: |
     groups:
       - name: plug-and-charge
@@ -78,38 +113,3 @@ data:
             labels: { severity: warning, domain: plug-and-charge }
             annotations:
               summary: Plug & Charge certificate inventory refresh failed
-            labels:
-              service: {{ .name | quote }}
-              namespace: {{ default $.Release.Namespace .namespace | quote }}
-              environment: {{ default "prod" .environment | quote }}
-{{- end }}
-{{- range .Values.podEndpointTargets }}
-      - job_name: {{ .name | quote }}
-        metrics_path: {{ default "/actuator/prometheus" .metricsPath | quote }}
-        scheme: {{ default "http" .scheme | quote }}
-        scrape_interval: {{ default $.Values.scrapeInterval .scrapeInterval }}
-        kubernetes_sd_configs:
-          - role: endpoints
-            namespaces:
-              names: [{{ .namespace | default $.Values.targetNamespace | default $.Release.Namespace | quote }}]
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_service_name]
-            action: keep
-            regex: {{ required "podEndpointTargets[].serviceName is required" .serviceName | quote }}
-          - source_labels: [__meta_kubernetes_endpoint_port_name]
-            action: keep
-            regex: {{ default "http" .portName | quote }}
-          - source_labels: [__meta_kubernetes_endpoint_ready]
-            action: keep
-            regex: "true"
-          - source_labels: [__meta_kubernetes_pod_name]
-            target_label: pod
-          - source_labels: [__meta_kubernetes_pod_node_name]
-            target_label: node
-          - target_label: service
-            replacement: {{ .serviceName | quote }}
-          - target_label: namespace
-            replacement: {{ .namespace | default $.Values.targetNamespace | default $.Release.Namespace | quote }}
-          - target_label: environment
-            replacement: {{ default "prod" .environment | quote }}
-{{- end }}
