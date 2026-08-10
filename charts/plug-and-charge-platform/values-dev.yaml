@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  tag: 889f237
-  digest: sha256:a6909ba312e8771072adb3205710e627d7ad4bea5870da4b24f65b41203d4d9f
+  tag: 937cf71
+  digest: sha256:552e0f51b0e8b7a6667b3e262663da7f0fbf941074354de1cfd6443ee0a6f8fc
 
 features:
   enabled: true
@@ -10,7 +10,12 @@ features:
   pkiAdminEnabled: true
   contractCertificateEnabled: true
   installationPackageEnabled: true
+  # Dev cluster is stopped; keep the protocol adapter dark until a real EXI conformance provider is ready.
+  iso15118CertificateInstallationEnabled: false
   userEventsEnabled: true
+
+iso15118:
+  provider: unavailable
 
 pki:
   # SoftHSM2 validates persistent PKCS#11 behavior in development only; it is not a production HSM.

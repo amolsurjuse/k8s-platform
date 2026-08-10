@@ -29,6 +29,7 @@ features:
   pkiAdminEnabled: false
   contractCertificateEnabled: false
   installationPackageEnabled: false
+  iso15118CertificateInstallationEnabled: false
   userEventsEnabled: false
   ocppEnabled: false
   ocpiEnabled: false
@@ -51,6 +52,9 @@ pki:
     pinKey: pin
     soPinKey: so-pin
     storageSize: 1Gi
+
+iso15118:
+  provider: unavailable
 
 resources:
   requests:

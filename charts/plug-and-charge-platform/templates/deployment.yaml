@@ -120,6 +120,10 @@ spec:
               value: {{ .Values.features.contractCertificateEnabled | quote }}
             - name: PNC_INSTALLATION_PACKAGE_ENABLED
               value: {{ .Values.features.installationPackageEnabled | quote }}
+            - name: PNC_ISO15118_CERTIFICATE_INSTALLATION_ENABLED
+              value: {{ .Values.features.iso15118CertificateInstallationEnabled | quote }}
+            - name: PNC_ISO15118_PROVIDER
+              value: {{ .Values.iso15118.provider | quote }}
             - name: PNC_PKI_KEY_CUSTODY_PROVIDER
               value: {{ .Values.pki.keyCustodyProvider | quote }}
             - name: PNC_PKI_CERTIFICATE_POLICY_OID
