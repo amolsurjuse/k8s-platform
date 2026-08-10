@@ -58,6 +58,23 @@ iso15118:
   provider: unavailable
   responseRetentionMinutes: 15
   cleanupIntervalMs: 60000
+  externalCps:
+    endpoint: ""
+    connectTimeoutMs: 1500
+    requestTimeoutMs: 4000
+    maxInFlight: 32
+    minimumClientCertificateValidityHours: 168
+    credentialSecret:
+      existingSecret: ""
+      clientKeyStoreKey: client-key-store.p12
+      clientKeyStorePasswordKey: client-key-store-password
+      trustStoreKey: trust-store.p12
+      trustStorePasswordKey: trust-store-password
+      mountPath: /etc/electrahub/cps
+    replaySecret:
+      existingSecret: ""
+      activeKeyIdKey: active-key-id
+      keyRingKey: key-ring
   conformance:
     enabled: false
     publicKeySecret:

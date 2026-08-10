@@ -1,8 +1,8 @@
 replicaCount: 2
 
 image:
-  tag: 6d2bb96
-  digest: sha256:11b41a06cb436fe45b57c2a841d8e99342404ddac8d9c12ae4aae36ea5f5b642
+  tag: 44e0d57
+  digest: sha256:3b0d836a7d3c72adf95b5a42b5e6f5f6a6fdcc250207355432d6f044d730ebf2
 
 features:
   enabled: true
@@ -26,6 +26,8 @@ pki:
 
 iso15118:
   provider: unavailable
+  externalCps:
+    minimumClientCertificateValidityHours: 168
 
 gatewayIdentitySecret:
   existingSecret: access-context-prod-secret

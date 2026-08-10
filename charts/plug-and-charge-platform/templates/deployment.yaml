@@ -80,6 +80,11 @@ spec:
             {{- if .Values.pki.oemTrustBundle.enabled }}
             - { name: oem-trust-bundle, mountPath: {{ .Values.pki.oemTrustBundle.mountPath | quote }}, subPath: {{ .Values.pki.oemTrustBundle.key | quote }}, readOnly: true }
             {{- end }}
+            {{- if eq .Values.iso15118.provider "external-cps" }}
+            - name: cps-mtls
+              mountPath: {{ .Values.iso15118.externalCps.credentialSecret.mountPath | quote }}
+              readOnly: true
+            {{- end }}
           ports:
             - name: http
               containerPort: 8098
@@ -130,6 +135,42 @@ spec:
               value: {{ .Values.iso15118.responseRetentionMinutes | quote }}
             - name: PNC_ISO15118_CLEANUP_INTERVAL_MS
               value: {{ .Values.iso15118.cleanupIntervalMs | quote }}
+            {{- if eq .Values.iso15118.provider "external-cps" }}
+            - name: PNC_ISO15118_CPS_ENDPOINT
+              value: {{ required "iso15118.externalCps.endpoint is required" .Values.iso15118.externalCps.endpoint | quote }}
+            - name: PNC_ISO15118_CPS_CLIENT_KEY_STORE
+              value: {{ printf "%s/%s" .Values.iso15118.externalCps.credentialSecret.mountPath .Values.iso15118.externalCps.credentialSecret.clientKeyStoreKey | quote }}
+            - name: PNC_ISO15118_CPS_CLIENT_KEY_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "iso15118.externalCps.credentialSecret.existingSecret is required" .Values.iso15118.externalCps.credentialSecret.existingSecret }}
+                  key: {{ .Values.iso15118.externalCps.credentialSecret.clientKeyStorePasswordKey }}
+            - name: PNC_ISO15118_CPS_TRUST_STORE
+              value: {{ printf "%s/%s" .Values.iso15118.externalCps.credentialSecret.mountPath .Values.iso15118.externalCps.credentialSecret.trustStoreKey | quote }}
+            - name: PNC_ISO15118_CPS_TRUST_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "iso15118.externalCps.credentialSecret.existingSecret is required" .Values.iso15118.externalCps.credentialSecret.existingSecret }}
+                  key: {{ .Values.iso15118.externalCps.credentialSecret.trustStorePasswordKey }}
+            - name: PNC_ISO15118_CPS_CONNECT_TIMEOUT_MS
+              value: {{ .Values.iso15118.externalCps.connectTimeoutMs | quote }}
+            - name: PNC_ISO15118_CPS_REQUEST_TIMEOUT_MS
+              value: {{ .Values.iso15118.externalCps.requestTimeoutMs | quote }}
+            - name: PNC_ISO15118_CPS_MAX_IN_FLIGHT
+              value: {{ .Values.iso15118.externalCps.maxInFlight | quote }}
+            - name: PNC_ISO15118_CPS_MINIMUM_CLIENT_CERTIFICATE_VALIDITY_HOURS
+              value: {{ .Values.iso15118.externalCps.minimumClientCertificateValidityHours | quote }}
+            - name: PNC_ISO15118_REPLAY_ACTIVE_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "iso15118.externalCps.replaySecret.existingSecret is required" .Values.iso15118.externalCps.replaySecret.existingSecret }}
+                  key: {{ .Values.iso15118.externalCps.replaySecret.activeKeyIdKey }}
+            - name: PNC_ISO15118_REPLAY_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "iso15118.externalCps.replaySecret.existingSecret is required" .Values.iso15118.externalCps.replaySecret.existingSecret }}
+                  key: {{ .Values.iso15118.externalCps.replaySecret.keyRingKey }}
+            {{- end }}
             - name: PNC_ISO15118_CONFORMANCE_ENABLED
               value: {{ .Values.iso15118.conformance.enabled | quote }}
             {{- if .Values.iso15118.conformance.enabled }}
@@ -196,6 +237,16 @@ spec:
             items:
               - key: {{ .Values.pki.oemTrustBundle.key }}
                 path: {{ .Values.pki.oemTrustBundle.key }}
+        {{- end }}
+        {{- if eq .Values.iso15118.provider "external-cps" }}
+        - name: cps-mtls
+          secret:
+            secretName: {{ required "iso15118.externalCps.credentialSecret.existingSecret is required" .Values.iso15118.externalCps.credentialSecret.existingSecret }}
+            items:
+              - key: {{ .Values.iso15118.externalCps.credentialSecret.clientKeyStoreKey }}
+                path: {{ .Values.iso15118.externalCps.credentialSecret.clientKeyStoreKey }}
+              - key: {{ .Values.iso15118.externalCps.credentialSecret.trustStoreKey }}
+                path: {{ .Values.iso15118.externalCps.credentialSecret.trustStoreKey }}
         {{- end }}
 ---
 apiVersion: policy/v1
