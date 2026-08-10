@@ -1,8 +1,8 @@
 replicaCount: 2
 
 image:
-  tag: 9fcf350
-  digest: sha256:363fb020dfbe32cc867385085630184a75ed33d2ae76177f03cdfdd9f56bf6a0
+  tag: c1afd4b
+  digest: sha256:b2df3a78bd5d308ddd409f8b34beb7aadf76b2783b266db0ea0abc5e39c1c39d
 
 features:
   enabled: true
@@ -16,6 +16,8 @@ features:
   iso15118CertificateInstallationEnabled: false
   iso15118ConformanceAdminEnabled: false
   iso15118OperationalReadinessAdminEnabled: false
+  # V15 custody capability is present, but no verification key is mounted and no write API exists.
+  cpsOnboardingAdminEnabled: false
   userEventsEnabled: true
 
 pki:

@@ -131,6 +131,8 @@ spec:
               value: {{ .Values.features.iso15118ConformanceAdminEnabled | quote }}
             - name: PNC_ISO15118_OPERATIONAL_READINESS_ADMIN_ENABLED
               value: {{ .Values.features.iso15118OperationalReadinessAdminEnabled | quote }}
+            - name: PNC_CPS_ONBOARDING_ADMIN_ENABLED
+              value: {{ .Values.features.cpsOnboardingAdminEnabled | quote }}
             - name: PNC_ISO15118_PROVIDER
               value: {{ .Values.iso15118.provider | quote }}
             - name: PNC_ISO15118_RESPONSE_RETENTION_MINUTES
@@ -175,7 +177,7 @@ spec:
             {{- end }}
             - name: PNC_ISO15118_CONFORMANCE_ENABLED
               value: {{ .Values.iso15118.conformance.enabled | quote }}
-            {{- if .Values.iso15118.conformance.enabled }}
+            {{- if or .Values.iso15118.conformance.enabled .Values.features.cpsOnboardingAdminEnabled }}
             - name: PNC_ISO15118_CONFORMANCE_VERIFICATION_KEY_RING
               valueFrom:
                 secretKeyRef:

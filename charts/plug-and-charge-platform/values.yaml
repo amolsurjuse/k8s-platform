@@ -2,8 +2,8 @@ replicaCount: 1
 
 image:
   repository: amolsurjuse/plug-and-charge-platform
-  tag: 9fcf350
-  digest: sha256:363fb020dfbe32cc867385085630184a75ed33d2ae76177f03cdfdd9f56bf6a0
+  tag: c1afd4b
+  digest: sha256:b2df3a78bd5d308ddd409f8b34beb7aadf76b2783b266db0ea0abc5e39c1c39d
   pullPolicy: IfNotPresent
 
 service:
@@ -32,6 +32,7 @@ features:
   iso15118CertificateInstallationEnabled: false
   iso15118ConformanceAdminEnabled: false
   iso15118OperationalReadinessAdminEnabled: false
+  cpsOnboardingAdminEnabled: false
   userEventsEnabled: false
   ocppEnabled: false
   ocpiEnabled: false
