@@ -35,6 +35,11 @@ iso15118:
 conformanceExecution:
   enabled: false
 
+# Local-only fail-closed review of a CPS onboarding manifest and mTLS material.
+# A separately approved change must provide the manifest, credentials and PVCs.
+cpsOnboardingValidation:
+  enabled: false
+
 operationalEvidenceExecution:
   enabled: false
 

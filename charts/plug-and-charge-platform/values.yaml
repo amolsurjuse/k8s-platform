@@ -118,6 +118,38 @@ conformanceExecution:
       cpu: 500m
       memory: 512Mi
 
+cpsOnboardingValidation:
+  enabled: false
+  runId: ""
+  image:
+    repository: amolsurjuse/plug-and-charge-onboarding-validator
+    digest: sha256:23e2e4d24c213d56e8f262a17429a2a41d1648c54ed8ac974ecfd11924f2da5a
+    pullPolicy: IfNotPresent
+  cpsEndpoint: ""
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 86400
+  connectTimeoutMs: 1500
+  requestTimeoutMs: 4000
+  minimumClientCertificateValidityHours: 168
+  input:
+    existingClaim: ""
+    manifestFile: onboarding-manifest.json
+  output:
+    existingClaim: ""
+  credentialSecret:
+    existingSecret: ""
+    clientKeyStoreKey: client-key-store.p12
+    clientKeyStorePasswordKey: client-key-store-password
+    trustStoreKey: trust-store.p12
+    trustStorePasswordKey: trust-store-password
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
 operationalEvidenceExecution:
   enabled: false
   runId: ""

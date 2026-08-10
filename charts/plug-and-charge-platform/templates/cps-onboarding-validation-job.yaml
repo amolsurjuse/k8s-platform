@@ -1,0 +1,106 @@
+{{- if .Values.cpsOnboardingValidation.enabled }}
+{{- $config := .Values.cpsOnboardingValidation }}
+{{- $runId := required "cpsOnboardingValidation.runId is required" $config.runId }}
+{{- if not (regexMatch "^[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$" $runId) }}
+{{- fail "cpsOnboardingValidation.runId must be a lowercase DNS label of at most 40 characters" }}
+{{- end }}
+{{- $digest := required "cpsOnboardingValidation.image.digest is required" $config.image.digest }}
+{{- if not (regexMatch "^sha256:[0-9a-f]{64}$" $digest) }}
+{{- fail "cpsOnboardingValidation.image.digest must be a sha256 digest" }}
+{{- end }}
+{{- $endpoint := required "cpsOnboardingValidation.cpsEndpoint is required" $config.cpsEndpoint }}
+{{- if not (regexMatch "^https://[^/?#]+(/[^?#]*)?$" $endpoint) }}
+{{- fail "cpsOnboardingValidation.cpsEndpoint must be an HTTPS URL without query or fragment" }}
+{{- end }}
+{{- $inputClaim := required "cpsOnboardingValidation.input.existingClaim is required" $config.input.existingClaim }}
+{{- $outputClaim := required "cpsOnboardingValidation.output.existingClaim is required" $config.output.existingClaim }}
+{{- $credentialSecret := required "cpsOnboardingValidation.credentialSecret.existingSecret is required" $config.credentialSecret.existingSecret }}
+{{- if not (regexMatch "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" $config.input.manifestFile) }}
+{{- fail "cpsOnboardingValidation.input.manifestFile must be a direct file name" }}
+{{- end }}
+{{- if or (lt (int $config.activeDeadlineSeconds) 60) (gt (int $config.activeDeadlineSeconds) 1800) }}
+{{- fail "cpsOnboardingValidation.activeDeadlineSeconds must be between 60 and 1800" }}
+{{- end }}
+{{- if or (lt (int $config.ttlSecondsAfterFinished) 3600) (gt (int $config.ttlSecondsAfterFinished) 604800) }}
+{{- fail "cpsOnboardingValidation.ttlSecondsAfterFinished must be between 3600 and 604800" }}
+{{- end }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-cps-onboarding-%s" .Release.Name $runId | trunc 63 | trimSuffix "-" }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}-cps-onboarding
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    electrahub.net/onboarding-run-id: {{ $runId | quote }}
+    electrahub.net/evidence-kind: cps-onboarding-preflight
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: {{ $config.activeDeadlineSeconds }}
+  ttlSecondsAfterFinished: {{ $config.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Chart.Name }}-cps-onboarding
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        electrahub.net/onboarding-run-id: {{ $runId | quote }}
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: cps-onboarding-validator
+          image: "{{ $config.image.repository }}@{{ $digest }}"
+          imagePullPolicy: {{ $config.image.pullPolicy }}
+          args:
+            - --manifest
+            - {{ printf "/input/%s" $config.input.manifestFile | quote }}
+            - --artifact
+            - {{ printf "/output/onboarding-%s.json" $runId | quote }}
+          env:
+            - { name: ONBOARDING_INPUT_DIR, value: /input }
+            - { name: ONBOARDING_OUTPUT_DIR, value: /output }
+            - { name: CPS_ENDPOINT, value: {{ $endpoint | quote }} }
+            - { name: CPS_CLIENT_KEY_STORE, value: /credentials/client-key-store.p12 }
+            - name: CPS_CLIENT_KEY_STORE_PASSWORD
+              valueFrom: { secretKeyRef: { name: {{ $credentialSecret }}, key: {{ $config.credentialSecret.clientKeyStorePasswordKey }} } }
+            - { name: CPS_TRUST_STORE, value: /credentials/trust-store.p12 }
+            - name: CPS_TRUST_STORE_PASSWORD
+              valueFrom: { secretKeyRef: { name: {{ $credentialSecret }}, key: {{ $config.credentialSecret.trustStorePasswordKey }} } }
+            - { name: CPS_CONNECT_TIMEOUT_MS, value: {{ $config.connectTimeoutMs | quote }} }
+            - { name: CPS_REQUEST_TIMEOUT_MS, value: {{ $config.requestTimeoutMs | quote }} }
+            - { name: CPS_MINIMUM_CLIENT_CERTIFICATE_VALIDITY_HOURS, value: {{ $config.minimumClientCertificateValidityHours | quote }} }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          resources: {{- toYaml $config.resources | nindent 12 }}
+          volumeMounts:
+            - { name: input, mountPath: /input, readOnly: true }
+            - { name: output, mountPath: /output }
+            - { name: credentials, mountPath: /credentials/client-key-store.p12, subPath: {{ $config.credentialSecret.clientKeyStoreKey }}, readOnly: true }
+            - { name: credentials, mountPath: /credentials/trust-store.p12, subPath: {{ $config.credentialSecret.trustStoreKey }}, readOnly: true }
+            - { name: temporary-files, mountPath: /tmp }
+      volumes:
+        - { name: input, persistentVolumeClaim: { claimName: {{ $inputClaim }} } }
+        - { name: output, persistentVolumeClaim: { claimName: {{ $outputClaim }} } }
+        - { name: credentials, secret: { secretName: {{ $credentialSecret }}, defaultMode: 0400 } }
+        - { name: temporary-files, emptyDir: { sizeLimit: 32Mi } }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-cps-onboarding-%s" .Release.Name $runId | trunc 63 | trimSuffix "-" }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Chart.Name }}-cps-onboarding
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      electrahub.net/onboarding-run-id: {{ $runId | quote }}
+  policyTypes: ["Ingress", "Egress"]
+{{- end }}
