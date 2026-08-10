@@ -1,0 +1,106 @@
+{{- if .Values.cpsOnboardingSigning.enabled }}
+{{- $config := .Values.cpsOnboardingSigning }}
+{{- $runId := required "cpsOnboardingSigning.runId is required" $config.runId }}
+{{- if not (regexMatch "^[a-z0-9]([a-z0-9-]{0,38}[a-z0-9])?$" $runId) }}
+{{- fail "cpsOnboardingSigning.runId must be a lowercase DNS label of at most 40 characters" }}
+{{- end }}
+{{- $tenantId := required "cpsOnboardingSigning.tenantId is required" $config.tenantId }}
+{{- if not (regexMatch "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$" $tenantId) }}
+{{- fail "cpsOnboardingSigning.tenantId must be a canonical tenant identifier" }}
+{{- end }}
+{{- $keyId := required "cpsOnboardingSigning.signingKeyId is required" $config.signingKeyId }}
+{{- if not (regexMatch "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$" $keyId) }}
+{{- fail "cpsOnboardingSigning.signingKeyId is invalid" }}
+{{- end }}
+{{- $keyRingHash := required "cpsOnboardingSigning.expectedVerificationKeyRingSha256 is required" $config.expectedVerificationKeyRingSha256 }}
+{{- if not (regexMatch "^[0-9a-f]{64}$" $keyRingHash) }}
+{{- fail "cpsOnboardingSigning.expectedVerificationKeyRingSha256 must be a lowercase SHA-256" }}
+{{- end }}
+{{- $digest := required "cpsOnboardingSigning.image.digest is required" $config.image.digest }}
+{{- if not (regexMatch "^sha256:[0-9a-f]{64}$" $digest) }}
+{{- fail "cpsOnboardingSigning.image.digest must be a sha256 digest" }}
+{{- end }}
+{{- $inputClaim := required "cpsOnboardingSigning.input.existingClaim is required" $config.input.existingClaim }}
+{{- $outputClaim := required "cpsOnboardingSigning.output.existingClaim is required" $config.output.existingClaim }}
+{{- $signingSecret := required "cpsOnboardingSigning.signingSecret.existingSecret is required" $config.signingSecret.existingSecret }}
+{{- if not (regexMatch "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" $config.input.artifactFile) }}
+{{- fail "cpsOnboardingSigning.input.artifactFile must be a direct file name" }}
+{{- end }}
+{{- if or (lt (int $config.activeDeadlineSeconds) 60) (gt (int $config.activeDeadlineSeconds) 1800) }}
+{{- fail "cpsOnboardingSigning.activeDeadlineSeconds must be between 60 and 1800" }}
+{{- end }}
+{{- if or (lt (int $config.ttlSecondsAfterFinished) 3600) (gt (int $config.ttlSecondsAfterFinished) 604800) }}
+{{- fail "cpsOnboardingSigning.ttlSecondsAfterFinished must be between 3600 and 604800" }}
+{{- end }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-cps-sign-%s" .Release.Name $runId | trunc 63 | trimSuffix "-" }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}-cps-onboarding-signer
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    electrahub.net/onboarding-signing-run-id: {{ $runId | quote }}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: {{ $config.activeDeadlineSeconds }}
+  ttlSecondsAfterFinished: {{ $config.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Chart.Name }}-cps-onboarding-signer
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        electrahub.net/onboarding-signing-run-id: {{ $runId | quote }}
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: cps-onboarding-signer
+          image: "{{ $config.image.repository }}@{{ $digest }}"
+          imagePullPolicy: {{ $config.image.pullPolicy }}
+          args:
+            - --artifact
+            - {{ $config.input.artifactFile | quote }}
+            - --submission
+            - {{ printf "submission-%s.json" $runId | quote }}
+          env:
+            - { name: ONBOARDING_SIGNING_INPUT_DIR, value: /input }
+            - { name: ONBOARDING_SIGNING_OUTPUT_DIR, value: /output }
+            - { name: ONBOARDING_TENANT_ID, value: {{ $tenantId | quote }} }
+            - { name: ONBOARDING_SIGNING_KEY_ID, value: {{ $keyId | quote }} }
+            - { name: ONBOARDING_EXPECTED_VERIFICATION_KEY_RING_SHA256, value: {{ $keyRingHash | quote }} }
+            - { name: ONBOARDING_SIGNING_KEY_FILE, value: /signing/ed25519-private-key.pem }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          resources: {{- toYaml $config.resources | nindent 12 }}
+          volumeMounts:
+            - { name: input, mountPath: /input, readOnly: true }
+            - { name: output, mountPath: /output }
+            - { name: signing, mountPath: /signing/ed25519-private-key.pem, subPath: {{ $config.signingSecret.privateKeyKey }}, readOnly: true }
+            - { name: temporary-files, mountPath: /tmp }
+      volumes:
+        - { name: input, persistentVolumeClaim: { claimName: {{ $inputClaim }} } }
+        - { name: output, persistentVolumeClaim: { claimName: {{ $outputClaim }} } }
+        - { name: signing, secret: { secretName: {{ $signingSecret }}, defaultMode: 0400 } }
+        - { name: temporary-files, emptyDir: { sizeLimit: 32Mi } }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-cps-sign-%s" .Release.Name $runId | trunc 63 | trimSuffix "-" }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Chart.Name }}-cps-onboarding-signer
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      electrahub.net/onboarding-signing-run-id: {{ $runId | quote }}
+  policyTypes: ["Ingress", "Egress"]
+{{- end }}

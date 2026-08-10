@@ -151,6 +151,34 @@ cpsOnboardingValidation:
       cpu: 250m
       memory: 256Mi
 
+cpsOnboardingSigning:
+  enabled: false
+  runId: ""
+  tenantId: ""
+  signingKeyId: ""
+  expectedVerificationKeyRingSha256: ""
+  image:
+    repository: amolsurjuse/plug-and-charge-onboarding-signer
+    digest: sha256:e8fad2a7b3992c7090574dfbe43d11b6ae4ea54ef2a5ef94be75524ac6be3cc9
+    pullPolicy: IfNotPresent
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 86400
+  input:
+    existingClaim: ""
+    artifactFile: onboarding-artifact.json
+  output:
+    existingClaim: ""
+  signingSecret:
+    existingSecret: ""
+    privateKeyKey: ed25519-private-key.pem
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
 operationalEvidenceExecution:
   enabled: false
   runId: ""

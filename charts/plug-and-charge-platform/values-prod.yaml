@@ -42,6 +42,10 @@ conformanceExecution:
 cpsOnboardingValidation:
   enabled: false
 
+# Offline API-submission export; no private key or PVC is mounted while dark.
+cpsOnboardingSigning:
+  enabled: false
+
 operationalEvidenceExecution:
   enabled: false
 
