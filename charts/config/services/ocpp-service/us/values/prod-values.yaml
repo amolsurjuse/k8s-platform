@@ -14,6 +14,9 @@ extraSecretEnv:
   - name: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
     secretName: "ocpp-simulator-handshake-secret"
     secretKey: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
+  - name: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
+    secretName: "access-context-prod-secret"
+    secretKey: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
 
 replicaCount: 1
 

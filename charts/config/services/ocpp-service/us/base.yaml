@@ -31,8 +31,11 @@ config:
     STATION_SERVICE_URL: "http://station-management-service:8081"
     SESSION_SERVICE_URL: "http://session-service:8083"
     PNC_SERVICE_URL: "http://plug-and-charge-platform:8098"
+    # This OCPP workload is tenant-dedicated. A shared multi-tenant OCPP pod
+    # must use an authoritative station-to-tenant mapping before activation.
+    OCPP_PNC_TENANT_ID: "electrahub"
     # Native Get15118EVCertificate stays dark until the CPS/EXI provider and
-    # authoritative charge-point tenant mapping pass conformance validation.
+    # production certificate-installation flow pass conformance validation.
     OCPP_ISO15118_CERTIFICATE_INSTALLATION_ENABLED: "false"
     SPRING_LIQUIBASE_ENABLED: "true"
     MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
