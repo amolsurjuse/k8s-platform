@@ -30,6 +30,11 @@ config:
     OCPP_HEARTBEAT_CHECK_INTERVAL_SECONDS: "30"
     STATION_SERVICE_URL: "http://station-management-service:8081"
     SESSION_SERVICE_URL: "http://session-service:8083"
+    PNC_SERVICE_URL: "http://plug-and-charge-platform:8098"
+    # Native Get15118EVCertificate stays dark until the CPS/EXI provider and
+    # authoritative charge-point tenant mapping pass conformance validation.
+    OCPP_ISO15118_CERTIFICATE_INSTALLATION_ENABLED: "false"
+    OCPP_ISO15118_TENANT_ID: "electrahub"
     SPRING_LIQUIBASE_ENABLED: "true"
     MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
     MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
