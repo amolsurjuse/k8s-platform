@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  tag: 0671b5b
-  digest: sha256:393e8db0433e94c1c09d07fe11896debe01552a1d30ee7e26279e0097b959abd
+  tag: 889f237
+  digest: sha256:a6909ba312e8771072adb3205710e627d7ad4bea5870da4b24f65b41203d4d9f
 
 features:
   enabled: true
