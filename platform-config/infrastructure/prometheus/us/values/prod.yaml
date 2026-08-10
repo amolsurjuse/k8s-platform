@@ -57,6 +57,10 @@ scrapeTargets:
     namespace: prod
     environment: prod
     targets: ["ai-support-service.prod.svc.cluster.local:8094"]
+  - name: plug-and-charge-platform
+    namespace: prod
+    environment: prod
+    targets: ["plug-and-charge-platform.prod.svc.cluster.local:8098"]
 
 podEndpointTargets:
   - name: api-gateway-pods
@@ -83,4 +87,9 @@ podEndpointTargets:
     namespace: prod
     environment: prod
     serviceName: ocpp-service
+    portName: http
+  - name: plug-and-charge-platform-pods
+    namespace: prod
+    environment: prod
+    serviceName: plug-and-charge-platform
     portName: http

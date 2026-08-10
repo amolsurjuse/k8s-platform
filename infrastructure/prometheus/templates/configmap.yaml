@@ -12,6 +12,9 @@ data:
       external_labels:
         cluster: electrahub-k3d
 
+    rule_files:
+      - /etc/prometheus/pnc-alerts.yml
+
     scrape_configs:
       - job_name: prometheus
         static_configs:
@@ -30,6 +33,51 @@ data:
 {{- range .targets }}
               - {{ . | quote }}
 {{- end }}
+  pnc-alerts.yml: |
+    groups:
+      - name: plug-and-charge
+        rules:
+          - alert: PlugAndChargeTargetDown
+            expr: sum(up{service="plug-and-charge-platform"}) < 1
+            for: 5m
+            labels: { severity: critical, domain: plug-and-charge }
+            annotations:
+              summary: Plug & Charge metrics target is unavailable
+          - alert: PlugAndChargeCpsFailureRatioHigh
+            expr: >-
+              sum(rate(pnc_iso15118_cps_requests_total{service="plug-and-charge-platform",outcome="failed"}[10m]))
+              /
+              clamp_min(sum(rate(pnc_iso15118_cps_requests_total{service="plug-and-charge-platform"}[10m])), 0.001)
+              > 0.05
+              and sum(increase(pnc_iso15118_cps_requests_total{service="plug-and-charge-platform"}[10m])) > 10
+            for: 10m
+            labels: { severity: critical, domain: plug-and-charge }
+            annotations:
+              summary: CPS request failure ratio exceeds 5 percent
+          - alert: PlugAndChargeAuthorizationBlocked
+            expr: sum(increase(pnc_iso15118_authorization_total{service="plug-and-charge-platform",outcome="blocked"}[15m])) > 0
+            for: 5m
+            labels: { severity: warning, domain: plug-and-charge }
+            annotations:
+              summary: Plug & Charge activation gate blocked a request
+          - alert: PlugAndChargeContractCertificateExpired
+            expr: max(pnc_certificate_inventory{service="plug-and-charge-platform",state="expired"}) > 0
+            for: 5m
+            labels: { severity: critical, domain: plug-and-charge }
+            annotations:
+              summary: One or more Plug & Charge contract certificates are expired
+          - alert: PlugAndChargeContractCertificateExpiring
+            expr: max(pnc_certificate_inventory{service="plug-and-charge-platform",state="expiring_30d"}) > 0
+            for: 30m
+            labels: { severity: warning, domain: plug-and-charge }
+            annotations:
+              summary: A Plug & Charge contract certificate expires within 30 days
+          - alert: PlugAndChargeInventoryRefreshFailed
+            expr: sum(increase(pnc_inventory_refresh_total{service="plug-and-charge-platform",outcome="failed"}[15m])) > 0
+            for: 5m
+            labels: { severity: warning, domain: plug-and-charge }
+            annotations:
+              summary: Plug & Charge certificate inventory refresh failed
             labels:
               service: {{ .name | quote }}
               namespace: {{ default $.Release.Namespace .namespace | quote }}

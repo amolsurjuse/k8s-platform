@@ -152,3 +152,55 @@ data:
         }
       ]
     }
+  plug-and-charge-operations.json: |
+    {
+      "uid": "electrahub-pnc-operations",
+      "title": "ElectraHub Plug & Charge Operations",
+      "tags": ["electrahub", "plug-and-charge", "iso15118"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "15s",
+      "time": { "from": "now-6h", "to": "now" },
+      "panels": [
+        {
+          "id": 1, "type": "stat", "title": "PnC Replicas Up",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "sum(up{service=\"plug-and-charge-platform\"})", "refId": "A" }],
+          "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 }
+        },
+        {
+          "id": 2, "type": "timeseries", "title": "Installation Outcomes",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "sum by (outcome, reason) (rate(pnc_iso15118_installations_total{service=\"plug-and-charge-platform\"}[5m]))", "legendFormat": "{{`{{outcome}}`}} {{`{{reason}}`}}", "refId": "A" }],
+          "gridPos": { "h": 8, "w": 18, "x": 6, "y": 0 }
+        },
+        {
+          "id": 3, "type": "timeseries", "title": "Authorization Decisions",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "sum by (outcome, reason) (increase(pnc_iso15118_authorization_total{service=\"plug-and-charge-platform\"}[15m]))", "legendFormat": "{{`{{outcome}}`}} {{`{{reason}}`}}", "refId": "A" }],
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+        },
+        {
+          "id": 4, "type": "timeseries", "title": "CPS P95 Latency",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "histogram_quantile(0.95, sum by (le) (rate(pnc_iso15118_cps_latency_seconds_bucket{service=\"plug-and-charge-platform\"}[5m])))", "legendFormat": "p95", "refId": "A" }],
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+        },
+        {
+          "id": 5, "type": "timeseries", "title": "CPS Outcomes",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "sum by (outcome, category) (rate(pnc_iso15118_cps_requests_total{service=\"plug-and-charge-platform\"}[5m]))", "legendFormat": "{{`{{outcome}}`}} {{`{{category}}`}}", "refId": "A" }],
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 }
+        },
+        {
+          "id": 6, "type": "table", "title": "Certificate and Credential Inventory",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [
+            { "expr": "pnc_certificate_inventory{service=\"plug-and-charge-platform\"}", "format": "table", "instant": true, "refId": "A" },
+            { "expr": "pnc_credential_inventory{service=\"plug-and-charge-platform\"}", "format": "table", "instant": true, "refId": "B" }
+          ],
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 }
+        }
+      ]
+    }
