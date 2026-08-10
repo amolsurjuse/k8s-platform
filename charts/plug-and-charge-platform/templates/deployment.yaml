@@ -126,6 +126,8 @@ spec:
               value: {{ .Values.iso15118.provider | quote }}
             - name: PNC_ISO15118_RESPONSE_RETENTION_MINUTES
               value: {{ .Values.iso15118.responseRetentionMinutes | quote }}
+            - name: PNC_ISO15118_CLEANUP_INTERVAL_MS
+              value: {{ .Values.iso15118.cleanupIntervalMs | quote }}
             - name: PNC_PKI_KEY_CUSTODY_PROVIDER
               value: {{ .Values.pki.keyCustodyProvider | quote }}
             - name: PNC_PKI_CERTIFICATE_POLICY_OID

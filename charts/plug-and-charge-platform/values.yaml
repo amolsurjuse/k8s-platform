@@ -56,6 +56,7 @@ pki:
 iso15118:
   provider: unavailable
   responseRetentionMinutes: 15
+  cleanupIntervalMs: 60000
 
 resources:
   requests:
