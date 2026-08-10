@@ -35,6 +35,9 @@ iso15118:
 conformanceExecution:
   enabled: false
 
+operationalEvidenceExecution:
+  enabled: false
+
 gatewayIdentitySecret:
   existingSecret: access-context-prod-secret
 

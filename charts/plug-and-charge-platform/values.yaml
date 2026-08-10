@@ -118,6 +118,40 @@ conformanceExecution:
       cpu: 500m
       memory: 512Mi
 
+operationalEvidenceExecution:
+  enabled: false
+  runId: ""
+  image:
+    repository: amolsurjuse/plug-and-charge-operational-runner
+    digest: sha256:614cbbbc580d2b6c0a23ad5f80fbee6cc33ec66c4aa0bc1e6f459b94a24e2ad5
+    pullPolicy: IfNotPresent
+  cpsEndpoint: ""
+  approvedDestinationCidrs: []
+  activeDeadlineSeconds: 86400
+  ttlSecondsAfterFinished: 86400
+  maxInFlight: 1
+  connectTimeoutMs: 1500
+  requestTimeoutMs: 4000
+  minimumClientCertificateValidityHours: 168
+  input:
+    existingClaim: ""
+    manifestFile: manifest.json
+  output:
+    existingClaim: ""
+  credentialSecret:
+    existingSecret: ""
+    clientKeyStoreKey: client-key-store.p12
+    clientKeyStorePasswordKey: client-key-store-password
+    trustStoreKey: trust-store.p12
+    trustStorePasswordKey: trust-store-password
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "2"
+      memory: 1Gi
+
 resources:
   requests:
     cpu: 100m
