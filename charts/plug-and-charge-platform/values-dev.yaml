@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  tag: 58f80ce
-  digest: sha256:011e875b7825ea60e00e437539182653bcc2ca49ae044fb455c75d68e6478242
+  tag: 0671b5b
+  digest: sha256:393e8db0433e94c1c09d07fe11896debe01552a1d30ee7e26279e0097b959abd
 
 features:
   enabled: true
