@@ -38,6 +38,11 @@ conformanceExecution:
 operationalEvidenceExecution:
   enabled: false
 
+# The chaos runner is deployed only as dark chart capability. Fault injection
+# must target a separately approved sandbox and must never run against prod.
+chaosExecution:
+  enabled: false
+
 gatewayIdentitySecret:
   existingSecret: access-context-prod-secret
 

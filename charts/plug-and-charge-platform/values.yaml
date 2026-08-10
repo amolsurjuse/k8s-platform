@@ -152,6 +152,41 @@ operationalEvidenceExecution:
       cpu: "2"
       memory: 1Gi
 
+chaosExecution:
+  enabled: false
+  runId: ""
+  image:
+    repository: amolsurjuse/plug-and-charge-chaos-runner
+    digest: sha256:1296e23d556ed146bff39dac4297d8d3bcb8277df07d2dd6d9d9debc39e22ff4
+    pullPolicy: IfNotPresent
+  # Must identify an isolated chaos sandbox, never a production CPS endpoint.
+  cpsEndpoint: ""
+  approvedDestinationCidrs: []
+  activeDeadlineSeconds: 3900
+  ttlSecondsAfterFinished: 86400
+  maxInFlight: 1
+  connectTimeoutMs: 1500
+  requestTimeoutMs: 4000
+  minimumClientCertificateValidityHours: 1
+  input:
+    existingClaim: ""
+    manifestFile: manifest.json
+  output:
+    existingClaim: ""
+  credentialSecret:
+    existingSecret: ""
+    clientKeyStoreKey: client-key-store.p12
+    clientKeyStorePasswordKey: client-key-store-password
+    trustStoreKey: trust-store.p12
+    trustStorePasswordKey: trust-store-password
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
 resources:
   requests:
     cpu: 100m
