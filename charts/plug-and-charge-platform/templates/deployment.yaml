@@ -122,12 +122,23 @@ spec:
               value: {{ .Values.features.installationPackageEnabled | quote }}
             - name: PNC_ISO15118_CERTIFICATE_INSTALLATION_ENABLED
               value: {{ .Values.features.iso15118CertificateInstallationEnabled | quote }}
+            - name: PNC_ISO15118_CONFORMANCE_ADMIN_ENABLED
+              value: {{ .Values.features.iso15118ConformanceAdminEnabled | quote }}
             - name: PNC_ISO15118_PROVIDER
               value: {{ .Values.iso15118.provider | quote }}
             - name: PNC_ISO15118_RESPONSE_RETENTION_MINUTES
               value: {{ .Values.iso15118.responseRetentionMinutes | quote }}
             - name: PNC_ISO15118_CLEANUP_INTERVAL_MS
               value: {{ .Values.iso15118.cleanupIntervalMs | quote }}
+            - name: PNC_ISO15118_CONFORMANCE_ENABLED
+              value: {{ .Values.iso15118.conformance.enabled | quote }}
+            {{- if .Values.iso15118.conformance.enabled }}
+            - name: PNC_ISO15118_CONFORMANCE_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "iso15118.conformance.publicKeySecret.existingSecret is required" .Values.iso15118.conformance.publicKeySecret.existingSecret }}
+                  key: {{ .Values.iso15118.conformance.publicKeySecret.key }}
+            {{- end }}
             - name: PNC_PKI_KEY_CUSTODY_PROVIDER
               value: {{ .Values.pki.keyCustodyProvider | quote }}
             - name: PNC_PKI_CERTIFICATE_POLICY_OID

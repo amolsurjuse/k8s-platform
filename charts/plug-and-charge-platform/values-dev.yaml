@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  tag: acb7389
-  digest: sha256:517a865d5e4fb89234461967b6f4a80b42c37d99b1c056a37907b938cc7b9af7
+  tag: a59c046
+  digest: sha256:07a3375a12160074f6706ce750686f9f041c475bdc618a653c49a40a9de61a4a
 
 features:
   enabled: true
@@ -12,6 +12,7 @@ features:
   installationPackageEnabled: true
   # Dev cluster is stopped; keep the protocol adapter dark until a real EXI conformance provider is ready.
   iso15118CertificateInstallationEnabled: false
+  iso15118ConformanceAdminEnabled: false
   userEventsEnabled: true
 
 iso15118:

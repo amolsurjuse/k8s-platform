@@ -1,8 +1,8 @@
 replicaCount: 2
 
 image:
-  tag: acb7389
-  digest: sha256:517a865d5e4fb89234461967b6f4a80b42c37d99b1c056a37907b938cc7b9af7
+  tag: a59c046
+  digest: sha256:07a3375a12160074f6706ce750686f9f041c475bdc618a653c49a40a9de61a4a
 
 features:
   enabled: true
@@ -14,6 +14,7 @@ features:
   installationPackageEnabled: false
   # Fail closed until the approved CPS, EXI codec, and conformance evidence are available.
   iso15118CertificateInstallationEnabled: false
+  iso15118ConformanceAdminEnabled: false
   userEventsEnabled: true
 
 pki:

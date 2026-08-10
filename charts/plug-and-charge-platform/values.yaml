@@ -30,6 +30,7 @@ features:
   contractCertificateEnabled: false
   installationPackageEnabled: false
   iso15118CertificateInstallationEnabled: false
+  iso15118ConformanceAdminEnabled: false
   userEventsEnabled: false
   ocppEnabled: false
   ocpiEnabled: false
@@ -57,6 +58,11 @@ iso15118:
   provider: unavailable
   responseRetentionMinutes: 15
   cleanupIntervalMs: 60000
+  conformance:
+    enabled: false
+    publicKeySecret:
+      existingSecret: ""
+      key: public-key
 
 resources:
   requests:
