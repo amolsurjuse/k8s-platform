@@ -77,6 +77,9 @@ spec:
             - { name: pkcs11-config, mountPath: /etc/softhsm2, readOnly: true }
             - { name: pkcs11-token, mountPath: /var/lib/softhsm }
             {{- end }}
+            {{- if .Values.pki.oemTrustBundle.enabled }}
+            - { name: oem-trust-bundle, mountPath: {{ .Values.pki.oemTrustBundle.mountPath | quote }}, subPath: {{ .Values.pki.oemTrustBundle.key | quote }}, readOnly: true }
+            {{- end }}
           ports:
             - name: http
               containerPort: 8098
@@ -113,10 +116,16 @@ spec:
               value: {{ .Values.features.adminApiEnabled | quote }}
             - name: PNC_PKI_ADMIN_ENABLED
               value: {{ .Values.features.pkiAdminEnabled | quote }}
+            - name: PNC_CONTRACT_CERTIFICATE_ENABLED
+              value: {{ .Values.features.contractCertificateEnabled | quote }}
             - name: PNC_PKI_KEY_CUSTODY_PROVIDER
               value: {{ .Values.pki.keyCustodyProvider | quote }}
             - name: PNC_PKI_CERTIFICATE_POLICY_OID
               value: {{ .Values.pki.certificatePolicyOid | quote }}
+            {{- if .Values.pki.oemTrustBundle.enabled }}
+            - name: PNC_PKI_OEM_TRUST_BUNDLE_FILE
+              value: {{ .Values.pki.oemTrustBundle.mountPath | quote }}
+            {{- end }}
             {{- if .Values.pki.pkcs11.enabled }}
             - name: SOFTHSM2_CONF
               value: {{ .Values.pki.pkcs11.configFile | quote }}
@@ -158,6 +167,14 @@ spec:
         - name: pkcs11-token
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-pkcs11
+        {{- end }}
+        {{- if .Values.pki.oemTrustBundle.enabled }}
+        - name: oem-trust-bundle
+          configMap:
+            name: {{ required "pki.oemTrustBundle.existingConfigMap is required" .Values.pki.oemTrustBundle.existingConfigMap }}
+            items:
+              - key: {{ .Values.pki.oemTrustBundle.key }}
+                path: {{ .Values.pki.oemTrustBundle.key }}
         {{- end }}
 ---
 apiVersion: policy/v1

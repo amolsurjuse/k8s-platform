@@ -9,10 +9,13 @@ features:
   adminApiEnabled: true
   # Remains dark until a production HSM adapter and credentials are provisioned.
   pkiAdminEnabled: false
+  contractCertificateEnabled: false
   userEventsEnabled: true
 
 pki:
   keyCustodyProvider: unavailable
+  oemTrustBundle:
+    enabled: false
   pkcs11:
     enabled: false
 

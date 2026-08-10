@@ -8,11 +8,15 @@ features:
   enabled: true
   adminApiEnabled: true
   pkiAdminEnabled: true
+  contractCertificateEnabled: true
   userEventsEnabled: true
 
 pki:
   # SoftHSM2 validates persistent PKCS#11 behavior in development only; it is not a production HSM.
   keyCustodyProvider: pkcs11
+  oemTrustBundle:
+    enabled: true
+    existingConfigMap: plug-and-charge-platform-oem-trust
   pkcs11:
     enabled: true
     existingSecret: plug-and-charge-platform-pkcs11
