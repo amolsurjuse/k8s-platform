@@ -15,6 +15,17 @@ spec:
       ports:
         - protocol: TCP
           port: 8098
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+              app.kubernetes.io/instance: prometheus
+      ports:
+        - protocol: TCP
+          port: 8098
   egress:
     - to:
         - namespaceSelector:
