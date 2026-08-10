@@ -2,8 +2,8 @@ replicaCount: 1
 
 image:
   repository: amolsurjuse/plug-and-charge-platform
-  tag: 17a00f9
-  digest: sha256:ea2e6c5cac0c425deb0ce9cdd2fb5e02e0f3ae073a844d59204f035fcef88341
+  tag: 3a4ce9f
+  digest: sha256:afdfcc3440d3319813b4303ff2501e0d2af917e9403e2d56ff7bd0b4227215b3
   pullPolicy: IfNotPresent
 
 service:
