@@ -29,6 +29,11 @@ iso15118:
   externalCps:
     minimumClientCertificateValidityHours: 168
 
+# An operator must supply an approved suite, CPS/signing credentials, output
+# custody, destination CIDRs and unique run ID in a separately reviewed change.
+conformanceExecution:
+  enabled: false
+
 gatewayIdentitySecret:
   existingSecret: access-context-prod-secret
 

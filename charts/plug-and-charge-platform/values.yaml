@@ -81,6 +81,41 @@ iso15118:
       existingSecret: ""
       key: public-key
 
+conformanceExecution:
+  enabled: false
+  runId: ""
+  image:
+    repository: amolsurjuse/plug-and-charge-conformance-runner
+    digest: sha256:fea29083302c5e6a877fe37db0a2f4787dcbe1266e3c3f5690c052719a808b09
+    pullPolicy: IfNotPresent
+  cpsEndpoint: ""
+  approvedDestinationCidrs: []
+  activeDeadlineSeconds: 3600
+  ttlSecondsAfterFinished: 86400
+  minimumClientCertificateValidityHours: 168
+  suite:
+    existingClaim: ""
+    manifestFile: manifest.json
+    vectorsDirectory: vectors
+  output:
+    existingClaim: ""
+  credentialSecret:
+    existingSecret: ""
+    clientKeyStoreKey: client-key-store.p12
+    clientKeyStorePasswordKey: client-key-store-password
+    trustStoreKey: trust-store.p12
+    trustStorePasswordKey: trust-store-password
+  signingSecret:
+    existingSecret: ""
+    privateKeyKey: ed25519-private-key.pem
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
 resources:
   requests:
     cpu: 100m
