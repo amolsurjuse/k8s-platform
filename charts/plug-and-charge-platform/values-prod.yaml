@@ -1,8 +1,8 @@
 replicaCount: 2
 
 image:
-  tag: 64b9d5b
-  digest: sha256:4a4c67bf5d958bce4fb84dd5b8f3b10efef2be084aa271e696e896e3101134d7
+  tag: 2a2fdf2
+  digest: sha256:f65d5b949a0883f92e7d3ae8d5eef83cf19f0a106bfaa4b89e5824ad70a38dca
 
 features:
   enabled: true
@@ -15,6 +15,7 @@ features:
   # Fail closed until the approved CPS, EXI codec, and conformance evidence are available.
   iso15118CertificateInstallationEnabled: false
   iso15118ConformanceAdminEnabled: false
+  iso15118OperationalReadinessAdminEnabled: false
   userEventsEnabled: true
 
 pki:

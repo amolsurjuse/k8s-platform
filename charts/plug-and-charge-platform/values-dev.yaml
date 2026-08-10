@@ -13,6 +13,7 @@ features:
   # Dev cluster is stopped; keep the protocol adapter dark until a real EXI conformance provider is ready.
   iso15118CertificateInstallationEnabled: false
   iso15118ConformanceAdminEnabled: false
+  iso15118OperationalReadinessAdminEnabled: false
   userEventsEnabled: true
 
 iso15118:

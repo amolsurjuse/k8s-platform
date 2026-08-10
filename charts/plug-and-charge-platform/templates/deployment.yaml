@@ -129,6 +129,8 @@ spec:
               value: {{ .Values.features.iso15118CertificateInstallationEnabled | quote }}
             - name: PNC_ISO15118_CONFORMANCE_ADMIN_ENABLED
               value: {{ .Values.features.iso15118ConformanceAdminEnabled | quote }}
+            - name: PNC_ISO15118_OPERATIONAL_READINESS_ADMIN_ENABLED
+              value: {{ .Values.features.iso15118OperationalReadinessAdminEnabled | quote }}
             - name: PNC_ISO15118_PROVIDER
               value: {{ .Values.iso15118.provider | quote }}
             - name: PNC_ISO15118_RESPONSE_RETENTION_MINUTES

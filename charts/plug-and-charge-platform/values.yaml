@@ -31,6 +31,7 @@ features:
   installationPackageEnabled: false
   iso15118CertificateInstallationEnabled: false
   iso15118ConformanceAdminEnabled: false
+  iso15118OperationalReadinessAdminEnabled: false
   userEventsEnabled: false
   ocppEnabled: false
   ocpiEnabled: false
