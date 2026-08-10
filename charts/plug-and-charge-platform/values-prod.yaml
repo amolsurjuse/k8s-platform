@@ -1,8 +1,8 @@
 replicaCount: 2
 
 image:
-  tag: c6add52
-  digest: sha256:4cd0b4dedd5be587f603352ae279029b78f8b1cc06e30d721d319a5037849a23
+  tag: 64b9d5b
+  digest: sha256:4a4c67bf5d958bce4fb84dd5b8f3b10efef2be084aa271e696e896e3101134d7
 
 features:
   enabled: true

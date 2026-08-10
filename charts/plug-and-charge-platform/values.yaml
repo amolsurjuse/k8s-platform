@@ -77,16 +77,17 @@ iso15118:
       keyRingKey: key-ring
   conformance:
     enabled: false
-    publicKeySecret:
+    verificationKeyRingSecret:
       existingSecret: ""
-      key: public-key
+      key: verification-key-ring.json
 
 conformanceExecution:
   enabled: false
   runId: ""
+  signingKeyId: ""
   image:
     repository: amolsurjuse/plug-and-charge-conformance-runner
-    digest: sha256:fea29083302c5e6a877fe37db0a2f4787dcbe1266e3c3f5690c052719a808b09
+    digest: sha256:22c79038e66ff91b9b375816c03b542fdb858e899e56190ad6d353523ff17017
     pullPolicy: IfNotPresent
   cpsEndpoint: ""
   approvedDestinationCidrs: []

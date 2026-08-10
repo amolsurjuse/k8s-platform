@@ -174,11 +174,11 @@ spec:
             - name: PNC_ISO15118_CONFORMANCE_ENABLED
               value: {{ .Values.iso15118.conformance.enabled | quote }}
             {{- if .Values.iso15118.conformance.enabled }}
-            - name: PNC_ISO15118_CONFORMANCE_PUBLIC_KEY
+            - name: PNC_ISO15118_CONFORMANCE_VERIFICATION_KEY_RING
               valueFrom:
                 secretKeyRef:
-                  name: {{ required "iso15118.conformance.publicKeySecret.existingSecret is required" .Values.iso15118.conformance.publicKeySecret.existingSecret }}
-                  key: {{ .Values.iso15118.conformance.publicKeySecret.key }}
+                  name: {{ required "iso15118.conformance.verificationKeyRingSecret.existingSecret is required" .Values.iso15118.conformance.verificationKeyRingSecret.existingSecret }}
+                  key: {{ .Values.iso15118.conformance.verificationKeyRingSecret.key }}
             {{- end }}
             - name: PNC_PKI_KEY_CUSTODY_PROVIDER
               value: {{ .Values.pki.keyCustodyProvider | quote }}
