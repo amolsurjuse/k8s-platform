@@ -46,6 +46,10 @@ cpsOnboardingValidation:
 cpsOnboardingSigning:
   enabled: false
 
+# Controlled Stage 25 evidence import remains dark; no token or network access is mounted.
+cpsOnboardingImport:
+  enabled: false
+
 operationalEvidenceExecution:
   enabled: false
 

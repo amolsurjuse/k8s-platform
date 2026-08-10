@@ -2,8 +2,8 @@ replicaCount: 1
 
 image:
   repository: amolsurjuse/plug-and-charge-platform
-  tag: c1afd4b
-  digest: sha256:b2df3a78bd5d308ddd409f8b34beb7aadf76b2783b266db0ea0abc5e39c1c39d
+  tag: 17a00f9
+  digest: sha256:ea2e6c5cac0c425deb0ce9cdd2fb5e02e0f3ae073a844d59204f035fcef88341
   pullPolicy: IfNotPresent
 
 service:
@@ -171,6 +171,36 @@ cpsOnboardingSigning:
   signingSecret:
     existingSecret: ""
     privateKeyKey: ed25519-private-key.pem
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+cpsOnboardingImport:
+  enabled: false
+  runId: ""
+  idempotencyKey: ""
+  endpoint: ""
+  approvedDestinationCidrs: []
+  image:
+    repository: amolsurjuse/plug-and-charge-onboarding-importer
+    digest: sha256:1ad4195b0b88c7552adcea886de93393fa3904879eb2cafdc4f9d55c94dd5b27
+    pullPolicy: IfNotPresent
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 86400
+  connectTimeoutMs: 3000
+  requestTimeoutMs: 15000
+  input:
+    existingClaim: ""
+    submissionFile: submission.json
+  output:
+    existingClaim: ""
+  credentialSecret:
+    existingSecret: ""
+    tokenKey: bearer-token
   resources:
     requests:
       cpu: 50m
