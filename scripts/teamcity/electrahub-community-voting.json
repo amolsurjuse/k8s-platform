@@ -15,7 +15,7 @@
       "dockerPlatforms": "linux/amd64,linux/arm64",
       "copyBuildArtifacts": true,
       "agentName": "",
-      "addVcsTrigger": false,
+      "addVcsTrigger": true,
       "deployVersionFile": "charts/config/services/community-voting-service/us/version/prod-version.yaml"
     },
     {

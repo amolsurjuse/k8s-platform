@@ -74,7 +74,7 @@ extraIngresses:
       nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     rules:
-      - host: "api.pulsevote-electrahub.net"
+      - host: "pulsevote-api.electrahub.net"
         paths:
           - path: /(.*)
             pathType: ImplementationSpecific

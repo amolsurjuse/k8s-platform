@@ -670,7 +670,7 @@ flutter pub get
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze --no-fatal-infos
 flutter test --coverage --dart-define=USE_REAL_API=false
-flutter build apk --debug --dart-define=USE_REAL_API=true --dart-define=GATEWAY_BASE_URL=https://api.pulsevote-electrahub.net
+flutter build apk --debug --dart-define=USE_REAL_API=true --dart-define=GATEWAY_BASE_URL=https://pulsevote-api.electrahub.net
 """)
         script = f"""set -eu
 CID="$(docker create -i "{cfg.flutter_image}" sh -lc {flutter_commands})"
