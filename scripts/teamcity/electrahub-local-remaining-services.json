@@ -127,7 +127,7 @@
       "dockerUseBuildx": true,
       "dockerPlatforms": "linux/amd64,linux/arm64",
       "agentName": "",
-      "deployVersionFile": "charts/config/services/notification-service/us/version/dev-version.yaml"
+      "deployVersionFile": "charts/config/services/notification-service/us/version/prod-version.yaml"
     },
     {
       "serviceName": "station-management-service",
