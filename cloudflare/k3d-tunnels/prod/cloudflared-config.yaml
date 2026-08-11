@@ -15,7 +15,7 @@ data:
         service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
       - hostname: api.electrahub.net
         service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
-      - hostname: api.pulsevote-electrahub.net
+      - hostname: pulsevote-api.electrahub.net
         service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
       - hostname: admin-portal.electrahub.net
         service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
