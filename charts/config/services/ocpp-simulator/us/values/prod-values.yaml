@@ -28,7 +28,7 @@ extraFieldRefEnv:
 config:
   data:
     SIMULATOR_CLUSTER_MODE: "leader"
-    # Stage 32 is dark: bind manifests to production but trust no signer until
+    # Stage 33 is dark: bind manifests to production but trust no signer until
     # the separate CPS key ceremony and canary approval are complete.
     PNC_FIXTURE_ENVIRONMENT: "production"
     PNC_FIXTURE_TRUSTED_SIGNERS_JSON: "{}"
