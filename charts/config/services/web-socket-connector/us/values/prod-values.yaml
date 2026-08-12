@@ -1,11 +1,6 @@
 replicaCount: 1
 
 extraSecretEnv:
-  # Transition to charger-scoped HMAC credentials. The shared value remains
-  # mapped below solely as a rollback fallback during the audit-mode canary.
-  - name: "OCPP_HANDSHAKE_DERIVATION_KEY"
-    secretName: "ocpp-simulator-handshake-secret"
-    secretKey: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
   - name: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
     secretName: "ocpp-simulator-handshake-secret"
     secretKey: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
