@@ -12,6 +12,11 @@ extraSecretEnv:
 deploymentStrategy:
   type: Recreate
 
+env:
+  # Spread a 1,028-charger cold reconnect over about five minutes so OCPP
+  # authentication and its dependencies remain inside their resource budget.
+  CONNECTION_START_INTERVAL: "300ms"
+
 resources:
   requests:
     cpu: "100m"
