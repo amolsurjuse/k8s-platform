@@ -18,15 +18,16 @@ extraSecretEnv:
     secretName: "access-context-prod-secret"
     secretKey: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
 
-replicaCount: 1
+replicaCount: 2
 
 podAnnotations:
-  electrahub.io/config-revision: "stage2-profile2-enforce-v1"
+  electrahub.io/config-revision: "stage2-ha-routing-v1"
 
-# OCPP sessions are socket-local today. Recreate prevents a rollout from
-# briefly accepting two live WebSocket sessions for one charge point.
 deploymentStrategy:
-  type: Recreate
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
 
 env:
   SPRING_PROFILES_ACTIVE: "prod"
@@ -63,7 +64,7 @@ config:
     OCPP_DEVICE_EVENT_TOPIC: "ocpp.device-events.v2"
     OCPP_EVENT_TENANT_ID: "electrahub"
     OCPP_EVENT_PUBLISH_TIMEOUT: "3s"
-    OCPP_CLUSTER_ROUTING_ENABLED: "false"
+    OCPP_CLUSTER_ROUTING_ENABLED: "true"
     OCPP_CONNECTION_MARKER_TTL_SECONDS: "120"
     # Every active production charger has a distinct credential. Transport
     # enforcement remains a separate WSS ingress gate below this phase.
@@ -129,5 +130,19 @@ hpa:
   enabled: false
 
 pdb:
-  enabled: false
+  enabled: true
+  minAvailable: 1
+
+# Keep OCPP replicas on different nodes when capacity permits. This is a
+# preference rather than a hard requirement so a single-node recovery does not
+# deadlock the deployment.
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: ocpp-service
 
