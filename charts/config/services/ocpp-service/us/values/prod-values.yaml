@@ -139,6 +139,10 @@ affinity:
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       - topologyKey: kubernetes.io/hostname
+        # Apply the hard rule within one ReplicaSet. During a zero-downtime
+        # rollout, old and new revisions may temporarily share a node.
+        matchLabelKeys:
+          - pod-template-hash
         labelSelector:
           matchLabels:
             app.kubernetes.io/instance: ocpp-service

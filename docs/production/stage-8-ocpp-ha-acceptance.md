@@ -9,7 +9,9 @@
 - A PodDisruptionBudget keeps one replica available during voluntary disruption.
 - Required hostname pod anti-affinity prevents both replicas from sharing one
   Kubernetes node. A topology-spread constraint additionally bounds skew as the
-  cluster grows.
+  cluster grows. Anti-affinity uses `pod-template-hash` matching so old and new
+  ReplicaSets can overlap during a zero-downtime rolling update without allowing
+  the final active ReplicaSet to co-locate.
 
 ## Production gates
 
