@@ -65,8 +65,10 @@ config:
     OCPP_EVENT_PUBLISH_TIMEOUT: "3s"
     OCPP_CLUSTER_ROUTING_ENABLED: "false"
     OCPP_CONNECTION_MARKER_TTL_SECONDS: "120"
-    # Production enforcement is a separate credential-completeness gate.
-    OCPP_HANDSHAKE_SECURITY_MODE: "AUDIT"
+    # Every active production charger has a distinct credential. Transport
+    # enforcement remains a separate WSS ingress gate below this phase.
+    OCPP_HANDSHAKE_SECURITY_MODE: "ENFORCE"
+    OCPP_HANDSHAKE_REQUIRE_SECURE_TRANSPORT: "false"
 
 terminationGracePeriodSeconds: 60
 
