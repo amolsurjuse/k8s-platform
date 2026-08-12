@@ -1,6 +1,11 @@
 secrets:
   existingSecretName: "postgresql-prod-secret"
 
+extraSecretEnv:
+  - name: "SPRING_DATA_REDIS_PASSWORD"
+    secretName: "redis-prod-secret"
+    secretKey: "redis-password"
+
 env:
   SPRING_PROFILES_ACTIVE: "prod"
 
