@@ -16,6 +16,17 @@ config:
     SPRING_JPA_HIBERNATE_DDL_AUTO: "validate"
     SPRING_LIQUIBASE_ENABLED: "true"
     OCPI_PUBLIC_BASE_URL: "https://api.electrahub.net/ocpi"
+    # Optional 2.3.0 modules and receiver roles are partner-specific. Keep each
+    # production gate explicit until its independent certification is stored.
+    OCPI_PAYMENTS_ENABLED: "false"
+    OCPI_PAYMENTS_PARTNER_CERTIFIED: "false"
+    OCPI_BOOKINGS_ENABLED: "false"
+    OCPI_BOOKINGS_ACTUATOR_READY: "false"
+    OCPI_EMSP_ENABLED: "false"
+    OCPI_HUB_ENABLED: "false"
+
+podAnnotations:
+  electrahub.io/config-revision: "ocpi-partner-gates-v1"
 
 startupProbe:
   enabled: true
