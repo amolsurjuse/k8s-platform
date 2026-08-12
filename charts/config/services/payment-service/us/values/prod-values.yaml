@@ -18,6 +18,9 @@ env:
 config:
   data:
     APP_REFUNDS_ENABLED: "true"
+    PAYMENT_GATEWAY_INCREMENTAL_AUTHORIZATION_ENABLED: "false"
+    SPRINGDOC_API_DOCS_ENABLED: "false"
+    SPRINGDOC_SWAGGER_UI_ENABLED: "false"
     PAYMENT_GATEWAY_CARD_ENROLLMENT_ENABLED: "true"
     PAYMENT_GATEWAY_EXECUTION_PILOT_NETWORK_IDS: "NW-US-EAST-01,NW-EH-IND-DEMO"
     PAYMENT_GATEWAY_HOSTED_CHECKOUT_PAYER_SCOPES: "IN|ENT-IN-DEMO|NW-EH-IND-DEMO"
@@ -28,7 +31,7 @@ config:
 podAnnotations:
   electrahub.net/payment-config-revision: "regional-stripe-e2e-v1"
 
-replicaCount: 1
+replicaCount: 2
 
 resources:
   requests:
@@ -45,7 +48,8 @@ hpa:
   enabled: false
 
 pdb:
-  enabled: false
+  enabled: true
+  minAvailable: 1
 
 metrics:
   servicemonitor:
