@@ -108,7 +108,22 @@ resources:
     memory: "2Gi"
 
 ingress:
-  enabled: false
+  enabled: true
+  className: "nginx"
+  host: "api.electrahub.net"
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+  path: /ws/ocpp
+  pathType: Prefix
+  tls:
+    enabled: true
+    secretName: "electrahub-prod-tls"
 
 hpa:
   enabled: false
