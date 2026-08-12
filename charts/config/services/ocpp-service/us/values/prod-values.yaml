@@ -146,3 +146,14 @@ affinity:
             matchLabels:
               app.kubernetes.io/instance: ocpp-service
 
+# Production has two schedulable nodes. Enforce one OCPP failure domain per
+# node so a node loss cannot remove every charger socket at once.
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: ocpp-service
+        app.kubernetes.io/name: common
+

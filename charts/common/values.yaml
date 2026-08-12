@@ -107,6 +107,7 @@ securityContext:
 nodeSelector: {}
 tolerations: []
 affinity: {}
+topologySpreadConstraints: []
 
 metrics:
   servicemonitor:
