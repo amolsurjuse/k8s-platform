@@ -32,9 +32,10 @@ config:
     INCREMENTAL_AUTHORIZATION_ENABLED: "false"
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
     SPRING_LIQUIBASE_ENABLED: "false"
-    # Stage 4 signed-meter verification is deployed inert. Keys and
-    # jurisdiction policy must be reviewed before either gate is enabled.
-    SESSION_SIGNED_METER_VERIFICATION_ENABLED: "false"
+    # Verify and persist signed evidence in shadow mode. Billing enforcement
+    # remains fail-safe until keys, transparency integration, and a reviewed
+    # jurisdiction policy are present.
+    SESSION_SIGNED_METER_VERIFICATION_ENABLED: "true"
     SESSION_SIGNED_METER_ENFORCEMENT_ENABLED: "false"
     KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
     SESSION_OCPP_EVENT_CONSUMER_ENABLED: "true"
