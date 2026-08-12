@@ -1,5 +1,8 @@
 replicaCount: 2
 
+podAnnotations:
+  electrahub.io/config-revision: "stage2-wss-fleet-v1"
+
 # Begin with one elected fleet owner. A standby replica is enabled only after
 # the owner lease and proxy behavior have been verified in production.
 deploymentStrategy:
@@ -27,6 +30,7 @@ extraFieldRefEnv:
 
 config:
   data:
+    DEFAULT_CSMS_URL: "wss://api.electrahub.net/ws/ocpp"
     SIMULATOR_CLUSTER_MODE: "leader"
     # Stage 35 is dark: bind manifests to production but trust no signer until
     # the separate CPS key ceremony and canary approval are complete.
