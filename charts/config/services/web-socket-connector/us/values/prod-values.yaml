@@ -1,6 +1,9 @@
 replicaCount: 1
 
 extraSecretEnv:
+  - name: "OCPP_HANDSHAKE_DERIVATION_KEY"
+    secretName: "ocpp-simulator-handshake-secret"
+    secretKey: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
   - name: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
     secretName: "ocpp-simulator-handshake-secret"
     secretKey: "OCPP_HANDSHAKE_SIMULATOR_PASSWORD"
