@@ -72,6 +72,9 @@ config:
     APP_GATEWAY_MOLLIE_WEBHOOK_BASE_URL: "https://api.electrahub.net/payment-gateway/api/v1/gateway/webhooks"
     MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "0.1"
 
+podAnnotations:
+  electrahub.net/security-config-revision: "springdoc-disabled-v1"
+
 replicaCount: 2
 
 resources:
