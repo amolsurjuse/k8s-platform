@@ -24,7 +24,7 @@ image:
   pullPolicy: Always
 
 podAnnotations:
-  electrahub.io/config-revision: "ocpp-workload-isolation-v3"
+  electrahub.io/config-revision: "signed-meter-shadow-v1"
 
 config:
   data:
