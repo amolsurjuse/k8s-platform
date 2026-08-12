@@ -19,6 +19,9 @@ config:
   data:
     APP_REFUNDS_ENABLED: "true"
     PAYMENT_GATEWAY_INCREMENTAL_AUTHORIZATION_ENABLED: "false"
+    PAYMENT_GATEWAY_ROUTING_ENABLED: "true"
+    PAYMENT_GATEWAY_ROUTING_ENFORCEMENT_ENABLED: "false"
+    PAYMENT_GATEWAY_PILOT_NETWORK_IDS: "NW-US-EAST-01,NW-EH-IND-DEMO"
     SPRINGDOC_API_DOCS_ENABLED: "false"
     SPRINGDOC_SWAGGER_UI_ENABLED: "false"
     PAYMENT_GATEWAY_CARD_ENROLLMENT_ENABLED: "true"
@@ -29,7 +32,7 @@ config:
     PAYMENT_GATEWAY_TOPUP_HOSTED_CHECKOUT_SCOPES: "IN|INR|ENT-IN-DEMO|NW-EH-IND-DEMO"
 
 podAnnotations:
-  electrahub.net/payment-config-revision: "regional-stripe-e2e-v1"
+  electrahub.net/payment-config-revision: "payment-route-shadow-v1"
 
 replicaCount: 2
 
