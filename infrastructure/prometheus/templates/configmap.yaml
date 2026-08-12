@@ -13,7 +13,7 @@ data:
         cluster: electrahub-k3d
 
     rule_files:
-      - /etc/prometheus/pnc-alerts.yml
+      - /etc/prometheus/platform-alerts.yml
 
     scrape_configs:
       - job_name: prometheus
@@ -68,7 +68,7 @@ data:
           - target_label: environment
             replacement: {{ default "prod" .environment | quote }}
 {{- end }}
-  pnc-alerts.yml: |
+  platform-alerts.yml: |
     groups:
       - name: plug-and-charge
         rules:
@@ -113,3 +113,63 @@ data:
             labels: { severity: warning, domain: plug-and-charge }
             annotations:
               summary: Plug & Charge certificate inventory refresh failed
+      - name: billing-analytics
+        rules:
+          - alert: BillingAnalyticsTargetDown
+            expr: sum(up{service="billing-service",environment="prod"}) < 1
+            for: 5m
+            labels: { severity: critical, domain: billing-analytics }
+            annotations:
+              summary: Billing analytics metrics target is unavailable
+              description: Prometheus has been unable to scrape the production billing service for five minutes.
+          - alert: BillingAnalyticsProjectionLagHigh
+            expr: max(electrahub_analytics_projection_oldest_unpublished_seconds{service="billing-service",environment="prod"}) > 120
+            for: 5m
+            labels: { severity: warning, domain: billing-analytics }
+            annotations:
+              summary: Billing analytics projection is more than two minutes behind
+              description: The oldest unpublished charging-session fact has exceeded the dashboard freshness SLO for five minutes.
+          - alert: BillingAnalyticsProjectionLagCritical
+            expr: max(electrahub_analytics_projection_oldest_unpublished_seconds{service="billing-service",environment="prod"}) > 900
+            for: 2m
+            labels: { severity: critical, domain: billing-analytics }
+            annotations:
+              summary: Billing analytics projection is more than fifteen minutes behind
+              description: Dashboard data is critically stale and the delivery worker or Elasticsearch requires intervention.
+          - alert: BillingAnalyticsDeadLetterPresent
+            expr: max(electrahub_analytics_projection_dead_backlog{service="billing-service",environment="prod"}) > 0
+            for: 2m
+            labels: { severity: critical, domain: billing-analytics }
+            annotations:
+              summary: Billing analytics has a dead-lettered projection
+              description: At least one charging-session fact exhausted its delivery attempts and requires replay or reconciliation.
+          - alert: BillingAnalyticsRetryBacklogPersistent
+            expr: max(electrahub_analytics_projection_retry_backlog{service="billing-service",environment="prod"}) > 0
+            for: 15m
+            labels: { severity: warning, domain: billing-analytics }
+            annotations:
+              summary: Billing analytics retry backlog is persistent
+              description: One or more projections have remained in retry for fifteen minutes.
+          - alert: BillingAnalyticsDeliveryStalled
+            expr: >-
+              max(electrahub_analytics_projection_pending{service="billing-service",environment="prod"}) > 0
+              and
+              sum(increase(electrahub_analytics_projection_published_total{service="billing-service",environment="prod"}[10m])) == 0
+            for: 10m
+            labels: { severity: critical, domain: billing-analytics }
+            annotations:
+              summary: Billing analytics delivery is stalled
+              description: Unpublished projections exist, but none has been published during the last ten minutes.
+          - alert: BillingAnalyticsHttp5xxRatioHigh
+            expr: >-
+              sum(rate(http_server_requests_seconds_count{service="billing-service",environment="prod",status=~"5.."}[10m]))
+              /
+              clamp_min(sum(rate(http_server_requests_seconds_count{service="billing-service",environment="prod"}[10m])), 0.001)
+              > 0.05
+              and
+              sum(increase(http_server_requests_seconds_count{service="billing-service",environment="prod"}[10m])) > 20
+            for: 10m
+            labels: { severity: warning, domain: billing-analytics }
+            annotations:
+              summary: Billing service HTTP 5xx ratio exceeds five percent
+              description: Production billing requests have sustained an elevated server-error ratio with meaningful traffic.

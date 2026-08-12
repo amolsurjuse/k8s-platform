@@ -152,6 +152,90 @@ data:
         }
       ]
     }
+  billing-analytics-operations.json: |
+    {
+      "uid": "billing-analytics-operations",
+      "title": "Billing Analytics Operations",
+      "tags": ["electrahub", "billing", "analytics", "production"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "15s",
+      "time": { "from": "now-6h", "to": "now" },
+      "panels": [
+        {
+          "id": 1,
+          "type": "stat",
+          "title": "Billing Target Up",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "sum(up{service=\"billing-service\",environment=\"prod\"})", "refId": "A" }],
+          "gridPos": { "h": 5, "w": 4, "x": 0, "y": 0 },
+          "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] } }, "overrides": [] }
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "Oldest Unpublished",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "max(electrahub_analytics_projection_oldest_unpublished_seconds{service=\"billing-service\",environment=\"prod\"})", "refId": "A" }],
+          "gridPos": { "h": 5, "w": 5, "x": 4, "y": 0 },
+          "fieldConfig": { "defaults": { "unit": "s", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 120 }, { "color": "red", "value": 900 }] } }, "overrides": [] }
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "Projection Backlog",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [
+            { "expr": "max(electrahub_analytics_projection_pending{service=\"billing-service\",environment=\"prod\"})", "legendFormat": "pending", "refId": "A" },
+            { "expr": "max(electrahub_analytics_projection_retry_backlog{service=\"billing-service\",environment=\"prod\"})", "legendFormat": "retry", "refId": "B" },
+            { "expr": "max(electrahub_analytics_projection_dead_backlog{service=\"billing-service\",environment=\"prod\"})", "legendFormat": "dead", "refId": "C" }
+          ],
+          "gridPos": { "h": 5, "w": 8, "x": 9, "y": 0 }
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Active Analytics Alerts",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "count(ALERTS{alertstate=\"firing\",domain=\"billing-analytics\"}) or vector(0)", "refId": "A" }],
+          "gridPos": { "h": 5, "w": 7, "x": 17, "y": 0 },
+          "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] }
+        },
+        {
+          "id": 5,
+          "type": "timeseries",
+          "title": "Projection Throughput and Retries",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [
+            { "expr": "sum(rate(electrahub_analytics_projection_published_total{service=\"billing-service\",environment=\"prod\"}[5m]))", "legendFormat": "published/s", "refId": "A" },
+            { "expr": "sum(rate(electrahub_analytics_projection_retries_total{service=\"billing-service\",environment=\"prod\"}[5m]))", "legendFormat": "retries/s", "refId": "B" },
+            { "expr": "sum(rate(electrahub_analytics_projection_dead_total{service=\"billing-service\",environment=\"prod\"}[5m]))", "legendFormat": "dead/s", "refId": "C" }
+          ],
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 }
+        },
+        {
+          "id": 6,
+          "type": "timeseries",
+          "title": "Projection Delivery P95",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [{ "expr": "histogram_quantile(0.95, sum by (le) (rate(electrahub_analytics_projection_delivery_seconds_bucket{service=\"billing-service\",environment=\"prod\"}[5m])))", "legendFormat": "p95", "refId": "A" }],
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+          "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] }
+        },
+        {
+          "id": 7,
+          "type": "timeseries",
+          "title": "Billing HTTP Traffic and 5xx",
+          "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+          "targets": [
+            { "expr": "sum(rate(http_server_requests_seconds_count{service=\"billing-service\",environment=\"prod\"}[5m]))", "legendFormat": "requests/s", "refId": "A" },
+            { "expr": "sum(rate(http_server_requests_seconds_count{service=\"billing-service\",environment=\"prod\",status=~\"5..\"}[5m]))", "legendFormat": "5xx/s", "refId": "B" }
+          ],
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 13 }
+        }
+      ]
+    }
   plug-and-charge-operations.json: |
     {
       "uid": "electrahub-pnc-operations",
