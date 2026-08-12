@@ -21,7 +21,7 @@ extraSecretEnv:
 replicaCount: 1
 
 podAnnotations:
-  electrahub.io/config-revision: "ocpp-kafka-producer-v1"
+  electrahub.io/config-revision: "stage2-credential-enforce-v1"
 
 # OCPP sessions are socket-local today. Recreate prevents a rollout from
 # briefly accepting two live WebSocket sessions for one charge point.
