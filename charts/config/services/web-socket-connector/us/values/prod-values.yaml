@@ -1,4 +1,4 @@
-replicaCount: 0
+replicaCount: 1
 
 extraSecretEnv:
   - name: "OCPP_HANDSHAKE_DERIVATION_KEY"
