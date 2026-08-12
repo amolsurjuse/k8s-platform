@@ -55,6 +55,7 @@ config:
     # Liquibase owns schema changes. Hibernate validates the result and cannot
     # mutate production implicitly during application startup.
     SPRING_JPA_HIBERNATE_DDL_AUTO: "validate"
+    SPRING_JPA_OPEN_IN_VIEW: "false"
     SPRING_LIQUIBASE_ENABLED: "true"
     KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
     OCPP_EVENT_KAFKA_ENABLED: "true"
