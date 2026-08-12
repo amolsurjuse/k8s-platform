@@ -30,6 +30,10 @@ config:
   data:
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
     SPRING_LIQUIBASE_ENABLED: "false"
+    # Stage 4 signed-meter verification is deployed inert. Keys and
+    # jurisdiction policy must be reviewed before either gate is enabled.
+    SESSION_SIGNED_METER_VERIFICATION_ENABLED: "false"
+    SESSION_SIGNED_METER_ENFORCEMENT_ENABLED: "false"
     KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
     SESSION_OCPP_EVENT_CONSUMER_ENABLED: "true"
     SESSION_OCPP_EVENT_TOPIC: "ocpp.device-events.v2"
