@@ -16,17 +16,18 @@ deploymentStrategy:
   type: Recreate
 
 env:
-  # Spread a 1,028-charger cold reconnect over about five minutes so OCPP
-  # authentication and its dependencies remain inside their resource budget.
-  CONNECTION_START_INTERVAL: "300ms"
+  # Admit at most twenty new sockets per second. This bounds cold-fleet and
+  # capacity-test authentication pressure while allowing a 10k fleet to
+  # recover within the production acceptance window.
+  CONNECTION_START_INTERVAL: "50ms"
 
 resources:
   requests:
-    cpu: "100m"
-    memory: "128Mi"
-  limits:
     cpu: "500m"
     memory: "512Mi"
+  limits:
+    cpu: "2"
+    memory: "2Gi"
 
 ingress:
   enabled: false
