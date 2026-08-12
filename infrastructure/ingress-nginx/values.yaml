@@ -1,4 +1,9 @@
 controller:
+  config:
+    # Cloudflare Tunnel terminates public TLS before forwarding to this
+    # controller. Preserve its trusted X-Forwarded-* scheme for applications
+    # that enforce secure transport at the edge.
+    use-forwarded-headers: "true"
   service:
     type: NodePort
 

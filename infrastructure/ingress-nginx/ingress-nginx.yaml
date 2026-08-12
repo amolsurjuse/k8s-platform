@@ -16,6 +16,10 @@ spec:
     helm:
       values: |
         controller:
+          config:
+            # Cloudflare Tunnel terminates public TLS before forwarding to
+            # ingress-nginx; preserve its trusted forwarded scheme.
+            use-forwarded-headers: "true"
           service:
             type: NodePort
           publishService:
