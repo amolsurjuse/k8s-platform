@@ -7,8 +7,9 @@
 - Rolling updates keep `maxUnavailable: 0`; the pre-stop hook drains sockets and
   returns WebSocket status 1012 so chargers reconnect.
 - A PodDisruptionBudget keeps one replica available during voluntary disruption.
-- A hard hostname topology-spread constraint prevents both replicas from sharing
-  one Kubernetes node while two schedulable nodes exist.
+- Required hostname pod anti-affinity prevents both replicas from sharing one
+  Kubernetes node. A topology-spread constraint additionally bounds skew as the
+  cluster grows.
 
 ## Production gates
 

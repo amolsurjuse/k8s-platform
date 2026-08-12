@@ -133,21 +133,17 @@ pdb:
   enabled: true
   minAvailable: 1
 
-# Keep OCPP replicas on different nodes when capacity permits. This is a
-# preference rather than a hard requirement so a single-node recovery does not
-# deadlock the deployment.
+# OCPP WebSockets are stateful. Never co-locate production replicas on one node;
+# a node loss must leave one CSMS endpoint available for fleet reconnects.
 affinity:
   podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          topologyKey: kubernetes.io/hostname
-          labelSelector:
-            matchLabels:
-              app.kubernetes.io/instance: ocpp-service
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: ocpp-service
 
-# Production has two schedulable nodes. Enforce one OCPP failure domain per
-# node so a node loss cannot remove every charger socket at once.
+# Keep skew explicit for observability and future clusters with more nodes.
 topologySpreadConstraints:
   - maxSkew: 1
     topologyKey: kubernetes.io/hostname
