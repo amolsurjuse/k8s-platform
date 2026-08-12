@@ -28,6 +28,8 @@ podAnnotations:
 
 config:
   data:
+    # Dormant until enterprise Adyen incremental-auth/SCA certification is complete.
+    INCREMENTAL_AUTHORIZATION_ENABLED: "false"
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
     SPRING_LIQUIBASE_ENABLED: "false"
     # Stage 4 signed-meter verification is deployed inert. Keys and
