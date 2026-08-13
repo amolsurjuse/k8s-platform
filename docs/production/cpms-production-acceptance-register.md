@@ -16,6 +16,7 @@ when its required real-world evidence is unavailable.
 | 12 OCPI expansion | 2.3.0 core sender discovery deployed; optional modules explicitly gated off | Conditional | Partner credentials and certification before Payments, Bookings, eMSP, or Hub roles |
 | 13 Payment hardening | Immutable balanced ledger proven; pilot route evaluation in shadow mode | Conditional | Provider certification, settlement imports, incremental authorisation, and chargeback operations |
 | 14 EU compliance engineering | Ad-hoc foundation and accessibility/security fixes deployed | Conditional | AFIR/NAP, EAA accessibility, GDPR/DPIA, metrology, and legal sign-off |
+| 15 SLO, monitoring, and disaster recovery | Core service availability, 5xx, latency, and dashboard freshness alerts plus an incident/restore runbook are deployed | Conditional | Complete an isolated restore drill and record measured RPO/RTO with named owners |
 
 ## Release rule
 

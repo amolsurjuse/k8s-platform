@@ -173,3 +173,37 @@ data:
             annotations:
               summary: Billing service HTTP 5xx ratio exceeds five percent
               description: Production billing requests have sustained an elevated server-error ratio with meaningful traffic.
+      - name: cpms-production-slo
+        rules:
+          - alert: CpmsCoreServiceUnavailable
+            expr: >-
+              max by (service) (up{environment="prod",service=~"api-gateway|auth-service|session-service|payment-service|billing-service|charger-management-service|station-management-service|ocpp-service|ocpi-service|pricing-service"}) == 0
+            for: 5m
+            labels: { severity: critical, domain: cpms, slo: availability }
+            annotations:
+              summary: "CPMS core service {{ `{{ $labels.service }}` }} is unavailable"
+              description: "No production target for {{ `{{ $labels.service }}` }} has been successfully scraped for five minutes. Follow the CPMS incident and DR runbook."
+          - alert: CpmsCoreServiceHttp5xxBurnRateHigh
+            expr: >-
+              sum by (service) (rate(http_server_requests_seconds_count{environment="prod",service=~"api-gateway|auth-service|session-service|payment-service|billing-service|charger-management-service|station-management-service|ocpp-service|ocpi-service|pricing-service",status=~"5.."}[10m]))
+              /
+              clamp_min(sum by (service) (rate(http_server_requests_seconds_count{environment="prod",service=~"api-gateway|auth-service|session-service|payment-service|billing-service|charger-management-service|station-management-service|ocpp-service|ocpi-service|pricing-service"}[10m])), 0.001)
+              > 0.05
+              and
+              sum by (service) (increase(http_server_requests_seconds_count{environment="prod",service=~"api-gateway|auth-service|session-service|payment-service|billing-service|charger-management-service|station-management-service|ocpp-service|ocpi-service|pricing-service"}[10m])) > 20
+            for: 10m
+            labels: { severity: critical, domain: cpms, slo: errors }
+            annotations:
+              summary: "CPMS service {{ `{{ $labels.service }}` }} exceeds the 5xx error budget"
+              description: "The production HTTP 5xx ratio has exceeded five percent with meaningful traffic for ten minutes."
+          - alert: CpmsCoreServiceLatencyHigh
+            expr: >-
+              histogram_quantile(0.95,
+                sum by (service, le) (rate(http_server_requests_seconds_bucket{environment="prod",service=~"api-gateway|auth-service|session-service|payment-service|billing-service|charger-management-service|station-management-service|ocpp-service|ocpi-service|pricing-service"}[10m]))) > 2
+              and
+              sum by (service) (increase(http_server_requests_seconds_count{environment="prod",service=~"api-gateway|auth-service|session-service|payment-service|billing-service|charger-management-service|station-management-service|ocpp-service|ocpi-service|pricing-service"}[10m])) > 20
+            for: 10m
+            labels: { severity: warning, domain: cpms, slo: latency }
+            annotations:
+              summary: "CPMS service {{ `{{ $labels.service }}` }} p95 latency exceeds two seconds"
+              description: "Production p95 server latency has exceeded the provisional two-second threshold for ten minutes."
