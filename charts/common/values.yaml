@@ -36,6 +36,8 @@ secrets:
   env: {}   # ENV_NAME: secretKey
 extraSecretEnv: [] # [{name: ENV_NAME, secretName: secret-name, secretKey: key, optional: false}]
 extraFieldRefEnv: [] # [{name: ENV_NAME, fieldPath: status.podIP, apiVersion: v1}]
+extraVolumeMounts: []
+extraVolumes: []
 
 resources:
   requests:

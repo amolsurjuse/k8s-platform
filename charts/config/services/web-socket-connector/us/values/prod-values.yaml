@@ -20,6 +20,20 @@ env:
   # capacity-test authentication pressure while allowing a 10k fleet to
   # recover within the production acceptance window.
   CONNECTION_START_INTERVAL: "50ms"
+  # A charger loads only files matching its own ID. This directory is backed
+  # by a runtime Secret and never by Git-managed certificate material.
+  OCPP_MTLS_CERTIFICATE_DIR: "/var/run/electrahub/charger-certs"
+
+extraVolumeMounts:
+  - name: profile3-canary-certificate
+    mountPath: /var/run/electrahub/charger-certs
+    readOnly: true
+
+extraVolumes:
+  - name: profile3-canary-certificate
+    secret:
+      secretName: ocpp-profile3-canary-cert
+      defaultMode: 0440
 
 resources:
   requests:
