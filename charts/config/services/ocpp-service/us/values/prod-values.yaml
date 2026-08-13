@@ -106,10 +106,12 @@ livenessProbe:
 
 resources:
   requests:
-    cpu: "1"
+    # Reserve enough CPU for the normal fleet and allow one pod per node to
+    # absorb BCrypt reconnect plus heartbeat bursts during the 5k HA gate.
+    cpu: "2"
     memory: "2Gi"
   limits:
-    cpu: "4"
+    cpu: "8"
     memory: "4Gi"
 
 ingress:

@@ -28,6 +28,22 @@
 The scale gate must use isolated synthetic charger identities. It must not create
 production billing sessions or overload the registered operational fleet.
 
+## Capacity-test observations (2026-08-13 UTC)
+
+- The first 5,000-connection attempt used an invalid 100 connections/second
+  ramp. Both 4-core replicas saturated during BCrypt authentication, so the Job
+  was aborted before failover and the operational fleet recovered completely.
+- The probe default was corrected to the deployed cold-fleet budget of 20
+  connections/second. The second run remained healthy through about 1,900
+  synthetic sockets, then heartbeat plus authentication work saturated both
+  replicas near 4,000-4,400 started sockets. The Job was aborted; memory stayed
+  stable and both production replicas remained available.
+- The resulting capacity correction raises the per-replica CPU request/limit
+  from 1/4 to 2/8 cores while retaining exactly two replicas, hard node
+  anti-affinity, the PodDisruptionBudget, and the same immutable application
+  image. A passing 5,000 steady-state and failover run is still required before
+  this gate is closed.
+
 ## Rollback
 
 Remove the topology constraint first if a node is unavailable and a replacement
