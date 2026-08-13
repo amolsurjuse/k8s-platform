@@ -18,7 +18,7 @@ extraSecretEnv:
 replicaCount: 2
 
 podAnnotations:
-  electrahub.io/config-revision: "ocpp-handshake-enforce-v1"
+  electrahub.io/config-revision: "profile3-fleet-pki-audit-v1"
 
 env:
   JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m"
@@ -37,6 +37,7 @@ config:
     OCPP_CONNECTION_MARKER_TTL_SECONDS: "120"
     # The synthetic fleet has completed a credentialed reconnect cycle.
     OCPP_HANDSHAKE_SECURITY_MODE: "ENFORCE"
+    OCPP_MTLS_MODE: "AUDIT"
 
 terminationGracePeriodSeconds: 60
 

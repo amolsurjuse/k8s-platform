@@ -21,7 +21,7 @@ extraSecretEnv:
 replicaCount: 2
 
 podAnnotations:
-  electrahub.io/config-revision: "stage2-ha-routing-v1"
+  electrahub.io/config-revision: "profile3-fleet-pki-audit-v1"
 
 deploymentStrategy:
   type: RollingUpdate
@@ -70,6 +70,10 @@ config:
     # enforcement remains a separate WSS ingress gate below this phase.
     OCPP_HANDSHAKE_SECURITY_MODE: "ENFORCE"
     OCPP_HANDSHAKE_REQUIRE_SECURE_TRANSPORT: "true"
+    # Profile 3 starts in audit mode. Cloudflare validates the transport
+    # certificate; the CSMS independently binds its fingerprint to charger ID.
+    # Change to ENFORCE only after the fleet reconnect acceptance gate passes.
+    OCPP_MTLS_MODE: "AUDIT"
 
 terminationGracePeriodSeconds: 60
 
