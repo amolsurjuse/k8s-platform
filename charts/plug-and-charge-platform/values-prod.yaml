@@ -1,8 +1,8 @@
 replicaCount: 2
 
 image:
-  tag: 590534a
-  digest: sha256:766b40de48c2166ad5dc76083b987777f12fb6419269bf5f4e7330aa000434c6
+  tag: jdk25-3927b09
+  digest: sha256:e56bab869fe1c0b9d966afc0a3aec43fcdec68197176f45d32e2f37f4a6c2355
 
 features:
   enabled: true
