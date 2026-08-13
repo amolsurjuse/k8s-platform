@@ -1,2 +1,3 @@
 image:
-  tag: "5"
+  tag: "jdk25-fd34113"
+  digest: "sha256:87ee8d89cf35824d2feac27c20b1750fe13c226f3322c12489014b02ea52e57b"
