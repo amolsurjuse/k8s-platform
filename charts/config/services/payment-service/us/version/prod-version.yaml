@@ -1,3 +1,3 @@
 image:
-  tag: "41"
-  digest: "sha256:bb4e28510ad83eb03a99563c68780e5d22b1fd62fb60fd3e6c9625eb7ba0c98f"
+  tag: "jdk25-5775950"
+  digest: "sha256:d47c40320781dee7b818cf186f2ef1159f0e26b7994ad22145e853bbb1adde23"
