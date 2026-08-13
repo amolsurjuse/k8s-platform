@@ -4,6 +4,14 @@ Use this folder to create or repair ElectraHub TeamCity pipelines from any machi
 
 The Python script uses only the standard library. It does not require Bash, curl, or jq on the machine where you run it.
 
+## Java build-agent baseline
+
+Java build agents use `Dockerfile.agent-jdk25`, which preserves the existing
+TeamCity/Docker tooling and runs the agent itself on Temurin 25 with Maven
+3.9.12. Generated Maven build steps use the same digest-pinned Maven 3.9.12 and
+Temurin 25 container while compiling application bytecode at each repository's
+configured `--release` level.
+
 ## Prerequisites
 
 - Python 3.9 or newer

@@ -1,0 +1,15 @@
+FROM maven:3.9.12-eclipse-temurin-25@sha256:4f82a03a7d6679281952d628131299b1be88d7030a49c6a2b7d2ba2642e44e3e AS maven-toolchain
+FROM eclipse-temurin:25.0.3_9-jdk@sha256:c42fecf62f32725c65cfea284c012526d6fb31cc78123c740ebdc1cfd2dced12 AS jdk-toolchain
+
+# Preserve the existing TeamCity agent, Docker CLI, and build tools while
+# replacing the agent JVM and host Maven toolchain with the fleet baseline.
+FROM electrahub/teamcity-agent-maven:20260704
+USER root
+COPY --from=jdk-toolchain /opt/java/openjdk /opt/temurin-25
+COPY --from=maven-toolchain /usr/share/maven /opt/apache-maven-3.9.12
+ENV JAVA_HOME=/opt/temurin-25 \
+    JDK_HOME=/opt/temurin-25 \
+    MAVEN_HOME=/opt/apache-maven-3.9.12 \
+    PATH=/opt/apache-maven-3.9.12/bin:/opt/temurin-25/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+RUN java -version && mvn -version && docker --version

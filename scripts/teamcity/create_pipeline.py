@@ -616,7 +616,7 @@ docker volume create "$MAVEN_CACHE_VOLUME" >/dev/null
 tar --exclude=.git --exclude=target -cf - . | docker run --rm -i \\
   --entrypoint sh \\
   -v "$MAVEN_CACHE_VOLUME:/root/.m2" \\
-  "maven:3.9.9-eclipse-temurin-21" \\
+  "maven:3.9.12-eclipse-temurin-25@sha256:4f82a03a7d6679281952d628131299b1be88d7030a49c6a2b7d2ba2642e44e3e" \\
   -lc {command}
 """
     if cfg.copy_build_artifacts:
@@ -626,7 +626,7 @@ MAVEN_CACHE_VOLUME="electrahub-maven-cache"
 docker volume create "$MAVEN_CACHE_VOLUME" >/dev/null
 CID="$(docker create -i --entrypoint sh \\
   -v "$MAVEN_CACHE_VOLUME:/root/.m2" \\
-  "maven:3.9.9-eclipse-temurin-21" \\
+  "maven:3.9.12-eclipse-temurin-25@sha256:4f82a03a7d6679281952d628131299b1be88d7030a49c6a2b7d2ba2642e44e3e" \\
   -lc {command})"
 cleanup() {{ docker rm -f "$CID" >/dev/null 2>&1 || true; }}
 trap cleanup EXIT
