@@ -49,6 +49,40 @@ Cloudflare's connection rather than the charger's certificate.
 - Full-fleet reconnect meets the existing capacity SLO with zero lost sessions.
 - Rollback to audit mode is documented and tested without reverting schema.
 
+## Production canary evidence (2026-08-13 UTC)
+
+- OCPP image 44 (`sha256:05d573...2c48`) is healthy on two replicas on
+  separate nodes with zero restarts; Profile 2 remains `ENFORCE` and Profile 3
+  fleet mode remains `AUDIT`.
+- WebSocket connector image 32 (`sha256:40bd58...5e9`) mounts the runtime-only
+  certificate Secret. Chargers without an enrolled certificate continue using
+  Profile 2, so the 1,028-connection fleet was not interrupted.
+- Cloudflare requests and validates client certificates for
+  `api.electrahub.net`. Transform rule order is security-sensitive: remove any
+  incoming `Client-Cert` first, then set it from
+  `cf.tls_client_auth.cert_rfc9440` only when the certificate is verified and
+  not revoked.
+- Active WAF rule `OCPP Profile 3 canary - EH-IN-CHG-0001` blocks an
+  unverified connection only on that charger's WebSocket path. The negative
+  probe returned HTTP 403 at Cloudflare.
+- `EH-IN-CHG-0001` uses an ECDSA P-256, one-year leaf certificate whose SHA-256
+  fingerprint is bound to the same charge-point ID in the CSMS. A forced
+  reconnect succeeded, the OCPP metric recorded
+  `outcome="accepted",protocol="ocpp1.6" = 1`, and heartbeats continued for
+  more than two minutes after reconnect.
+- A first connector canary exposed an overly strict certificate-directory
+  fallback. It was rolled back immediately, corrected in image 32, and
+  redeployed. The corrected behavior fails closed for partial certificate
+  material while preserving Profile 2 for chargers with no certificate files.
+
+## Fleet enforcement gate
+
+The platform implementation and production canary are complete. Fleet-wide
+`OCPP_MTLS_MODE=ENFORCE` is intentionally gated until every intended physical
+charger has its own certificate and the batch reconnect, rotation, revocation,
+and rollback exercises above have passed. Enabling it before that point would
+disconnect otherwise healthy Profile 2 chargers.
+
 ## Rollback
 
 Set `OCPP_MTLS_MODE=AUDIT` and sync the OCPP application. Do not remove the
