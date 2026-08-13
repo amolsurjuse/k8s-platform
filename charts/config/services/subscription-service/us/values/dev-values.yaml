@@ -1,6 +1,11 @@
 secrets:
   existingSecretName: "postgresql-dev-secret"
 
+extraSecretEnv:
+  - name: "ENV_REDIS_PASSWORD"
+    secretName: "redis-dev-secret"
+    secretKey: "redis-password"
+
 replicaCount: 1
 
 resources:
