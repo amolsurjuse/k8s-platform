@@ -35,4 +35,10 @@ data:
         service: http://teamcity-external.cloudflare.svc.cluster.local:8111
       - hostname: docs.electrahub.net
         service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: identity.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: identity-gateway.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - hostname: identity-admin.electrahub.net
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
       - service: http_status:404
