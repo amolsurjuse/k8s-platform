@@ -10,8 +10,6 @@ extraSecretEnv:
   - name: BOOKSTACK_TOKEN_SECRET
     secretName: ai-support-bookstack-secret
     secretKey: BOOKSTACK_TOKEN_SECRET
-
-extraSecretEnv:
   - name: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
     secretName: "access-context-prod-secret"
     secretKey: "APP_INTERNAL_ACCESS_CONTEXT_SECRET"
