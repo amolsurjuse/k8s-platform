@@ -31,9 +31,10 @@ config:
   data:
     SUPPORT_EMAIL: "support@electrahub.com"
     AI_STREAM_TOKEN_DELAY_MS: "0"
-    AI_PROVIDER: "ollama"
-    AI_MODEL: "electrahub-sparky:4b"
-    OLLAMA_BASE_URL: "http://host.docker.internal:11434"
+    AI_PROVIDER: "openai"
+    AI_PROVIDER_CHAIN: "openai"
+    AI_MODEL: "gpt-5.6-luna"
+    AI_OLLAMA_ENABLED: "false"
     AI_TEMPERATURE: "0.12"
     AI_MAX_OUTPUT_TOKENS: "320"
     AI_LLM_TIMEOUT_MS: "30000"
