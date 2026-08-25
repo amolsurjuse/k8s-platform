@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "grafana.labels" . | nindent 4 }}
 data:
+  payment-service-slo.json: |
+{{ .Files.Get "dashboards/payment-service-slo.json" | nindent 4 }}
   electrahub-services.json: |
     {
       "uid": "electrahub-services",

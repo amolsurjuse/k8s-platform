@@ -1,0 +1,225 @@
+{
+  "uid": "payment-service-slo",
+  "title": "Payment Service SLO",
+  "description": "Operational SLO dashboard for payment-service. Targets are candidate internal objectives pending a representative production baseline and owner approval: 99.9% API availability and 99% of eligible requests below 2.5 seconds.",
+  "tags": ["electrahub", "payments", "slo", "prometheus"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "label": "Environment",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+        "query": "label_values(up{service=\"payment-service\",job=\"payment-service-pods\"}, environment)",
+        "refresh": 1,
+        "current": { "selected": true, "text": "prod", "value": "prod" }
+      },
+      {
+        "name": "operation",
+        "label": "Payment operation",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+        "query": "label_values(payment_transaction_attempts_total{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"}, operation)",
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1,
+        "current": { "selected": true, "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "provider",
+        "label": "Provider",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+        "query": "label_values(payment_transaction_attempts_total{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"}, provider)",
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1,
+        "current": { "selected": true, "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "API Availability (candidate 99.9%)",
+      "description": "Non-5xx eligible requests divided by all eligible requests. Actuator traffic is excluded.",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "100 * sum(rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",status!~\"5..\",uri!~\"/actuator.*\"}[$__rate_interval])) / clamp_min(sum(rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[$__rate_interval])), 0.000001)" }],
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 3, "min": 0, "max": 100, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99.5 }, { "color": "green", "value": 99.9 }] } }, "overrides": [] }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Latency Compliance (candidate 99% < 2.5s)",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "100 * sum(rate(http_server_requests_seconds_bucket{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\",le=\"2.5\"}[$__rate_interval])) / clamp_min(sum(rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[$__rate_interval])), 0.000001)" }],
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "min": 0, "max": 100, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 98 }, { "color": "green", "value": 99 }] } }, "overrides": [] }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Availability Error Budget Remaining",
+      "description": "Remaining share of a 0.1% error budget over the selected dashboard range.",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "clamp_max(clamp_min(100 * (1 - ((1 - (sum(increase(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",status!~\"5..\",uri!~\"/actuator.*\"}[$__range])) / clamp_min(sum(increase(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[$__range])), 1))) / 0.001)), 0), 100)" }],
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 1, "min": 0, "max": 100, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 25 }, { "color": "green", "value": 50 }] } }, "overrides": [] }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Reconciliation Age",
+      "description": "Candidate freshness objective: under 15 minutes.",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "max(payment_reconciliation_age_seconds{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})" }],
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "s", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 600 }, { "color": "red", "value": 900 }] } }, "overrides": [] }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Eligible Request Rate by Status",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "sum by (status) (rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[$__rate_interval]))", "legendFormat": "{{status}}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "HTTP Latency Percentiles",
+      "description": "Diagnostic percentiles; SLO compliance uses the fixed 2.5-second bucket ratio above.",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(http_server_requests_seconds_bucket{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[$__rate_interval])))", "legendFormat": "p50" },
+        { "refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[$__rate_interval])))", "legendFormat": "p95" },
+        { "refId": "C", "expr": "histogram_quantile(0.99, sum by (le) (rate(http_server_requests_seconds_bucket{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[$__rate_interval])))", "legendFormat": "p99" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Availability Error-Budget Burn Rate",
+      "description": "1.0 consumes the 99.9% availability budget at the sustainable rate; 14.4 is the initial fast-burn diagnostic threshold.",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "(1 - (sum(rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",status!~\"5..\",uri!~\"/actuator.*\"}[1h])) / clamp_min(sum(rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[1h])), 0.000001))) / 0.001", "legendFormat": "1h burn" },
+        { "refId": "B", "expr": "(1 - (sum(rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",status!~\"5..\",uri!~\"/actuator.*\"}[6h])) / clamp_min(sum(rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",uri!~\"/actuator.*\"}[6h])), 0.000001))) / 0.001", "legendFormat": "6h burn" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "fieldConfig": { "defaults": { "unit": "none", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 14.4 }] } }, "overrides": [] }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "HTTP 4xx and 5xx Rate",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "sum by (status) (rate(http_server_requests_seconds_count{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",status=~\"4..|5..\",uri!~\"/actuator.*\"}[$__rate_interval]))", "legendFormat": "HTTP {{status}}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Payment Transaction Attempts",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "sum by (operation, outcome, provider) (rate(payment_transaction_attempts_total{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",operation=~\"$operation\",provider=~\"$provider\"}[$__rate_interval]))", "legendFormat": "{{operation}} {{outcome}} {{provider}}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Payment Success Ratio by Operation",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "100 * sum by (operation) (rate(payment_transaction_attempts_total{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",operation=~\"$operation\",provider=~\"$provider\",outcome=\"success\"}[$__rate_interval])) / clamp_min(sum by (operation) (rate(payment_transaction_attempts_total{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",operation=~\"$operation\",provider=~\"$provider\"}[$__rate_interval])), 0.000001)", "legendFormat": "{{operation}}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100 }, "overrides": [] }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Payment Transaction p95 Latency",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "histogram_quantile(0.95, sum by (le, operation, provider) (rate(payment_transaction_duration_seconds_bucket{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",operation=~\"$operation\",provider=~\"$provider\"}[$__rate_interval])))", "legendFormat": "{{operation}} {{provider}}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 29 },
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Outbox Publication Outcomes",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "sum by (event_type, outcome) (rate(payment_outbox_messages_total{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"}[$__rate_interval]))", "legendFormat": "{{event_type}} {{outcome}}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 29 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Outbox and Reconciliation Freshness",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "max(payment_outbox_oldest_message_age_seconds{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "oldest outbox message" },
+        { "refId": "B", "expr": "max(payment_reconciliation_age_seconds{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "reconciliation age" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 37 },
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] }
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Database Pool Saturation",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "max by (pod) (hikaricp_connections_active{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "active {{pod}}" },
+        { "refId": "B", "expr": "max by (pod) (hikaricp_connections_pending{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "pending {{pod}}" },
+        { "refId": "C", "expr": "max by (pod) (hikaricp_connections_max{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "max {{pod}}" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 37 }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "JVM Heap and Process CPU",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (pod) (jvm_memory_used_bytes{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\",area=\"heap\"})", "legendFormat": "heap {{pod}}" },
+        { "refId": "B", "expr": "max by (pod) (process_cpu_usage{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "CPU {{pod}}" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 45 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [{ "matcher": { "id": "byRegexp", "options": "/^heap/" }, "properties": [{ "id": "unit", "value": "bytes" }] }, { "matcher": { "id": "byRegexp", "options": "/^CPU/" }, "properties": [{ "id": "unit", "value": "percentunit" }] }] }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Payment Integrity Risk Gauges",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "max(electrahub_payment_ledger_gaps{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "ledger gaps" },
+        { "refId": "B", "expr": "max(electrahub_payment_ledger_unbalanced_journals{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "unbalanced journals" },
+        { "refId": "C", "expr": "max(electrahub_payment_disputes_overdue_evidence{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "overdue dispute evidence" },
+        { "refId": "D", "expr": "max(electrahub_payment_settlements_variances{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"})", "legendFormat": "settlement variances" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 45 }
+    },
+    {
+      "id": 17,
+      "type": "table",
+      "title": "Payment-Service Scrape Targets",
+      "datasource": { "type": "prometheus", "uid": "electrahub-prometheus" },
+      "targets": [{ "refId": "A", "expr": "up{service=\"payment-service\",job=\"payment-service-pods\",environment=\"$environment\"}", "format": "table", "instant": true }],
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 53 }
+    }
+  ]
+}
