@@ -24,12 +24,15 @@ image:
   pullPolicy: Always
 
 podAnnotations:
-  electrahub.io/config-revision: "signed-meter-shadow-v1"
+  electrahub.io/config-revision: "eur-card-authorization-hold-v1"
 
 config:
   data:
     # Dormant until enterprise Adyen incremental-auth/SCA certification is complete.
     INCREMENTAL_AUTHORIZATION_ENABLED: "false"
+    # Card authorization exposure is independent from the wallet reserve.
+    # Unlisted currencies retain the application fallback until explicitly approved.
+    SESSION_CARD_AUTHORIZATION_HOLDS_BY_CURRENCY: "EUR=100.00"
     SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
     SPRING_LIQUIBASE_ENABLED: "false"
     # Verify and persist signed evidence in shadow mode. Billing enforcement
