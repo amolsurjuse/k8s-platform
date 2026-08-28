@@ -32,6 +32,9 @@ config:
     NOTIFICATION_DRIVER_RESET_PASSWORD_URL: "https://driver-portal-dev.electrahub.net/reset-password"
 
 extraSecretEnv:
+  - name: APP_SECURITY_INTERNAL_TOKEN
+    secretName: electrahub-internal-service-token
+    secretKey: APP_SECURITY_INTERNAL_TOKEN
   - name: FIREBASE_SERVICE_ACCOUNT_BASE64
     secretName: notification-firebase-secret
     secretKey: FIREBASE_SERVICE_ACCOUNT_BASE64
