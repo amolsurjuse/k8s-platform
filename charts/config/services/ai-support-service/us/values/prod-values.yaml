@@ -85,3 +85,6 @@ config:
     AI_MAX_OUTPUT_TOKENS: "180"
     AI_LLM_TIMEOUT_MS: "30000"
     AI_BOOKSTACK_ENABLED: "true"
+    AI_SUPPORT_MCP_ENABLED: "true"
+    AI_SUPPORT_MCP_URL: "http://support-mcp-service:8095/mcp"
+    AI_SUPPORT_MCP_MODEL_PLANNING_ENABLED: "true"

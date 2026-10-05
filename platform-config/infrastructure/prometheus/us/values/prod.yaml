@@ -57,6 +57,10 @@ scrapeTargets:
     namespace: prod
     environment: prod
     targets: ["ai-support-service.prod.svc.cluster.local:8094"]
+  - name: support-mcp-service
+    namespace: prod
+    environment: prod
+    targets: ["support-mcp-service-metrics.prod.svc.cluster.local:8097"]
   - name: plug-and-charge-platform
     namespace: prod
     environment: prod

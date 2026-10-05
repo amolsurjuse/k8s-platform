@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: support-mcp-memory
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: {{ .Values.memory.storageClassName | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.memory.size | quote }}

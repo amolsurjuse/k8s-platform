@@ -11,6 +11,9 @@ extraSecretEnv:
   - name: "APP_SECURITY_INTERNAL_TOKEN"
     secretName: "electrahub-internal-service-token"
     secretKey: "APP_SECURITY_INTERNAL_TOKEN"
+  - name: "APP_SERVICES_PAYMENT_DIAGNOSTICS_INTERNAL_TOKEN"
+    secretName: "electrahub-internal-service-token"
+    secretKey: "APP_SECURITY_INTERNAL_TOKEN"
 
 # A charging burst drives both synchronous starts and OCPP status/meter events.
 # Four replicas isolate that fan-out while keeping the aggregate PostgreSQL

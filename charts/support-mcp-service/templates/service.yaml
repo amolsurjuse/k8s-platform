@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-mcp-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: support-mcp-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: support-mcp-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - name: mcp
+      port: 8095
+      targetPort: mcp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-mcp-service-metrics
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: support-mcp-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: support-mcp-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - name: management
+      port: 8097
+      targetPort: management

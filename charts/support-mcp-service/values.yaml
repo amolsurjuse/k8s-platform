@@ -1,0 +1,40 @@
+image:
+  repository: amolsurjuse/ai-support-service
+  tag: sparky-mcp-20261005-607dc21
+  # A published immutable digest is mandatory before rendering for deployment.
+  digest: "sha256:37d69206e20b7d1e094e626fa69506dce17f7ab2a1515005c7711ce49a07fa71"
+  pullPolicy: IfNotPresent
+
+identitySecret:
+  name: access-context-prod-secret
+  key: APP_INTERNAL_ACCESS_CONTEXT_SECRET
+
+gatewayUrl: http://api-gateway:8090
+cluster:
+  enabled: true
+  id: k3d-electrahub-prod
+  reconcileMs: 60000
+  ttlSeconds: 180
+  # Both the service address and its observed post-DNAT destination are narrow.
+  # Reconcile these values if the k3d control-plane IP changes.
+  apiServiceCidr: 10.43.0.1/32
+  apiEndpointCidr: 172.19.0.4/32
+  apiEndpointPort: 6443
+
+memory:
+  storageClassName: local-path
+  size: 1Gi
+
+monitoring:
+  namespace: monitoring
+  instance: prometheus
+  environment: prod
+  region: us
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
