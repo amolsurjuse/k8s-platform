@@ -1,8 +1,8 @@
 image:
   repository: amolsurjuse/ai-support-service
-  tag: sparky-mcp-timeout-20261006-5eefe43
+  tag: sparky-mcp-readonly-20261006-9632631
   # A published immutable digest is mandatory before rendering for deployment.
-  digest: "sha256:0960f0a998da1e2846ee64b17fe778c6e6200989a624a6207d333d59dadafec8"
+  digest: "sha256:069cdc0ccd18844e94bef165cc795272a751d0a8b5067ee9e96769c752fa69d0"
   pullPolicy: IfNotPresent
 
 identitySecret:
